@@ -1,0 +1,7 @@
+# Folder view configuration files
+.DS_Store
+xcuserdata
+*.xcscheme
+*.xcuserstate
+xcschememanagement.plist
+Pods
