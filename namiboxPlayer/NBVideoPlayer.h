@@ -55,17 +55,17 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  *
  *  @param seconds 时间点
  */
-- (void)seekToTime:(CGFloat)seconds;
+//- (void)seekToTime:(CGFloat)seconds;
 
 /**
  * 恢复播放
  */
-- (void)resume;
+//- (void)resume;
 
 /**
  *  暂停播放
  */
-- (void)pause;
+//- (void)pause;
 
 /**
  *  停止播放
@@ -75,22 +75,22 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 /**
  *  全屏
  */
-- (void)fullScreen;
+//- (void)fullScreen;
 
 /**
  *  隐藏工具条
  */
-- (void)toolViewHidden;
+//- (void)toolViewHidden;
 
 /**
  *  显示工具条
  */
-- (void)showToolView;
+//- (void)showToolView;
 
 /**
  *  半屏幕
  */
-- (void)halfScreen;
+//- (void)halfScreen;
 
 /**
  *  清除所有本地缓存视频文件

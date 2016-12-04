@@ -75,8 +75,8 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, strong) UIView         *statusBarBgView;        //全屏状态栏的背景view
 @property (nonatomic, strong) UIView         *toolView;
-@property (nonatomic, strong) UILabel        *currentTimeLbl;
-@property (nonatomic, strong) UILabel        *totalTimeLbl;
+@property (nonatomic, strong) UILabel        *currentTimeLbl;         //当前播放时间
+@property (nonatomic, strong) UILabel        *totalTimeLbl;           //总共播放时间
 @property (nonatomic, strong) UIProgressView *videoProgressView;      //缓冲进度条
 @property (nonatomic, strong) UISlider       *playSlider;             //滑竿
 @property (nonatomic, strong) UIButton       *stopButton;             //播放暂停按钮
@@ -254,67 +254,8 @@ typedef enum : NSUInteger {
     
 }
 
-+ (void)clearAllVideoCache {
-    NSFileManager *fileManager=[NSFileManager defaultManager];
-    //这里自己写需要保存数据的路径
-    NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
-    for (NSString *fileName in childFiles) {
-        //如有需要，加入条件，过滤掉不想删除的文件
-        NSLog(@"%@", fileName);
-        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
-            NSString *absolutePath=[cachPath stringByAppendingPathComponent:fileName];
-            [fileManager removeItemAtPath:absolutePath error:nil];
-        }
-    }
-}
-
-+ (double)allVideoCacheSize {
-    
-    double cacheVideoSize = 0.0f;
-    
-    NSFileManager *fileManager=[NSFileManager defaultManager];
-    //这里自己写需要保存数据的路径
-    NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
-    for (NSString *fileName in childFiles) {
-        //如有需要，加入条件，过滤掉不想删除的文件
-        NSLog(@"%@", fileName);
-        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
-            NSString *path = [cachPath stringByAppendingPathComponent: fileName];
-            NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath: path error: nil ];
-            cacheVideoSize += ((double)([fileAttributes fileSize ]) / 1024.0 / 1024.0);
-        }
-    }
-    
-    return cacheVideoSize;
-}
-
 + (void)clearVideoCache:(NSString *)url {
     
-}
-
-- (void)seekToTime:(CGFloat)seconds {
-    if (self.state == NBPlayerStateStopped) {
-        return;
-    }
-    
-    seconds = MAX(0, seconds);
-    seconds = MIN(seconds, self.duration);
-    
-    [self.player pause];
-    [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
-        self.isPauseByUser = NO;
-        [self.player play];
-        if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
-            self.state = NBPlayerStateBuffering;
-            
-            self.actIndicator.hidden = NO;
-            [self.actIndicator startAnimating];
-            //            [[XCHudHelper sharedInstance] showHudOnView:_showView caption:nil image:nil acitivity:YES autoHideTime:0];
-        }
-        
-    }];
 }
 
 #pragma mark - observer
@@ -670,6 +611,7 @@ typedef enum : NSUInteger {
         make.left.mas_equalTo(0);
     }];
     
+    // 横屏的时候显示status bar
     [self.statusBarBgView removeFromSuperview];
     [_showView addSubview:self.statusBarBgView];
     [self.statusBarBgView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -679,7 +621,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(20);
     }];
     
-    self.toolView.frame = CGRectMake(0, CGRectGetHeight(_showView.frame) - 44, CGRectGetWidth(_showView.frame), 44);
     [self.toolView removeFromSuperview];
     [_showView addSubview:self.toolView];
     [self.toolView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -689,7 +630,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
-    self.stopButton.frame = CGRectMake(0, 0, 44, 44);
     [self.stopButton removeFromSuperview];
     [self.toolView addSubview:self.stopButton];
     [self.stopButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -699,7 +639,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
-    self.screenButton.frame = CGRectMake(CGRectGetWidth(self.toolView.frame) - 44, 0, 44, 44);
     [self.screenButton removeFromSuperview];
     [self.toolView addSubview:self.screenButton];
     [self.screenButton mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -709,6 +648,7 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
+    // 当前播放时间
     self.currentTimeLbl.frame = CGRectMake(44, 0, 52, 44);
     [self.currentTimeLbl removeFromSuperview];
     [self.toolView addSubview:self.currentTimeLbl];
@@ -719,7 +659,7 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
-    self.totalTimeLbl.frame = CGRectMake(CGRectGetWidth(self.toolView.frame) - 52 - 44, 0, 52, 44);
+    // 总共播放时间
     [self.totalTimeLbl removeFromSuperview];
     [self.toolView addSubview:self.totalTimeLbl];
     [self.totalTimeLbl mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -729,10 +669,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
-    CGFloat playSliderWidth = CGRectGetWidth(self.toolView.frame) - 2 * CGRectGetMaxX(self.currentTimeLbl.frame);
-    self.videoProgressView.frame = CGRectMake(CGRectGetMaxX(self.currentTimeLbl.frame), 21, playSliderWidth, 20);
-    
-    self.playSlider.frame = CGRectMake(CGRectGetMaxX(self.currentTimeLbl.frame), 0, playSliderWidth, 44);
     [self.playSlider removeFromSuperview];
     [self.toolView addSubview:self.playSlider];
     [self.playSlider mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -742,6 +678,7 @@ typedef enum : NSUInteger {
         make.bottom.mas_equalTo(0);
     }];
     
+    // 进度条
     [self.videoProgressView removeFromSuperview];
     [self.toolView addSubview:self.videoProgressView];
     [self.videoProgressView mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -751,7 +688,7 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(1);
     }];
     
-    self.actIndicator.frame = CGRectMake((CGRectGetWidth(_showView.frame) - 37) / 2, (CGRectGetHeight(_showView.frame) - 37) / 2, 37, 37);
+    // 加载旋转菊花
     [self.actIndicator removeFromSuperview];
     [_showView addSubview:self.actIndicator];
     [self.actIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -761,7 +698,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(44);
     }];
     
-    self.touchView.frame = CGRectMake(0, 0, CGRectGetWidth(_showView.frame), CGRectGetHeight(_showView.frame) - 44);
     [self.touchView removeFromSuperview];
     [_showView addSubview:self.touchView];
     [self.touchView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -771,9 +707,11 @@ typedef enum : NSUInteger {
         make.bottom.equalTo(weakSelf.playerView).offset(-44);
     }];
     
+    // 音量控制view
     [self.volumeView removeFromSuperview];
     [_showView addSubview:self.volumeView];
     
+    // 快进⏩
     [self.timeSheetView removeFromSuperview];
     [_showView addSubview:self.timeSheetView];
     [self.timeSheetView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -816,6 +754,8 @@ typedef enum : NSUInteger {
         return YES;
     }
 }
+
+#pragma mark - 手势Action
 
 - (void)tapAction:(UITapGestureRecognizer *)tap{
     //点击一次
@@ -964,45 +904,30 @@ typedef enum : NSUInteger {
     }
 }
 
-#pragma mark - 控制条隐藏
+#pragma mark - Slider相关
 
-- (void)toolViewHidden {
-    self.toolView.hidden = YES;
-    self.statusBarBgView.hidden = YES;
-    
-    if (_isFullScreen) {
-        [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    }
-    [_hiddenTimer invalidate];
-}
-
-#pragma mark - 控制条退出隐藏
-
-- (void)showToolView {
-    
-    if (!self.repeatBtn.hidden) {
+// 拖动slider 播放跳跃播放
+- (void)seekToTime:(CGFloat)seconds {
+    if (self.state == NBPlayerStateStopped) {
         return;
     }
-    self.toolView.hidden = NO;
     
-    if (_isFullScreen) {
-        self.statusBarBgView.hidden = NO;
-    } else {
-        self.statusBarBgView.hidden = YES;
-    }
+    seconds = MAX(0, seconds);
+    seconds = MIN(seconds, self.duration);
     
-    if ([UIApplication sharedApplication].statusBarHidden) {
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    }
-    if (!_hiddenTimer.valid) {
-        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
-    }else{
-        [_hiddenTimer invalidate];
-        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
-    }
+    [self.player pause];
+    [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
+        self.isPauseByUser = NO;
+        [self.player play];
+        if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
+            self.state = NBPlayerStateBuffering;
+            
+            self.actIndicator.hidden = NO;
+            [self.actIndicator startAnimating];
+        }
+        
+    }];
 }
-
-#pragma mark - 事件响应
 
 //手指结束拖动，播放器从当前点开始播放，开启滑竿的时间走动
 - (void)playSliderChangeEnd:(UISlider *)slider {
@@ -1017,7 +942,7 @@ typedef enum : NSUInteger {
     [self updateCurrentTime:slider.value];
 }
 
-#pragma mark - 控件拖动
+// 设置slider最小值和最大值
 - (void)setPlaySliderValue:(CGFloat)time {
     self.playSlider.minimumValue = 0.0;
     self.playSlider.maximumValue = (NSInteger)time;
@@ -1066,6 +991,8 @@ typedef enum : NSUInteger {
 - (void)updateVideoSlider:(CGFloat)currentSecond {
     [self.playSlider setValue:currentSecond animated:YES];
 }
+
+#pragma mark - 暂停播放相关方法
 
 /**
  *  暂停或者播放
@@ -1147,6 +1074,8 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerProgressChangedNotification object:nil];
 }
 
+#pragma mark - 计算播放进度
+
 /**
  *  计算播放进度
  *
@@ -1158,6 +1087,42 @@ typedef enum : NSUInteger {
     }
     
     return 0;
+}
+
+#pragma mark - 工具条隐藏或者显示
+
+- (void)toolViewHidden {
+    self.toolView.hidden = YES;
+    self.statusBarBgView.hidden = YES;
+    
+    if (_isFullScreen) {
+        [[UIApplication sharedApplication] setStatusBarHidden:YES];
+    }
+    [_hiddenTimer invalidate];
+}
+
+- (void)showToolView {
+    
+    if (!self.repeatBtn.hidden) {
+        return;
+    }
+    self.toolView.hidden = NO;
+    
+    if (_isFullScreen) {
+        self.statusBarBgView.hidden = NO;
+    } else {
+        self.statusBarBgView.hidden = YES;
+    }
+    
+    if ([UIApplication sharedApplication].statusBarHidden) {
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    }
+    if (!_hiddenTimer.valid) {
+        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
+    }else{
+        [_hiddenTimer invalidate];
+        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
+    }
 }
 
 #pragma mark - private
@@ -1356,6 +1321,44 @@ typedef enum : NSUInteger {
     }else{
         [[UIApplication sharedApplication] setStatusBarHidden:NO];
     }
+}
+
+#pragma mark - 对外的API
+
++ (void)clearAllVideoCache {
+    NSFileManager *fileManager=[NSFileManager defaultManager];
+    //这里自己写需要保存数据的路径
+    NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
+    NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
+    for (NSString *fileName in childFiles) {
+        //如有需要，加入条件，过滤掉不想删除的文件
+        NSLog(@"%@", fileName);
+        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
+            NSString *absolutePath=[cachPath stringByAppendingPathComponent:fileName];
+            [fileManager removeItemAtPath:absolutePath error:nil];
+        }
+    }
+}
+
++ (double)allVideoCacheSize {
+    
+    double cacheVideoSize = 0.0f;
+    
+    NSFileManager *fileManager=[NSFileManager defaultManager];
+    //这里自己写需要保存数据的路径
+    NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
+    NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
+    for (NSString *fileName in childFiles) {
+        //如有需要，加入条件，过滤掉不想删除的文件
+        NSLog(@"%@", fileName);
+        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
+            NSString *path = [cachPath stringByAppendingPathComponent: fileName];
+            NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath: path error: nil ];
+            cacheVideoSize += ((double)([fileAttributes fileSize ]) / 1024.0 / 1024.0);
+        }
+    }
+    
+    return cacheVideoSize;
 }
 
 - (void)dealloc {
