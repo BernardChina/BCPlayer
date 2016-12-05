@@ -20,3 +20,9 @@ NSString *cachePathForVideo(NSString *url) {
     NSString *cachePath =  [document stringByAppendingPathComponent:md5File];
     return cachePath;
 }
+
+NSURL *getSchemeVideoURL(NSString *url) {
+    NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
+    components.scheme = @"streaming";
+    return [components URL];
+}

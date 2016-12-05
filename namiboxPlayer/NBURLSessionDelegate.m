@@ -8,6 +8,4 @@
 
 #import "NBURLSessionDelegate.h"
 
-@implementation NBURLSessionDelegate
 
-@end

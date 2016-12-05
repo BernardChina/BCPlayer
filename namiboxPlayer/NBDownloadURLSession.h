@@ -12,8 +12,10 @@
 
 @interface NBDownloadURLSession : NSObject
 
-// 视频播放地址
-@property (nonatomic, copy) NSString *playUrl;
+- (instancetype) initWidthPlayUrl:(NSString *)playUrl;
+
+@property (nonatomic, assign) double downloadProgress;
+@property (nonatomic, assign) BOOL startPlay;
 @property (nonatomic, weak) id<NBURLSessionDelegate> delegate;
 
 @end

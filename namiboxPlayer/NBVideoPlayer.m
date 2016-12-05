@@ -14,6 +14,7 @@
 #import "NSString+NB.h"
 #import "NBPlayer.h"
 #import "NBPlayerDefine.h"
+#import "NBDownloadURLSession.h"
 
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
@@ -28,6 +29,8 @@ static NSString *const NBVideoPlayerItemPlaybackBufferEmptyKeyPath = @"playbackB
 static NSString *const NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath = @"playbackLikelyToKeepUp";
 static NSString *const NBVideoPlayerItemPresentationSizeKeyPath = @"presentationSize";
 
+static void* const DownloadKVOContext = (void *)&DownloadKVOContext;
+
 typedef enum : NSUInteger {
     NBPlayerControlTypeProgress,
     NBPlayerControlTypeVoice,
@@ -35,7 +38,7 @@ typedef enum : NSUInteger {
     NBPlayerControlTypeNone = 999,
 } NBPlayerControlType;
 
-@interface NBVideoPlayer()<NBLoaderURLSessionDelegate, UIGestureRecognizerDelegate>{
+@interface NBVideoPlayer()<NBLoaderURLSessionDelegate, NBURLSessionDelegate, UIGestureRecognizerDelegate>{
     //用来控制上下菜单view隐藏的timer
     NSTimer * _hiddenTimer;
     UIInterfaceOrientation _currentOrientation;
@@ -52,6 +55,9 @@ typedef enum : NSUInteger {
     float _touchBeginLightValue;
     //记录触摸开始的音量
     float _touchBeginVoiceValue;
+    
+    //网络播放地址
+    NSURL *_playUrl;
 }
 
 @property (nonatomic, assign) NBPlayerState state;
@@ -91,6 +97,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UISlider       *volumeSlider;           //用这个来控制音量
 
 @property (nonatomic, strong) NBLoaderURLSession *resouerLoader;
+@property (nonatomic, strong) NBDownloadURLSession *downloadSession;  //下载session
 
 @property (nonatomic, assign) NBPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度
 @property (nonatomic, strong) NBTimeSheetView *timeSheetView;        //左右滑动时间View
@@ -169,7 +176,8 @@ typedef enum : NSUInteger {
         self.resouerLoader          = [[NBLoaderURLSession alloc] init];
         self.resouerLoader.playCachePath = self.cachePath;
         self.resouerLoader.delegate = self;
-        NSURL *playUrl              = [self.resouerLoader getSchemeVideoURL:url];
+        
+        NSURL *playUrl              = getSchemeVideoURL(str);
         self.videoURLAsset          = [AVURLAsset URLAssetWithURL:playUrl options:nil];
         [_videoURLAsset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
         self.currentPlayerItem      = [AVPlayerItem playerItemWithAsset:_videoURLAsset];
@@ -220,6 +228,7 @@ typedef enum : NSUInteger {
     [self setVideoToolView];
 }
 
+// 缓存后播放
 - (void)playAfterCacheWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
     [self.player pause];
     [self releasePlayer];
@@ -236,11 +245,19 @@ typedef enum : NSUInteger {
     
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        
+        self.downloadSession = [[NBDownloadURLSession alloc] initWidthPlayUrl:str];
+        self.downloadSession.delegate = self;
     }
+    
+    [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+    [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+    
+    [self setVideoToolView];
 }
 
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
+    
+    _playUrl = url;
     
     self.cachePath = cachePathForVideo(url.absoluteString);
     
@@ -260,7 +277,7 @@ typedef enum : NSUInteger {
     }
     // 缓存后再播放
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
-        
+        [self playAfterCacheWithVideoUrl:url showView:showView andSuperView:superView];
     }
 }
 
@@ -329,6 +346,26 @@ typedef enum : NSUInteger {
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    
+    // 下载context
+    if (context == DownloadKVOContext) {
+        if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
+            [self.videoProgressView setProgress:[[change objectForKey:@"new"] floatValue] animated:YES];
+            [self.actIndicator startAnimating];
+            self.actIndicator.hidden = NO;
+            return;
+        }
+        if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
+            
+            [self.actIndicator stopAnimating];
+            self.actIndicator.hidden = YES;
+            
+            [self playWithUrl:_playUrl showView:_showView andSuperView:_playerSuperView cacheType:NBPlayerCacheTypeNoCache];
+            
+            return;
+        }
+    }
+    
     AVPlayerItem *playerItem = (AVPlayerItem *)object;
     
     if ([NBVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
@@ -346,7 +383,6 @@ typedef enum : NSUInteger {
         [self calculateDownloadProgress:playerItem];
         
     } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) { //监听播放器在缓冲数据的状态
-        //        [[XCHudHelper sharedInstance] showHudOnView:_showView caption:nil image:nil acitivity:YES autoHideTime:0];
         [self.actIndicator startAnimating];
         self.actIndicator.hidden = NO;
         if (playerItem.isPlaybackBufferEmpty) {
@@ -457,7 +493,6 @@ typedef enum : NSUInteger {
 
 - (void)setState:(NBPlayerState)state {
     if (state != NBPlayerStateBuffering) {
-        //        [[XCHudHelper sharedInstance] hideHud];
         [self.actIndicator stopAnimating];
         self.actIndicator.hidden = YES;
     }
@@ -1209,6 +1244,16 @@ typedef enum : NSUInteger {
     }
     
     NSLog(@"%@", str);
+}
+
+#pragma mark - NBURLSessionDelegate
+
+- (void)didFinishLoading {
+    _isFinishLoad = YES;
+}
+
+- (void)didFailLoadingwithError:(NSInteger)errorCode {
+
 }
 
 #pragma mark - 通知中心检测到屏幕旋转
