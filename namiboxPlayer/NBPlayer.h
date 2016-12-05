@@ -11,4 +11,10 @@
 #define kScreenWidth ([UIScreen mainScreen].bounds.size.width)
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <Masonry/Masonry.h>
+
+#import "NBVideoPlayer.h"
+#import "NBPlayerEnvironment.h"
+#import "NSString+NB.h"
+

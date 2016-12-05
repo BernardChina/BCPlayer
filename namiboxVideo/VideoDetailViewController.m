@@ -7,7 +7,7 @@
 //
 
 #import "VideoDetailViewController.h"
-#import "NBVideoPlayer.h"
+#import "NBPlayer.h"
 
 @interface VideoDetailViewController (){
     NBVideoPlayer *_play;
@@ -31,7 +31,7 @@
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
               showView:videoView
           andSuperView:self.view
-             withCache:YES];
+             cacheType:NBPlayerCacheTypePlayWithCache];
     
     NSLog(@"%f", [NBVideoPlayer allVideoCacheSize]);
 }

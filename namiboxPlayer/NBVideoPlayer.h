@@ -10,6 +10,8 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 
+#import "NBPlayer.h"
+
 FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;
 FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
 FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
@@ -20,6 +22,12 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateStopped,          //播放结束
     NBPlayerStatePause,            //暂停播放
     NBPlayerStateFinish,           //播放完成
+};
+
+typedef NS_ENUM(NSInteger, NBPlayerCacheType) {
+    NBPlayerCacheTypeNoCache,       // 不缓存，直接播放
+    NBPlayerCacheTypePlayWithCache, // 边播放边缓存
+    NBPlayerCacheTypePlayAfterCache // 先缓存，再播放
 };
 
 @interface NBVideoPlayer : NSObject
@@ -39,16 +47,17 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 + (instancetype)sharedInstance;
 
 /**
- *  播放服务器的视频，先判断本地是否有缓存文件，缓存文件名为连接的url经过md5加密后生成的字符串
- *
- *  @param url       视频地址
- *  @param showView  显示的View
- *  @param withCache 是否播放缓存的文件
+ 播放视频(本地或服务器),缓存文件url经过md5加密
+
+ @param url 视频地址
+ @param showView 显示的view
+ @param superView 显示view的父view
+ @param cacheType 播放缓存机制，不缓存，边播边缓存，先缓存再播放
  */
 - (void)playWithUrl:(NSURL *)url
            showView:(UIView *)showView
        andSuperView:(UIView *)superView
-          withCache:(BOOL)withCache;
+          cacheType:(NBPlayerCacheType)cacheType;
 
 /**
  *  指定到某一事件点开始播放

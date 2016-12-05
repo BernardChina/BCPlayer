@@ -132,12 +132,11 @@
             // 如果往回拖也重新请求
             range.location < self.task.offset) {
             [self.task setUrl:interceptedURL offset:range.location];
-            //            [self.task.taskArr removeAllObjects];
             NSLog(@"%@",@"删掉了taskarr");
         }
     }
     
-    
+    self.task.playCachePath = self.playCachePath;
 }
 
 

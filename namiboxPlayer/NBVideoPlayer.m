@@ -13,6 +13,7 @@
 #import "NBLightView.h"
 #import "NSString+NB.h"
 #import "NBPlayer.h"
+#import "NBPlayerDefine.h"
 
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
@@ -93,6 +94,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, assign) NBPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度
 @property (nonatomic, strong) NBTimeSheetView *timeSheetView;        //左右滑动时间View
+@property (nonatomic, strong) NSString *cachePath;
 
 @end
 
@@ -165,6 +167,7 @@ typedef enum : NSUInteger {
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
         
         self.resouerLoader          = [[NBLoaderURLSession alloc] init];
+        self.resouerLoader.playCachePath = self.cachePath;
         self.resouerLoader.delegate = self;
         NSURL *playUrl              = [self.resouerLoader getSchemeVideoURL:url];
         self.videoURLAsset          = [AVURLAsset URLAssetWithURL:playUrl options:nil];
@@ -217,26 +220,47 @@ typedef enum : NSUInteger {
     [self setVideoToolView];
 }
 
+- (void)playAfterCacheWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
+    [self.player pause];
+    [self releasePlayer];
+    
+    self.isPauseByUser = NO;
+    self.loadedProgress = 0;
+    self.duration = 0;
+    self.current  = 0;
+    
+    _showView = showView;
+    _showViewRect = showView.frame;
+    _showView.backgroundColor = [UIColor blackColor];
+    _playerSuperView = superView;
+    
+    NSString *str = [url absoluteString];
+    if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
+        
+    }
+}
 
-- (void)playWithUrl:(NSURL *)url
-           showView:(UIView *)showView
-       andSuperView:(UIView *)superView
-          withCache:(BOOL)withCache {
+- (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
     
-    NSURLComponents *components = [[NSURLComponents alloc] initWithURL:url resolvingAgainstBaseURL:NO];
-    components.scheme = @"streaming";
-    NSURL *playUrl = [components URL];
-    NSString *md5File = [NSString stringWithFormat:@"%@.mp4", [[playUrl absoluteString] stringToMD5]];
+    self.cachePath = cachePathForVideo(url.absoluteString);
     
-    //这里自己写需要保存数据的路径
-    NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    NSString *cachePath =  [document stringByAppendingPathComponent:md5File];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath] && withCache) {
-        NSURL *localURL = [NSURL fileURLWithPath:cachePath];
+    // 假如有缓存文件，首先播放缓存文件
+    if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+        NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
         [self playWithVideoUrl:localURL showView:showView andSuperView:superView];
-    } else {
+        return;
+    }
+    // 假如不缓存
+    if (cacheType == NBPlayerCacheTypeNoCache) {
+        
+    }
+    // 边播边缓存
+    if (cacheType == NBPlayerCacheTypePlayWithCache) {
         [self playWithVideoUrl:url showView:showView andSuperView:superView];
+    }
+    // 缓存后再播放
+    if (cacheType == NBPlayerCacheTypePlayAfterCache) {
+        
     }
 }
 
@@ -1185,8 +1209,6 @@ typedef enum : NSUInteger {
     }
     
     NSLog(@"%@", str);
-    //    [XCHudHelper showMessage:str];
-    
 }
 
 #pragma mark - 通知中心检测到屏幕旋转

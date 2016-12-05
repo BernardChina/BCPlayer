@@ -8,6 +8,7 @@
 
 #import "NBVideoRequestTask.h"
 #import "NSString+NB.h"
+#import "NBPlayerEnvironment.h"
 
 @interface NBVideoRequestTask()<NSURLSessionDataDelegate>
 
@@ -156,14 +157,16 @@
         if (self.taskArr.count < 2) {
             _isFinishLoad = YES;
             
-            //使用md5将请求url地址加密后作为缓存本地文件的文件名
-            NSString *md5File = [NSString stringWithFormat:@"%@.mp4", [[_url absoluteString] stringToMD5]];
+//            //使用md5将请求url地址加密后作为缓存本地文件的文件名
+//            NSString *md5File = [NSString stringWithFormat:@"%@.mp4", [[_url absoluteString] stringToMD5]];
+//            
+//            NSLog(@"saveFileName:%@", md5File);
+//            
+//            //这里自己写需要保存数据的路径
+//            NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+//            NSString *movePath =  [document stringByAppendingPathComponent:md5File];
             
-            NSLog(@"saveFileName:%@", md5File);
-            
-            //这里自己写需要保存数据的路径
-            NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-            NSString *movePath =  [document stringByAppendingPathComponent:md5File];
+            NSString *movePath = self.playCachePath;
             
             if (![[NSFileManager defaultManager] fileExistsAtPath:movePath]) {
                 
