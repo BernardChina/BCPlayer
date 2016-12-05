@@ -38,7 +38,7 @@ typedef enum : NSUInteger {
     NBPlayerControlTypeNone = 999,
 } NBPlayerControlType;
 
-@interface NBVideoPlayer()<NBLoaderURLSessionDelegate, NBURLSessionDelegate, UIGestureRecognizerDelegate>{
+@interface NBVideoPlayer()<NBLoaderURLSessionDelegate, UIGestureRecognizerDelegate>{
     //用来控制上下菜单view隐藏的timer
     NSTimer * _hiddenTimer;
     UIInterfaceOrientation _currentOrientation;
@@ -156,19 +156,6 @@ typedef enum : NSUInteger {
 
 - (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
     
-    [self.player pause];
-    [self releasePlayer];
-    
-    self.isPauseByUser = NO;
-    self.loadedProgress = 0;
-    self.duration = 0;
-    self.current  = 0;
-    
-    _showView = showView;
-    _showViewRect = showView.frame;
-    _showView.backgroundColor = [UIColor blackColor];
-    _playerSuperView = superView;
-    
     NSString *str = [url absoluteString];
     //如果是ios  < 7 或者是本地资源，直接播放
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
@@ -183,10 +170,6 @@ typedef enum : NSUInteger {
         self.currentPlayerItem      = [AVPlayerItem playerItemWithAsset:_videoURLAsset];
         
         _isLocalVideo = NO;
-    } else {
-        self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
-        self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
-        _isLocalVideo = YES;
     }
     
     if (!self.player) {
@@ -197,16 +180,32 @@ typedef enum : NSUInteger {
     
     [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
     
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath options:NSKeyValueObservingOptionNew context:nil];
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath options:NSKeyValueObservingOptionNew context:nil];
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self commonObserver];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.currentPlayerItem];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.currentPlayerItem];
+    // 如果已经在NBPlayerStateBuffering，则直接发通知，否则设置状态
+    if (self.state == NBPlayerStateBuffering) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
+    } else {
+        self.state = NBPlayerStateBuffering;
+    }
+    
+}
+
+// 播放本地视频
+- (void)playWithLocalUrl:(NSURL *)url {
+    self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
+    self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
+    _isLocalVideo = YES;
+    
+    if (!self.player) {
+        self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
+    } else {
+        [self.player replaceCurrentItemWithPlayerItem:self.currentPlayerItem];
+    }
+    
+    [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
+    
+    [self commonObserver];
     
     if ([url.scheme isEqualToString:@"file"]) {
         // 如果已经在NBPlayerStatePlaying，则直接发通知，否则设置状态
@@ -215,21 +214,31 @@ typedef enum : NSUInteger {
         } else {
             self.state = NBPlayerStatePlaying;
         }
-        
-    } else {
-        // 如果已经在NBPlayerStateBuffering，则直接发通知，否则设置状态
-        if (self.state == NBPlayerStateBuffering) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
-        } else {
-            self.state = NBPlayerStateBuffering;
-        }
     }
     
     [self setVideoToolView];
+    
 }
 
 // 缓存后播放
-- (void)playAfterCacheWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
+- (void)playAfterCacheWithVideoUrl:(NSURL *)url {
+    
+    NSString *str = [url absoluteString];
+    if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
+        self.downloadSession = [[NBDownloadURLSession alloc] initWidthPlayUrl:str];
+    }
+    
+    [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+    [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+    
+}
+
+- (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
+    
+    _playUrl = url;
+    
+    self.cachePath = cachePathForVideo(url.absoluteString);
+    
     [self.player pause];
     [self releasePlayer];
     
@@ -243,30 +252,13 @@ typedef enum : NSUInteger {
     _showView.backgroundColor = [UIColor blackColor];
     _playerSuperView = superView;
     
-    NSString *str = [url absoluteString];
-    if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        self.downloadSession = [[NBDownloadURLSession alloc] initWidthPlayUrl:str];
-        self.downloadSession.delegate = self;
-    }
-    
-    [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
-    [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
-    
-    [self setVideoToolView];
-}
-
-- (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
-    
-    _playUrl = url;
-    
-    self.cachePath = cachePathForVideo(url.absoluteString);
-    
     // 假如有缓存文件，首先播放缓存文件
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
         NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-        [self playWithVideoUrl:localURL showView:showView andSuperView:superView];
+        [self playWithLocalUrl:localURL];
         return;
     }
+    
     // 假如不缓存
     if (cacheType == NBPlayerCacheTypeNoCache) {
         
@@ -277,8 +269,10 @@ typedef enum : NSUInteger {
     }
     // 缓存后再播放
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
-        [self playAfterCacheWithVideoUrl:url showView:showView andSuperView:superView];
+        [self playAfterCacheWithVideoUrl:url];
     }
+    
+    [self setVideoToolView];
 }
 
 - (void)fullScreen {
@@ -350,17 +344,23 @@ typedef enum : NSUInteger {
     // 下载context
     if (context == DownloadKVOContext) {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
+            // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:@"new"] floatValue] animated:YES];
             [self.actIndicator startAnimating];
             self.actIndicator.hidden = NO;
             return;
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
+            // 下载完成
+            _isFinishLoad = YES;
             
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
-            [self playWithUrl:_playUrl showView:_showView andSuperView:_playerSuperView cacheType:NBPlayerCacheTypeNoCache];
+            if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+                NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+                [self playWithLocalUrl:localURL];
+            }
             
             return;
         }
@@ -1209,6 +1209,21 @@ typedef enum : NSUInteger {
     
 }
 
+// 基本的监听
+- (void)commonObserver {
+    
+    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.currentPlayerItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.currentPlayerItem];
+}
+
 #pragma mark - NBLoaderURLSessionDelegate
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
@@ -1244,16 +1259,6 @@ typedef enum : NSUInteger {
     }
     
     NSLog(@"%@", str);
-}
-
-#pragma mark - NBURLSessionDelegate
-
-- (void)didFinishLoading {
-    _isFinishLoad = YES;
-}
-
-- (void)didFailLoadingwithError:(NSInteger)errorCode {
-
 }
 
 #pragma mark - 通知中心检测到屏幕旋转
