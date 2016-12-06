@@ -17,4 +17,5 @@
 #import "NBVideoPlayer.h"
 #import "NBPlayerEnvironment.h"
 #import "NSString+NB.h"
+#import "NBPlayerDefine.h"
 

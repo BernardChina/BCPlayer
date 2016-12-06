@@ -18,4 +18,6 @@
 @property (nonatomic, assign) BOOL startPlay;
 @property (nonatomic, weak) id<NBURLSessionDelegate> delegate;
 
+- (void) cancel;
+
 @end

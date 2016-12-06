@@ -70,12 +70,22 @@
     int64_t kReceived = downloadTask.countOfBytesReceived / 1024;
     int64_t kExpected = downloadTask.countOfBytesExpectedToReceive / 1024;
     NSString *statusString = [NSString stringWithFormat:@"%lldk of %lldk", kReceived, kExpected];
-    NSLog(@"ddd: %@",statusString);
+    NSLog(@"进度: %@",statusString);
     
     double progress = (double) downloadTask.countOfBytesReceived / (double)downloadTask.countOfBytesExpectedToReceive;
     
     self.downloadProgress = progress;
     
+}
+
+- (void)cancel {
+    [session invalidateAndCancel];
+    session = nil;
+}
+
+- (void)dealloc {
+    NSLog(@"%@",@"NBDownloadUrlSession dealloc");
+    [self cancel];
 }
 
 @end

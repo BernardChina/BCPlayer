@@ -9,6 +9,7 @@
 #import "NBVideoRequestTask.h"
 #import "NSString+NB.h"
 #import "NBPlayerEnvironment.h"
+#import "NBPlayerDefine.h"
 
 @interface NBVideoRequestTask()<NSURLSessionDataDelegate>
 
@@ -73,7 +74,6 @@
         [request addValue:[NSString stringWithFormat:@"bytes=%ld-%ld",(unsigned long)offset, (unsigned long)self.videoLength - 1] forHTTPHeaderField:@"Range"];
     }
     
-    
     [self.session invalidateAndCancel];
     self.session = nil;
     
@@ -117,7 +117,6 @@
     self.videoLength = videoLength;
     self.mimeType = @"video/mp4";
     
-    
     if ([self.delegate respondsToSelector:@selector(task:didReciveVideoLength:mimeType:)]) {
         [self.delegate task:self didReciveVideoLength:self.videoLength mimeType:self.mimeType];
     }
@@ -125,7 +124,6 @@
     [self.taskArr addObject:session];
     
     NSLog(@"%@",@"重置taskarr session");
-    
     
     self.fileHandle = [NSFileHandle fileHandleForWritingAtPath:_tempPath];
     
@@ -154,17 +152,8 @@
     if (!error) {
         NSLog(@"connectionDidFinishLoading22222: %@", self.taskArr);
         
-        if (self.taskArr.count < 2) {
+        if (self.taskArr.count < 2 && currentCacheType == NBPlayerCacheTypePlayWithCache) {
             _isFinishLoad = YES;
-            
-//            //使用md5将请求url地址加密后作为缓存本地文件的文件名
-//            NSString *md5File = [NSString stringWithFormat:@"%@.mp4", [[_url absoluteString] stringToMD5]];
-//            
-//            NSLog(@"saveFileName:%@", md5File);
-//            
-//            //这里自己写需要保存数据的路径
-//            NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
-//            NSString *movePath =  [document stringByAppendingPathComponent:md5File];
             
             NSString *movePath = self.playCachePath;
             
@@ -236,6 +225,11 @@
     [self cancel];
     //移除文件
     [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
+}
+
+- (void)dealloc {
+    NSLog(@"%@",@"NBVideoRequest dealloc");
+    [self cancel];
 }
 
 @end

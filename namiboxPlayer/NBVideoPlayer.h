@@ -11,6 +11,8 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 #import "NBPlayer.h"
+#import "NBPlayerDefine.h"
+
 
 FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;
 FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
@@ -22,12 +24,6 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateStopped,          //播放结束
     NBPlayerStatePause,            //暂停播放
     NBPlayerStateFinish,           //播放完成
-};
-
-typedef NS_ENUM(NSInteger, NBPlayerCacheType) {
-    NBPlayerCacheTypeNoCache,       // 不缓存，直接播放
-    NBPlayerCacheTypePlayWithCache, // 边播放边缓存
-    NBPlayerCacheTypePlayAfterCache // 先缓存，再播放
 };
 
 @interface NBVideoPlayer : NSObject

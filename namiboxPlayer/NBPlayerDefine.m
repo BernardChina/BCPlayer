@@ -26,3 +26,5 @@ NSURL *getSchemeVideoURL(NSString *url) {
     components.scheme = @"streaming";
     return [components URL];
 }
+
+NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;

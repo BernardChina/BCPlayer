@@ -236,6 +236,7 @@ typedef enum : NSUInteger {
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
     
     _playUrl = url;
+    currentCacheType = cacheType;
     
     self.cachePath = cachePathForVideo(url.absoluteString);
     
@@ -310,7 +311,6 @@ typedef enum : NSUInteger {
 }
 
 - (void)playerItemDidPlayToEnd:(NSNotification *)notification {
-    //    [self stop];
     
     //如果当前播放次数小于重复播放次数，继续重新播放
     if (self.playCount < self.playRepatCount) {
@@ -1187,6 +1187,15 @@ typedef enum : NSUInteger {
 #pragma mark - private
 
 - (void)releasePlayer {
+    if (currentCacheType == NBPlayerCacheTypePlayAfterCache && self.downloadSession) {
+        
+        [self.downloadSession removeObserver:self forKeyPath:@"downloadProgress"];
+        [self.downloadSession removeObserver:self forKeyPath:@"startPlay"];
+        
+        [self.downloadSession cancel];
+        self.downloadSession = nil;
+    }
+    
     if (!self.currentPlayerItem) {
         return;
     }
@@ -1434,6 +1443,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)dealloc {
+    NSLog(@"%@",@"NBVideoPlayer dealloc");
     [self releasePlayer];
 }
 
