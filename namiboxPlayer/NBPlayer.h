@@ -18,4 +18,5 @@
 #import "NBPlayerEnvironment.h"
 #import "NSString+NB.h"
 #import "NBPlayerDefine.h"
+#import "NBPlayerDelegate.h"
 

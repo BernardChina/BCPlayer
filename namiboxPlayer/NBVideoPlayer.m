@@ -67,8 +67,6 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) AVPlayerItem   *currentPlayerItem;
 @property (nonatomic, strong) NSObject       *playbackTimeObserver;
 @property (nonatomic, assign) BOOL           isPauseByUser;           //是否被用户暂停
-@property (nonatomic, assign) BOOL           isLocalVideo;            //是否播放本地文件
-@property (nonatomic, assign) BOOL           isFinishLoad;            //是否下载完毕
 
 @property (nonatomic, weak  ) UIView         *showView;
 @property (nonatomic, assign) CGRect         showViewRect;            //视频展示ViewRect
@@ -125,8 +123,6 @@ typedef enum : NSUInteger {
         _stopInBackground = YES;
         _isFullScreen = NO;
         _canFullScreen = YES;
-        _playRepatCount = 1;
-        _playCount = 1;
         
         UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
         switch (orientation) {
@@ -153,7 +149,7 @@ typedef enum : NSUInteger {
 - (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
     
     NSString *str = [url absoluteString];
-    //如果是ios  < 7 或者是本地资源，直接播放
+    
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
         
         self.resouerLoader          = [[NBLoaderURLSession alloc] init];
@@ -164,8 +160,6 @@ typedef enum : NSUInteger {
         self.videoURLAsset          = [AVURLAsset URLAssetWithURL:playUrl options:nil];
         [_videoURLAsset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
         self.currentPlayerItem      = [AVPlayerItem playerItemWithAsset:_videoURLAsset];
-        
-        _isLocalVideo = NO;
     }
     
     if (!self.player) {
@@ -191,7 +185,6 @@ typedef enum : NSUInteger {
 - (void)playWithLocalUrl:(NSURL *)url {
     self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
-    _isLocalVideo = YES;
     
     if (!self.player) {
         self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
@@ -256,14 +249,11 @@ typedef enum : NSUInteger {
         return;
     }
     
-    // 假如不缓存
-    if (cacheType == NBPlayerCacheTypeNoCache) {
-        
-    }
-    // 边播边缓存
-    if (cacheType == NBPlayerCacheTypePlayWithCache) {
+    // 假如不缓存 或者 边播边缓存
+    if (cacheType == NBPlayerCacheTypeNoCache || cacheType == NBPlayerCacheTypePlayWithCache) {
         [self playWithVideoUrl:url showView:showView andSuperView:superView];
     }
+    
     // 缓存后再播放
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
         [self playAfterCacheWithVideoUrl:url];
@@ -307,29 +297,13 @@ typedef enum : NSUInteger {
 }
 
 - (void)playerItemDidPlayToEnd:(NSNotification *)notification {
-    
-    //如果当前播放次数小于重复播放次数，继续重新播放
-    if (self.playCount < self.playRepatCount) {
-        self.playCount++;
-        [self seekToTime:0];
-        [self updateCurrentTime:0];
-    } else {
-        
-        //如果有播放下一个的需求就播放下一个
-        if (self.playNextBlock) {
-            self.playNextBlock();
-        } else {
-            //重新播放
-            self.repeatBtn.hidden = NO;
-            [self toolViewHidden];
-            self.state = NBPlayerStateFinish;
-            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
-            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
-        }
-    }
+    // 播放结束后，调用此通知，可以通过这个方法实现循环播放或者播放下个视频
+    /*
+     当播放结束后，播放头移动到playerItem的末尾，如果此时调用play方法是没有效果的，应该先把播放头移到player item起始位置。如果需要实现循环播放的功能，可以监听通知AVPlayerItemDidPlayToEndTimeNotification，当收到这个通知的时候，调用seekToTime：把播放头移动到起始位置[player seekToTime:kCMTimeZero];
+     */
 }
 
-//在监听播放器状态中处理比较准确
+//在监听播放器状态中处理比较准确，播放停止了，有可能是网络原因
 - (void)playerItemPlaybackStalled:(NSNotification *)notification {
     // 这里网络不好的时候，就会进入，不做处理，会在playbackBufferEmpty里面缓存之后重新播放
     NSLog(@"buffing----buffing");
@@ -341,14 +315,13 @@ typedef enum : NSUInteger {
     if (context == DownloadKVOContext) {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
             // 更改进度
-            [self.videoProgressView setProgress:[[change objectForKey:@"new"] floatValue] animated:YES];
+            [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
             [self.actIndicator startAnimating];
             self.actIndicator.hidden = NO;
             return;
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
             // 下载完成
-            _isFinishLoad = YES;
             
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
@@ -374,11 +347,13 @@ typedef enum : NSUInteger {
             [self stop];
         }
         
-    } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {  //监听播放器的下载进度
-        
+    } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
+        //监听播放器的下载进度
         [self calculateDownloadProgress:playerItem];
         
-    } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) { //监听播放器在缓冲数据的状态
+    } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
+        //监听播放器在缓冲数据的状态
+        //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
         [self.actIndicator startAnimating];
         self.actIndicator.hidden = NO;
         if (playerItem.isPlaybackBufferEmpty) {
@@ -386,6 +361,7 @@ typedef enum : NSUInteger {
             [self bufferingSomeSecond];
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
+        // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
         NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;
@@ -402,16 +378,18 @@ typedef enum : NSUInteger {
 }
 
 - (void)monitoringPlayback:(AVPlayerItem *)playerItem {
-    
+    // playerItem.duration. 表示项目媒体的持续时间
     self.duration = playerItem.duration.value / playerItem.duration.timescale; //视频总时间
     [self.player play];
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
     
     __weak __typeof(self)weakSelf = self;
+    // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
     self.playbackTimeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
         __strong __typeof(weakSelf)strongSelf = weakSelf;
+        // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
         [strongSelf updateCurrentTime:current];
         [strongSelf updateVideoSlider:current];
@@ -432,13 +410,14 @@ typedef enum : NSUInteger {
     
 }
 
-- (void)unmonitoringPlayback:(AVPlayerItem *)playerItem {
+- (void)unmonitoringPlayback {
     if (self.playbackTimeObserver != nil) {
         [self.player removeTimeObserver:self.playbackTimeObserver];
         self.playbackTimeObserver = nil;
     }
 }
 
+// 计算缓存进度
 - (void)calculateDownloadProgress:(AVPlayerItem *)playerItem {
     NSArray *loadedTimeRanges = [playerItem loadedTimeRanges];
     CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];// 获取缓冲区域
@@ -1217,22 +1196,31 @@ typedef enum : NSUInteger {
 // 基本的监听
 - (void)commonObserver {
     
+    // status.播放器的播放状态
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    // loadedTimeRanges. 已加载项目的时间范围
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    // playbackBufferEmpty. 指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    // presentationSize. 播放器呈现的大小size
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
+    // 播放结束后，发送的通知
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.currentPlayerItem];
+    // 播放停顿后，调用此通知，有可能原因网络慢，不能正常加载
+    // 当某些媒体未及时到达以继续播放时发布
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.currentPlayerItem];
 }
 
 #pragma mark - NBLoaderURLSessionDelegate
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
-    _isFinishLoad = task.isFinishLoad;
+
+    
 }
 
 //网络中断：-1005
@@ -1440,7 +1428,9 @@ typedef enum : NSUInteger {
 
 - (void)dealloc {
     NSLog(@"%@",@"NBVideoPlayer dealloc");
+    [self.player pause];
     [self releasePlayer];
+    [self unmonitoringPlayback];
 }
 
 @end

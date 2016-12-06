@@ -42,13 +42,15 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [_play stop];
+//    [_play stop];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
 
 /*
 #pragma mark - Navigation
