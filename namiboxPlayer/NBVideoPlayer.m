@@ -206,7 +206,6 @@ typedef enum : NSUInteger {
     }
     
     [self setVideoToolView];
-    
 }
 
 // 缓存后播放
@@ -301,6 +300,12 @@ typedef enum : NSUInteger {
     /*
      当播放结束后，播放头移动到playerItem的末尾，如果此时调用play方法是没有效果的，应该先把播放头移到player item起始位置。如果需要实现循环播放的功能，可以监听通知AVPlayerItemDidPlayToEndTimeNotification，当收到这个通知的时候，调用seekToTime：把播放头移动到起始位置[player seekToTime:kCMTimeZero];
      */
+    //重新播放
+    self.repeatBtn.hidden = NO;
+    [self toolViewHidden];
+    self.state = NBPlayerStateFinish;
+    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
+    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
 }
 
 //在监听播放器状态中处理比较准确，播放停止了，有可能是网络原因
