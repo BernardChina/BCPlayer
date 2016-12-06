@@ -13,11 +13,6 @@
 #import "NBPlayer.h"
 #import "NBPlayerDefine.h"
 
-
-FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;
-FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
-FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
-
 typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateBuffering = 1,    //正在缓存
     NBPlayerStatePlaying,          //正在播放
@@ -60,7 +55,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  *
  *  @param seconds 时间点
  */
-//- (void)seekToTime:(CGFloat)seconds;
+- (void)seekToTime:(CGFloat)seconds;
 
 /**
  * 恢复播放

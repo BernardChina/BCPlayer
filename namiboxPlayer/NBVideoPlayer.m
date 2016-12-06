@@ -19,10 +19,6 @@
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
 
-NSString *const kNBPlayerStateChangedNotification    = @"NBPlayerStateChangedNotification";
-NSString *const kNBPlayerProgressChangedNotification = @"NBPlayerProgressChangedNotification";
-NSString *const kNBPlayerLoadProgressChangedNotification = @"NBPlayerLoadProgressChangedNotification";
-
 static NSString *const NBVideoPlayerItemStatusKeyPath = @"status";
 static NSString *const NBVideoPlayerItemLoadedTimeRangesKeyPath = @"loadedTimeRanges";
 static NSString *const NBVideoPlayerItemPlaybackBufferEmptyKeyPath = @"playbackBufferEmpty";
@@ -96,7 +92,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) MPVolumeView   *volumeView;             //音量控制控件
 @property (nonatomic, strong) UISlider       *volumeSlider;           //用这个来控制音量
 
-@property (nonatomic, strong) NBLoaderURLSession *resouerLoader;
+@property (nonatomic, strong) NBLoaderURLSession *resouerLoader;      //缓存session
 @property (nonatomic, strong) NBDownloadURLSession *downloadSession;  //下载session
 
 @property (nonatomic, assign) NBPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度

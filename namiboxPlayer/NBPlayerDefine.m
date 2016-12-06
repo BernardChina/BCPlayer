@@ -28,3 +28,7 @@ NSURL *getSchemeVideoURL(NSString *url) {
 }
 
 NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;
+
+NSString *const kNBPlayerStateChangedNotification    = @"NBPlayerStateChangedNotification";
+NSString *const kNBPlayerProgressChangedNotification = @"NBPlayerProgressChangedNotification";
+NSString *const kNBPlayerLoadProgressChangedNotification = @"NBPlayerLoadProgressChangedNotification";

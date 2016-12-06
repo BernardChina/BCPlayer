@@ -17,3 +17,8 @@ typedef NS_ENUM(NSInteger, NBPlayerCacheType) {
 extern NSString *cachePathForVideo(NSString *url);
 extern NSURL *getSchemeVideoURL(NSString *url);
 extern NBPlayerCacheType currentCacheType;
+
+// 暴漏出来的通知
+FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;
+FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
+FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
