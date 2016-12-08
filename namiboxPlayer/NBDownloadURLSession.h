@@ -10,11 +10,13 @@
 
 @interface NBDownloadURLSession : NSObject
 
-- (instancetype) initWidthPlayUrl:(NSString *)playUrl;
+//- (instancetype) initWidthPlayUrl:(NSString *)playUrl;
 
 @property (nonatomic, assign) double downloadProgress;
 @property (nonatomic, assign) BOOL startPlay;
 
-- (void) cancel;
+- (void)cancel;
+
+- (void)addDownloadTask:(NSString *)playUrl;
 
 @end

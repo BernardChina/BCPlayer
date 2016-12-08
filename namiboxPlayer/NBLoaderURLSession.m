@@ -79,6 +79,10 @@
     
     NSData *filedata = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:_videoPath] options:NSDataReadingMappedIfSafe error:nil];
     
+    if (filedata.length == 0) {
+        return NO;
+    }
+    
     // This is the total data we have from startOffset to whatever has been downloaded so far
     NSUInteger unreadBytes = self.task.downLoadingOffset - ((NSInteger)startOffset - self.task.offset);
     
@@ -132,6 +136,7 @@
             // 如果往回拖也重新请求
             range.location < self.task.offset) {
             [self.task setUrl:interceptedURL offset:range.location];
+            NSLog(@"%@",loadingRequest);
             NSLog(@"%@",@"删掉了taskarr");
         }
     }
@@ -143,6 +148,7 @@
 - (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
     NSLog(@"%@",@"为什么cancel了");
+    NSLog(@"%@",loadingRequest);
     [self.pendingRequests removeObject:loadingRequest];
     
 }

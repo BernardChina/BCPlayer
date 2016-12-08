@@ -10,6 +10,7 @@
 		9256F3431DF4FF3E0075E952 /* NBPlayerEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3421DF4FF3E0075E952 /* NBPlayerEnvironment.m */; };
 		9256F3461DF506C10075E952 /* NBDownloadURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3451DF506C10075E952 /* NBDownloadURLSession.m */; };
 		9256F3491DF50ACA0075E952 /* NBPlayerDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */; };
+		9276E4991DF9407200B922DC /* NBPlayerM3U8Handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */; };
 		927ABD101DF1731800689E94 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD0F1DF1731800689E94 /* main.m */; };
 		927ABD131DF1731800689E94 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD121DF1731800689E94 /* AppDelegate.m */; };
 		927ABD161DF1731800689E94 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD151DF1731800689E94 /* ViewController.m */; };
@@ -38,6 +39,8 @@
 		9256F3471DF50ACA0075E952 /* NBPlayerDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerDefine.h; sourceTree = "<group>"; };
 		9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerDefine.m; sourceTree = "<group>"; };
 		9256F34D1DF667FE0075E952 /* NBPlayerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerDelegate.h; sourceTree = "<group>"; };
+		9276E4971DF9407200B922DC /* NBPlayerM3U8Handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerM3U8Handler.h; sourceTree = "<group>"; };
+		9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerM3U8Handler.m; sourceTree = "<group>"; };
 		927ABD0B1DF1731800689E94 /* namiboxVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = namiboxVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		927ABD0F1DF1731800689E94 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		927ABD111DF1731800689E94 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -148,6 +151,8 @@
 				927ABD4D1DF1778200689E94 /* NBLoaderURLSession.m */,
 				9256F3441DF506C10075E952 /* NBDownloadURLSession.h */,
 				9256F3451DF506C10075E952 /* NBDownloadURLSession.m */,
+				9276E4971DF9407200B922DC /* NBPlayerM3U8Handler.h */,
+				9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */,
 				927ABD581DF177FA00689E94 /* NBVideoRequestTask.h */,
 				927ABD591DF177FA00689E94 /* NBVideoRequestTask.m */,
 				927ABD4F1DF177A600689E94 /* NBPlayerView.h */,
@@ -305,6 +310,7 @@
 				9256F3431DF4FF3E0075E952 /* NBPlayerEnvironment.m in Sources */,
 				9256F3461DF506C10075E952 /* NBDownloadURLSession.m in Sources */,
 				927ABD271DF1751700689E94 /* VideoDetailViewController.m in Sources */,
+				9276E4991DF9407200B922DC /* NBPlayerM3U8Handler.m in Sources */,
 				927ABD4E1DF1778200689E94 /* NBLoaderURLSession.m in Sources */,
 				9256F3491DF50ACA0075E952 /* NBPlayerDefine.m in Sources */,
 				927ABD5A1DF177FA00689E94 /* NBVideoRequestTask.m in Sources */,

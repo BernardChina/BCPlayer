@@ -15,6 +15,8 @@
 #import "NBPlayer.h"
 #import "NBPlayerDefine.h"
 #import "NBDownloadURLSession.h"
+#import "NBPlayerDefine.h"
+#import "NBPlayerM3U8Handler.h"
 
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
@@ -24,8 +26,6 @@ static NSString *const NBVideoPlayerItemLoadedTimeRangesKeyPath = @"loadedTimeRa
 static NSString *const NBVideoPlayerItemPlaybackBufferEmptyKeyPath = @"playbackBufferEmpty";
 static NSString *const NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath = @"playbackLikelyToKeepUp";
 static NSString *const NBVideoPlayerItemPresentationSizeKeyPath = @"presentationSize";
-
-static void* const DownloadKVOContext = (void *)&DownloadKVOContext;
 
 typedef enum : NSUInteger {
     NBPlayerControlTypeProgress,
@@ -213,12 +213,26 @@ typedef enum : NSUInteger {
     
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        self.downloadSession = [[NBDownloadURLSession alloc] initWidthPlayUrl:str];
+        self.downloadSession = [[NBDownloadURLSession alloc] init];
+        [self.downloadSession addDownloadTask:str];
+        
+        [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+        [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     }
     
-    [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
-    [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+}
+// 支持hls
+- (void)playHLSWithUrl:(NSURL *)url {
     
+    NSString *str = [url absoluteString];
+    if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
+        NBPlayerM3U8Handler *handler = [[NBPlayerM3U8Handler alloc] init];
+        self.downloadSession = [[NBDownloadURLSession alloc] init];
+        handler.loadSession = self.downloadSession;
+        [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+        [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+        [handler praseUrl:url.absoluteString];
+    }
 }
 
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
@@ -256,6 +270,10 @@ typedef enum : NSUInteger {
     // 缓存后再播放
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
         [self playAfterCacheWithVideoUrl:url];
+    }
+    // 支持hls
+    if (cacheType == NBPlayerCacheTypePlayHLS) {
+        [self playHLSWithUrl:url];
     }
     
     [self setVideoToolView];
@@ -327,7 +345,6 @@ typedef enum : NSUInteger {
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
             // 下载完成
-            
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             

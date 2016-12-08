@@ -137,9 +137,10 @@
     [self.fileHandle seekToEndOfFile];
     
     [self.fileHandle writeData:data];
-    
+    NSLog(@"接受多少: %lu",data.length);
     _downLoadingOffset += data.length;
-    
+    NSData *filedata = [NSData dataWithContentsOfURL:[NSURL fileURLWithPath:_tempPath] options:NSDataReadingMappedIfSafe error:nil];
+    NSLog(@"filedata: %lu",(unsigned long)filedata.length);
     
     if ([self.delegate respondsToSelector:@selector(didReciveVideoDataWithTask:)]) {
         [self.delegate didReciveVideoDataWithTask:self];
