@@ -29,6 +29,9 @@
     
     NSLog(@"app path :%@",homedi);
     
+    UIBarButtonItem *leftBar = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStylePlain target:self action:nil];
+    self.navigationItem.backBarButtonItem = leftBar;
+    
     self.view.backgroundColor = [UIColor whiteColor];
     self.title = @"纳米盒子播放器";
     
@@ -53,7 +56,7 @@
 - (UITableView *)tableView
 {
     if (!_tableView) {
-        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight - 64) style:UITableViewStylePlain];
+        _tableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, kScreenWidth, kScreenHeight) style:UITableViewStylePlain];
         _tableView.dataSource = self;
         _tableView.delegate = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
@@ -93,7 +96,9 @@
     VideoDetailViewController *videoVC = [[VideoDetailViewController alloc]init];
     videoVC.videoUrlStr = [self.videoList objectAtIndex:indexPath.row];
     [self.navigationController pushViewController:videoVC animated:YES];
+    
 }
+
 
 
 @end

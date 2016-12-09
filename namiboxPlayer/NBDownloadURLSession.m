@@ -9,13 +9,20 @@
 #import "NBDownloadURLSession.h"
 #import "NBPlayerDefine.h"
 #import "NBPlayer.h"
+#import "NBPlayerM3U8Handler.h"
+#import "HTTPServer.h"
+#import "NBPlayerEnvironment.h"
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
     NSMutableArray *_urls;  // hls中ts文件的url
     NSMutableArray *_urlsWidthDownloaded; // hls中ts文件已经下载的url
+    NSMutableArray *_segmentInfos;
 }
+
+/** 本地服务器对象 */
+@property (nonatomic, strong)HTTPServer * httpServer;
 
 @end
 
@@ -26,6 +33,8 @@
         _startPlay = NO;
         _urls = [[NSMutableArray alloc] init];
         _urlsWidthDownloaded = [[NSMutableArray alloc] init];
+        _segmentInfos = [[NSMutableArray alloc] init];
+        
         [session invalidateAndCancel];
         session = nil;
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -35,28 +44,9 @@
     return self;
 }
 
-//- (instancetype)initWidthPlayUrl:(NSString *)playUrl {
-//    if (self == [super init]) {
-//        _playUrl = playUrl;
-//        _startPlay = NO;
-//        
-//        [session invalidateAndCancel];
-//        session = nil;
-//        NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-//        sessionConfiguration.timeoutIntervalForRequest = 1000;
-//        session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-//        
-//        NSURL * url = [NSURL URLWithString:_playUrl];
-//        NSURLRequest * request = [NSURLRequest requestWithURL:url];
-//        NSURLSessionDownloadTask * downloadTask = [session downloadTaskWithRequest:request];
-//        
-//        [downloadTask resume];
-//    }
-//    return self;
-//}
-
 - (void)addDownloadTask:(NSString *)playUrl {
     _playUrl = playUrl;
+    [_segmentInfos addObject:_segmentInfo];
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
@@ -73,20 +63,25 @@
     
     if (currentCacheType == NBPlayerCacheTypePlayHLS) {
         NSURL *url = downloadTask.response.URL;
+        // 已经下载的url
         [_urlsWidthDownloaded addObject:url];
         
         NSInteger index = [_urls indexOfObject:url];
         NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
         cachePath =  [document stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)index]];
         
+        M3U8SegmentInfo *seg = (M3U8SegmentInfo *)_segmentInfos[index];
+        seg.locationUrl = [httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%ld.ts",(long)index]];
+        
         self.downloadProgress = (double)_urlsWidthDownloaded.count/(double)_urls.count;
         
         if (_urlsWidthDownloaded.count == _urls.count) {
+            [self createLocalM3U8file];
             self.startPlay = YES;
         }
         
     } else {
-        cachePath = cachePathForVideo(_playUrl);
+        cachePath = saveCachePathForVideo(_playUrl);
     }
     
     // Copy temporary file
@@ -125,6 +120,42 @@
         
         self.downloadProgress = progress;
     }
+}
+
+-(NSString*)createLocalM3U8file {
+    
+    NSString *fullpath = cachePathForVideo;
+    
+//    NSFileManager *fileManager = [NSFileManager defaultManager];
+//    if (![fileManager fileExistsAtPath:fullpath]) {
+//        return nil;
+//    }
+    
+    //创建文件头部
+    __block NSString* head = @"#EXTM3U\n#EXT-X-TARGETDURATION:30\n#EXT-X-VERSION:2\n#EXT-X-DISCONTINUITY\n";
+    
+    [_segmentInfos enumerateObjectsUsingBlock:^(M3U8SegmentInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSString* length = [NSString stringWithFormat:@"#EXTINF:%ld,\n",(long)obj.duration];
+        head = [NSString stringWithFormat:@"%@%@%@\n",head,length,obj.locationUrl];
+    }];
+    //创建尾部
+    NSString* end = @"#EXT-X-ENDLIST";
+    head = [head stringByAppendingString:end];
+    NSMutableData *writer = [[NSMutableData alloc] init];
+    [writer appendData:[head dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    NSError *error;
+    BOOL bSucc =[writer writeToFile:fullpath options:(NSDataWritingAtomic )  error:&error];
+    
+    
+    if(bSucc) {
+        NSLog(@"create m3u8file succeed; fullpath:%@, content:%@",fullpath,head);
+        return  fullpath;
+    } else {
+        NSLog(@"create m3u8file failed:%@", error);
+        return  nil;
+    }
+    return nil;
 }
 
 - (void)cancel {

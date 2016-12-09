@@ -8,12 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+@class M3U8SegmentInfo;
 @interface NBDownloadURLSession : NSObject
-
-//- (instancetype) initWidthPlayUrl:(NSString *)playUrl;
 
 @property (nonatomic, assign) double downloadProgress;
 @property (nonatomic, assign) BOOL startPlay;
+@property (nonatomic, strong) M3U8SegmentInfo *segmentInfo;
 
 - (void)cancel;
 

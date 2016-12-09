@@ -17,6 +17,9 @@
 #import "NBDownloadURLSession.h"
 #import "NBPlayerDefine.h"
 #import "NBPlayerM3U8Handler.h"
+#import "HTTPServer.h"
+
+#import <AVKit/AVKit.h>
 
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
@@ -55,6 +58,8 @@ typedef enum : NSUInteger {
     //网络播放地址
     NSURL *_playUrl;
 }
+
+@property (nonatomic, strong)HTTPServer * httpServer;
 
 @property (nonatomic, assign) NBPlayerState state;
 @property (nonatomic, assign) CGFloat        loadedProgress;
@@ -181,8 +186,28 @@ typedef enum : NSUInteger {
     
 }
 
+- (void)openHttpServer {
+    self.httpServer = [[HTTPServer alloc] init];
+    [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
+    [self.httpServer setPort:12345]; // 设置服务器端口
+    
+    NSString *webPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+    
+    NSLog(@"-------------\nSetting document root: %@\n", webPath);
+    // 设置服务器路径
+    [self.httpServer setDocumentRoot:webPath];
+    NSError *error;
+    if(![self.httpServer start:&error]) {
+        NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
+    }
+}
+
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
+    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+        [self openHttpServer];
+        
+    }
     self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
     
@@ -240,7 +265,7 @@ typedef enum : NSUInteger {
     _playUrl = url;
     currentCacheType = cacheType;
     
-    self.cachePath = cachePathForVideo(url.absoluteString);
+    self.cachePath = saveCachePathForVideo(url.absoluteString);
     
     [self.player pause];
     [self releasePlayer];
@@ -258,6 +283,9 @@ typedef enum : NSUInteger {
     // 假如有缓存文件，首先播放缓存文件
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
         NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+        if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+            localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+        }
         [self playWithLocalUrl:localURL];
         return;
     }
@@ -350,6 +378,9 @@ typedef enum : NSUInteger {
             
             if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
                 NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+                if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+                    localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+                }
                 [self playWithLocalUrl:localURL];
             }
             

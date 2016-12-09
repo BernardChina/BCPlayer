@@ -9,17 +9,30 @@
 #import "NBPlayerDefine.h"
 #import "NBPlayer.h"
 
-NSString *cachePathForVideo(NSString *url) {
+NSString *saveCachePathForVideo(NSString *url) {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
     components.scheme = @"streaming";
     NSURL *playUrl = [components URL];
-    NSString *md5File = [NSString stringWithFormat:@"%@.mp4", [[playUrl absoluteString] stringToMD5]];
+    NSString *md5File = @"";
+    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+        md5File = [NSString stringWithFormat:@"%@.m3u8", [[playUrl absoluteString] stringToMD5]];
+    } else {
+        md5File = [NSString stringWithFormat:@"%@.mp4", [[playUrl absoluteString] stringToMD5]];
+    }
+    
+    cacheVieoName = md5File;
     
     //这里自己写需要保存数据的路径
     NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
     NSString *cachePath =  [document stringByAppendingPathComponent:md5File];
+    
+    cachePathForVideo = cachePath;
+    
     return cachePath;
 }
+
+NSString *cachePathForVideo = @"";
+NSString *cacheVieoName = @"";
 
 NSURL *getSchemeVideoURL(NSString *url) {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
@@ -32,3 +45,5 @@ NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;
 NSString *const kNBPlayerStateChangedNotification    = @"NBPlayerStateChangedNotification";
 NSString *const kNBPlayerProgressChangedNotification = @"NBPlayerProgressChangedNotification";
 NSString *const kNBPlayerLoadProgressChangedNotification = @"NBPlayerLoadProgressChangedNotification";
+
+NSString* const httpServerLocalUrl = @"http://127.0.0.1:12345/";

@@ -15,7 +15,10 @@ typedef NS_ENUM(NSInteger, NBPlayerCacheType) {
     NBPlayerCacheTypePlayHLS    // 支持hls
 };
 
-extern NSString *cachePathForVideo(NSString *url);
+extern NSString *saveCachePathForVideo(NSString *url);
+extern NSString *cachePathForVideo;
+// 加密后的视频名称
+extern NSString *cacheVieoName;
 extern NSURL *getSchemeVideoURL(NSString *url);
 extern NBPlayerCacheType currentCacheType;
 
@@ -25,3 +28,5 @@ FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
 FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
 
 static void* const DownloadKVOContext = (void *)&DownloadKVOContext;
+
+extern NSString* const httpServerLocalUrl;

@@ -8,6 +8,7 @@
 
 #import "VideoDetailViewController.h"
 #import "NBPlayer.h"
+#import <Masonry/Masonry.h>
 
 @interface VideoDetailViewController (){
     NBVideoPlayer *_play;
@@ -20,13 +21,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.navigationItem.backBarButtonItem.title = @"";
     // Do any additional setup after loading the view, typically from a nib.
     
+    UIView *bgView = [[UIView alloc] init];
+    bgView.backgroundColor = [UIColor whiteColor];
+    [self.view addSubview:bgView];
+    [bgView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.view).offset(0);
+    }];
     
     _play = [[NBVideoPlayer alloc]init];
     UIView *videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
-    [self.view addSubview:videoView];
+    [bgView addSubview:videoView];
     
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
               showView:videoView

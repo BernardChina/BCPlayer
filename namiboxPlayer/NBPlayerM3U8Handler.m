@@ -57,6 +57,7 @@
             M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
             segment.duration = [temp[0] intValue];
             segment.locationUrl = [self removeSpaceAndNewlineAndOtherFlag:temp[1]];
+            self.loadSession.segmentInfo = segment;
             [self.loadSession addDownloadTask:segment.locationUrl];
             
             [segments addObject:segment];
