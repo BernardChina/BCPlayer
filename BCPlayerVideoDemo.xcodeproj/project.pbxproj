@@ -399,15 +399,15 @@
 				92231DA21DFD8340002A1FAB /* BCPlayer */,
 				92231E4D1DFD94A0002A1FAB /* AppDelegate.h */,
 				92231E4E1DFD94A0002A1FAB /* AppDelegate.m */,
+				92231E561DFD94A0002A1FAB /* VideoDetailViewController.h */,
+				92231E571DFD94A0002A1FAB /* VideoDetailViewController.m */,
+				92231E581DFD94A0002A1FAB /* ViewController.h */,
+				92231E591DFD94A0002A1FAB /* ViewController.m */,
 				92231E4F1DFD94A0002A1FAB /* Assets.xcassets */,
 				92231E501DFD94A0002A1FAB /* LaunchScreen.storyboard */,
 				92231E521DFD94A0002A1FAB /* Main.storyboard */,
 				92231E541DFD94A0002A1FAB /* Info.plist */,
 				92231E551DFD94A0002A1FAB /* main.m */,
-				92231E561DFD94A0002A1FAB /* VideoDetailViewController.h */,
-				92231E571DFD94A0002A1FAB /* VideoDetailViewController.m */,
-				92231E581DFD94A0002A1FAB /* ViewController.h */,
-				92231E591DFD94A0002A1FAB /* ViewController.m */,
 			);
 			path = BCPlayerVideo;
 			sourceTree = "<group>";
