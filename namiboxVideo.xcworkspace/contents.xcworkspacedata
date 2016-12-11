@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:namiboxVideo.xcodeproj">
+      location = "group:/Users/liuyongqiang/Documents/github/BCPlayer/BCPlayerVideoDemo.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">

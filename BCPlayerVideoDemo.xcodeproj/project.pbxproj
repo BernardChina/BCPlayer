@@ -484,7 +484,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 927ABD061DF1731800689E94 /* Build configuration list for PBXProject "namiboxVideo" */;
+			buildConfigurationList = 927ABD061DF1731800689E94 /* Build configuration list for PBXProject "BCPlayerVideoDemo" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -784,7 +784,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		927ABD061DF1731800689E94 /* Build configuration list for PBXProject "namiboxVideo" */ = {
+		927ABD061DF1731800689E94 /* Build configuration list for PBXProject "BCPlayerVideoDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				927ABD201DF1731800689E94 /* Debug */,
