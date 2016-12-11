@@ -1,25 +1,24 @@
 //
-//  NBPlayerM3U8Handler.m
+//  BCPlayerM3U8Handler.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/8.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBPlayerM3U8Handler.h"
-#import "NBDownloadURLSession.h"
-#import "NBPlayerDefine.h"
+#import "BCPlayerM3U8Handler.h"
+#import "BCDownloadURLSession.h"
+#import "BCPlayerDefine.h"
 
-@interface NBPlayerM3U8Handler()
+@interface BCPlayerM3U8Handler()
 
 @end
 
 @implementation M3U8SegmentInfo
 
-
 @end
 
-@implementation NBPlayerM3U8Handler
+@implementation BCPlayerM3U8Handler
 
 - (void)praseUrl:(NSString *)urlstr {
     NSURL *url = [[NSURL alloc] initWithString:urlstr];

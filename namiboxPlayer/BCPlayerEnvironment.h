@@ -1,18 +1,18 @@
 //
-//  NBPlayerEnvironment.h
+//  BCPlayerEnvironment.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
-@class NBPlayerEnvironment;
+@class BCPlayerEnvironment;
 
-void NBSetWBEnviroment(NBPlayerEnvironment *env);
+void BCSetWBEnviroment(BCPlayerEnvironment *env);
 
-@interface NBPlayerEnvironment : NSObject
+@interface BCPlayerEnvironment : NSObject
 
 + (instancetype)defaultEnvironment;
 

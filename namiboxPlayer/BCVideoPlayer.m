@@ -1,22 +1,23 @@
 //
-//  NBVideoPlayer.m
+//  BCVideoPlayer.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBVideoPlayer.h"
-#import "NBLoaderURLSession.h"
-#import "NBPlayerView.h"
-#import "NBTimeSheetView.h"
-#import "NBLightView.h"
-#import "NSString+NB.h"
-#import "NBPlayer.h"
-#import "NBPlayerDefine.h"
-#import "NBDownloadURLSession.h"
-#import "NBPlayerDefine.h"
-#import "NBPlayerM3U8Handler.h"
+#import "BCVideoPlayer.h"
+#import "BCDownloadURLSession.h"
+#import "BCLoaderURLSession.h"
+#import "BCPlayerView.h"
+#import "BCTimeSheetView.h"
+#import "BCLightView.h"
+#import "NSString+BC.h"
+#import "BCPlayer.h"
+#import "BCPlayerDefine.h"
+#import "BCDownloadURLSession.h"
+#import "BCPlayerDefine.h"
+#import "BCPlayerM3U8Handler.h"
 #import "HTTPServer.h"
 
 #import <AVKit/AVKit.h>
@@ -24,20 +25,20 @@
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
 
-static NSString *const NBVideoPlayerItemStatusKeyPath = @"status";
-static NSString *const NBVideoPlayerItemLoadedTimeRangesKeyPath = @"loadedTimeRanges";
-static NSString *const NBVideoPlayerItemPlaybackBufferEmptyKeyPath = @"playbackBufferEmpty";
-static NSString *const NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath = @"playbackLikelyToKeepUp";
-static NSString *const NBVideoPlayerItemPresentationSizeKeyPath = @"presentationSize";
+static NSString *const BCVideoPlayerItemStatusKeyPath = @"status";
+static NSString *const BCVideoPlayerItemLoadedTimeRangesKeyPath = @"loadedTimeRanges";
+static NSString *const BCVideoPlayerItemPlaybackBufferEmptyKeyPath = @"playbackBufferEmpty";
+static NSString *const BCVideoPlayerItemPlaybackLikelyToKeepUpKeyPath = @"playbackLikelyToKeepUp";
+static NSString *const BCVideoPlayerItemPresentationSizeKeyPath = @"presentationSize";
 
 typedef enum : NSUInteger {
-    NBPlayerControlTypeProgress,
-    NBPlayerControlTypeVoice,
-    NBPlayerControlTypeLight,
-    NBPlayerControlTypeNone = 999,
-} NBPlayerControlType;
+    BCPlayerControlTypeProgress,
+    BCPlayerControlTypeVoice,
+    BCPlayerControlTypeLight,
+    BCPlayerControlTypeNone = 999,
+} BCPlayerControlType;
 
-@interface NBVideoPlayer()<NBLoaderURLSessionDelegate, UIGestureRecognizerDelegate>{
+@interface BCVideoPlayer()<BCLoaderURLSessionDelegate, UIGestureRecognizerDelegate>{
     //用来控制上下菜单view隐藏的timer
     NSTimer * _hiddenTimer;
     UIInterfaceOrientation _currentOrientation;
@@ -61,7 +62,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, strong)HTTPServer * httpServer;
 
-@property (nonatomic, assign) NBPlayerState state;
+@property (nonatomic, assign) BCPlayerState state;
 @property (nonatomic, assign) CGFloat        loadedProgress;
 @property (nonatomic, assign) CGFloat        duration;
 @property (nonatomic, assign) CGFloat        current;
@@ -95,21 +96,21 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) MPVolumeView   *volumeView;             //音量控制控件
 @property (nonatomic, strong) UISlider       *volumeSlider;           //用这个来控制音量
 
-@property (nonatomic, strong) NBLoaderURLSession *resouerLoader;      //缓存session
-@property (nonatomic, strong) NBDownloadURLSession *downloadSession;  //下载session
+@property (nonatomic, strong) BCLoaderURLSession *resouerLoader;      //缓存session
+@property (nonatomic, strong) BCDownloadURLSession *downloadSession;  //下载session
 
-@property (nonatomic, assign) NBPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度
-@property (nonatomic, strong) NBTimeSheetView *timeSheetView;        //左右滑动时间View
+@property (nonatomic, assign) BCPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度
+@property (nonatomic, strong) BCTimeSheetView *timeSheetView;        //左右滑动时间View
 @property (nonatomic, strong) NSString *cachePath;
 
 @end
 
-@implementation NBVideoPlayer
+@implementation BCVideoPlayer
 
 + (instancetype)sharedInstance {
     
     static dispatch_once_t onceToken;
-    static NBVideoPlayer *instance;
+    static BCVideoPlayer *instance;
     
     dispatch_once(&onceToken, ^{
         instance = [[self alloc]init];
@@ -124,7 +125,7 @@ typedef enum : NSUInteger {
         _loadedProgress = 0;
         _duration = 0;
         _current  = 0;
-        _state = NBPlayerStateStopped;
+        _state = BCPlayerStateStopped;
         _stopInBackground = YES;
         _isFullScreen = NO;
         _canFullScreen = YES;
@@ -146,7 +147,7 @@ typedef enum : NSUInteger {
             default:
                 break;
         }
-        [NBLightView sharedInstance];
+        [BCLightView sharedInstance];
     }
     return self;
 }
@@ -157,7 +158,7 @@ typedef enum : NSUInteger {
     
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
         
-        self.resouerLoader          = [[NBLoaderURLSession alloc] init];
+        self.resouerLoader          = [[BCLoaderURLSession alloc] init];
         self.resouerLoader.playCachePath = self.cachePath;
         self.resouerLoader.delegate = self;
         
@@ -178,10 +179,10 @@ typedef enum : NSUInteger {
     [self commonObserver];
     
     // 如果已经在NBPlayerStateBuffering，则直接发通知，否则设置状态
-    if (self.state == NBPlayerStateBuffering) {
+    if (self.state == BCPlayerStateBuffering) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
     } else {
-        self.state = NBPlayerStateBuffering;
+        self.state = BCPlayerStateBuffering;
     }
     
 }
@@ -191,7 +192,7 @@ typedef enum : NSUInteger {
     [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
     [self.httpServer setPort:12345]; // 设置服务器端口
     
-    NSString *webPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+    NSString *webPath = [[BCPlayerEnvironment defaultEnvironment] cachePath];
     
     NSLog(@"-------------\nSetting document root: %@\n", webPath);
     // 设置服务器路径
@@ -223,10 +224,10 @@ typedef enum : NSUInteger {
     
     if ([url.scheme isEqualToString:@"file"]) {
         // 如果已经在NBPlayerStatePlaying，则直接发通知，否则设置状态
-        if (self.state == NBPlayerStatePlaying) {
+        if (self.state == BCPlayerStatePlaying) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
         } else {
-            self.state = NBPlayerStatePlaying;
+            self.state = BCPlayerStatePlaying;
         }
     }
     
@@ -238,7 +239,7 @@ typedef enum : NSUInteger {
     
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        self.downloadSession = [[NBDownloadURLSession alloc] init];
+        self.downloadSession = [[BCDownloadURLSession alloc] init];
         [self.downloadSession addDownloadTask:str];
         
         [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
@@ -251,8 +252,8 @@ typedef enum : NSUInteger {
     
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        NBPlayerM3U8Handler *handler = [[NBPlayerM3U8Handler alloc] init];
-        self.downloadSession = [[NBDownloadURLSession alloc] init];
+        BCPlayerM3U8Handler *handler = [[BCPlayerM3U8Handler alloc] init];
+        self.downloadSession = [[BCDownloadURLSession alloc] init];
         handler.loadSession = self.downloadSession;
         [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
@@ -334,14 +335,14 @@ typedef enum : NSUInteger {
 - (void)appDidEnterBackground {
     if (self.stopInBackground) {
         [self pause];
-        self.state = NBPlayerStatePause;
+        self.state = BCPlayerStatePause;
         self.isPauseByUser = NO;
     }
 }
 - (void)appDidEnterPlayGround {
     if (!self.isPauseByUser) {
         [self resume];
-        self.state = NBPlayerStatePlaying;
+        self.state = BCPlayerStatePlaying;
     }
 }
 
@@ -353,7 +354,7 @@ typedef enum : NSUInteger {
     //重新播放
     self.repeatBtn.hidden = NO;
     [self toolViewHidden];
-    self.state = NBPlayerStateFinish;
+    self.state = BCPlayerStateFinish;
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
     
@@ -397,7 +398,7 @@ typedef enum : NSUInteger {
     
     AVPlayerItem *playerItem = (AVPlayerItem *)object;
     
-    if ([NBVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
+    if ([BCVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
         if ([playerItem status] == AVPlayerStatusReadyToPlay) {
             
             _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
@@ -408,23 +409,23 @@ typedef enum : NSUInteger {
             [self.delegate NBVideoPlayer:self didCompleteWithError:[NSError errorWithDomain:@"播放失败" code:0 userInfo:nil]];
         }
         
-    } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
+    } else if ([BCVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
         //监听播放器的下载进度
         [self calculateDownloadProgress:playerItem];
         
-    } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
+    } else if ([BCVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
         //监听播放器在缓冲数据的状态
         //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
         [self.actIndicator startAnimating];
         self.actIndicator.hidden = NO;
         if (playerItem.isPlaybackBufferEmpty) {
-            self.state = NBPlayerStateBuffering;
+            self.state = BCPlayerStateBuffering;
             [self bufferingSomeSecond];
         }
-    } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
+    } else if ([BCVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
         // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
-        NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
-    } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
+        NSLog(@"BCVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
+    } else if ([BCVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;
         static float staticHeight = 0;
         staticHeight = size.height/size.width * kScreenWidth;
@@ -458,7 +459,7 @@ typedef enum : NSUInteger {
         [strongSelf updateCurrentTime:current];
         [strongSelf updateVideoSlider:current];
         if (strongSelf.isPauseByUser == NO) {
-            strongSelf.state = NBPlayerStatePlaying;
+            strongSelf.state = BCPlayerStatePlaying;
         }
         
         // 不相等的时候才更新，并发通知，否则seek时会继续跳动
@@ -530,8 +531,8 @@ typedef enum : NSUInteger {
     [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerLoadProgressChangedNotification object:nil];
 }
 
-- (void)setState:(NBPlayerState)state {
-    if (state != NBPlayerStateBuffering) {
+- (void)setState:(BCPlayerState)state {
+    if (state != BCPlayerStateBuffering) {
         [self.actIndicator stopAnimating];
         self.actIndicator.hidden = YES;
     }
@@ -684,9 +685,9 @@ typedef enum : NSUInteger {
     return _volumeView;
 }
 
-- (NBTimeSheetView *)timeSheetView {
+- (BCTimeSheetView *)timeSheetView {
     if (!_timeSheetView) {
-        _timeSheetView = [[NBTimeSheetView alloc]initWithFrame:CGRectMake(0, 0, 120, 60)];
+        _timeSheetView = [[BCTimeSheetView alloc]initWithFrame:CGRectMake(0, 0, 120, 60)];
         _timeSheetView.hidden = YES;
         _timeSheetView.layer.cornerRadius = 10.0;
     }
@@ -913,7 +914,7 @@ typedef enum : NSUInteger {
             
             //当滑动角度小于30度的时候, 进度手势
             if (tan < 1 / sqrt(3)) {
-                self.controlType = NBPlayerControlTypeProgress;
+                self.controlType = BCPlayerControlTypeProgress;
                 _controlJudge = YES;
             }
             
@@ -921,21 +922,21 @@ typedef enum : NSUInteger {
             else if (tan > sqrt(3)) {
                 //判断是在屏幕的左半边还是右半边滑动, 左侧控制为亮度, 右侧控制音量
                 if (_touchBeginPoint.x < self.touchView.frame.size.width / 2) {
-                    _controlType = NBPlayerControlTypeLight;
+                    _controlType = BCPlayerControlTypeLight;
                 }else{
-                    _controlType = NBPlayerControlTypeVoice;
+                    _controlType = BCPlayerControlTypeVoice;
                 }
                 _controlJudge = YES;
             } else {
-                _controlType = NBPlayerControlTypeNone;
+                _controlType = BCPlayerControlTypeNone;
                 return;
             }
         }
         
-        if (NBPlayerControlTypeProgress == _controlType) {
+        if (BCPlayerControlTypeProgress == _controlType) {
             float value = [self moveProgressControllWithTempPoint:touchPoint];
             [self timeValueChangingWithValue:value];
-        } else if (NBPlayerControlTypeVoice == _controlType) {
+        } else if (BCPlayerControlTypeVoice == _controlType) {
             //根据触摸开始时的音量和触摸开始时的点去计算出现在滑动到的音量
             float voiceValue = _touchBeginVoiceValue - ((touchPoint.y - _touchBeginPoint.y) / CGRectGetHeight(self.touchView.frame));
             //判断控制一下, 不能超出 0~1
@@ -946,9 +947,9 @@ typedef enum : NSUInteger {
             }else{
                 self.volumeSlider.value = voiceValue;
             }
-        } else if (NBPlayerControlTypeLight == _controlType) {
+        } else if (BCPlayerControlTypeLight == _controlType) {
             [UIScreen mainScreen].brightness -= ((touchPoint.y - _touchBeginPoint.y) / 10000);
-        } else if (NBPlayerControlTypeNone == _controlType) {
+        } else if (BCPlayerControlTypeNone == _controlType) {
             if (self.toolView.hidden) {
                 [self showToolView];
             } else {
@@ -966,7 +967,7 @@ typedef enum : NSUInteger {
         _controlJudge = NO;
         //判断是否移动过,
         if (_hasMoved) {
-            if (NBPlayerControlTypeProgress == _controlType) {
+            if (BCPlayerControlTypeProgress == _controlType) {
                 float value = [self moveProgressControllWithTempPoint:touchPoint];
                 [self seekToTime:value];
                 self.timeSheetView.hidden = YES;
@@ -1006,7 +1007,7 @@ typedef enum : NSUInteger {
 
 // 拖动slider 播放跳跃播放
 - (void)seekToTime:(CGFloat)seconds {
-    if (self.state == NBPlayerStateStopped) {
+    if (self.state == BCPlayerStateStopped) {
         return;
     }
     
@@ -1018,7 +1019,7 @@ typedef enum : NSUInteger {
         self.isPauseByUser = NO;
         [self.player play];
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
-            self.state = NBPlayerStateBuffering;
+            self.state = BCPlayerStateBuffering;
             
             self.actIndicator.hidden = NO;
             [self.actIndicator startAnimating];
@@ -1099,23 +1100,23 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
-    if (self.state == NBPlayerStatePlaying) {
+    if (self.state == BCPlayerStatePlaying) {
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
         [self.player pause];
-        self.state = NBPlayerStatePause;
-    } else if (self.state == NBPlayerStatePause) {
+        self.state = BCPlayerStatePause;
+    } else if (self.state == BCPlayerStatePause) {
         self.repeatBtn.hidden = YES;
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
         [self.player play];
-        self.state = NBPlayerStatePlaying;
-    } else if (self.state == NBPlayerStateFinish) {
+        self.state = BCPlayerStatePlaying;
+    } else if (self.state == BCPlayerStateFinish) {
         self.repeatBtn.hidden = YES;
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
         [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
         [self seekToTime:0.0];
-        self.state = NBPlayerStatePlaying;
+        self.state = BCPlayerStatePlaying;
     }
     self.isPauseByUser = YES;
 }
@@ -1152,7 +1153,7 @@ typedef enum : NSUInteger {
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
     self.isPauseByUser = YES;
-    self.state = NBPlayerStatePause;
+    self.state = BCPlayerStatePause;
     [self.player pause];
 }
 
@@ -1164,7 +1165,7 @@ typedef enum : NSUInteger {
     self.loadedProgress = 0;
     self.duration = 0;
     self.current  = 0;
-    self.state = NBPlayerStateStopped;
+    self.state = BCPlayerStateStopped;
     [self.player pause];
     [self releasePlayer];
     self.repeatBtn.hidden = YES;
@@ -1240,11 +1241,11 @@ typedef enum : NSUInteger {
     }
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath];
-    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath];
-    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath];
-    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath];
-    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath];
+    [self.currentPlayerItem removeObserver:self forKeyPath:BCVideoPlayerItemStatusKeyPath];
+    [self.currentPlayerItem removeObserver:self forKeyPath:BCVideoPlayerItemLoadedTimeRangesKeyPath];
+    [self.currentPlayerItem removeObserver:self forKeyPath:BCVideoPlayerItemPlaybackBufferEmptyKeyPath];
+    [self.currentPlayerItem removeObserver:self forKeyPath:BCVideoPlayerItemPlaybackLikelyToKeepUpKeyPath];
+    [self.currentPlayerItem removeObserver:self forKeyPath:BCVideoPlayerItemPresentationSizeKeyPath];
     [self.player removeTimeObserver:self.playbackTimeObserver];
     self.playbackTimeObserver = nil;
     self.currentPlayerItem = nil;
@@ -1261,15 +1262,15 @@ typedef enum : NSUInteger {
 - (void)commonObserver {
     
     // status.播放器的播放状态
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:BCVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
     // loadedTimeRanges. 已加载项目的时间范围
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:BCVideoPlayerItemLoadedTimeRangesKeyPath options:NSKeyValueObservingOptionNew context:nil];
     // playbackBufferEmpty. 指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:BCVideoPlayerItemPlaybackBufferEmptyKeyPath options:NSKeyValueObservingOptionNew context:nil];
     // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:BCVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
     // presentationSize. 播放器呈现的大小size
-    [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    [self.currentPlayerItem addObserver:self forKeyPath:BCVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
@@ -1282,7 +1283,7 @@ typedef enum : NSUInteger {
 
 #pragma mark - NBLoaderURLSessionDelegate
 
-- (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
+- (void)didFinishLoadingWithTask:(BCVideoRequestTask *)task {
 
     
 }
@@ -1293,7 +1294,7 @@ typedef enum : NSUInteger {
 //服务器内部错误：-1004
 //找不到服务器：-1003
 
-- (void)didFailLoadingWithTask:(NBVideoRequestTask *)task withError:(NSInteger )errorCode {
+- (void)didFailLoadingWithTask:(BCVideoRequestTask *)task withError:(NSInteger )errorCode {
     NSString *str = nil;
     switch (errorCode) {
         case -1001:
@@ -1360,9 +1361,9 @@ typedef enum : NSUInteger {
         [self.showView removeFromSuperview];
         [self.playerSuperView addSubview:self.showView];
         
-        NBLightView *lightView = [NBLightView sharedInstance];
+        BCLightView *lightView = [BCLightView sharedInstance];
         [[UIApplication sharedApplication].keyWindow bringSubviewToFront:lightView];
-        __weak NBVideoPlayer * weakSelf = self;
+        __weak BCVideoPlayer * weakSelf = self;
         [self.showView mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.top.mas_equalTo(CGRectGetMinY(weakSelf.showViewRect));
             make.left.mas_equalTo(CGRectGetMinX(weakSelf.showViewRect));
@@ -1381,7 +1382,7 @@ typedef enum : NSUInteger {
         [[UIApplication sharedApplication].keyWindow addSubview:self.showView];
         
         // 亮度view加到window最上层
-        NBLightView *lightView = [NBLightView sharedInstance];
+        BCLightView *lightView = [BCLightView sharedInstance];
         [[UIApplication sharedApplication].keyWindow insertSubview:self.showView belowSubview:lightView];
         
         [self.showView mas_remakeConstraints:^(MASConstraintMaker *make) {
@@ -1404,7 +1405,7 @@ typedef enum : NSUInteger {
         [[UIApplication sharedApplication] setStatusBarOrientation:_currentOrientation animated:YES];
         //旋转视频播放的view和显示亮度的view
         self.showView.transform = [self getOrientation:orientation];
-        [NBLightView sharedInstance].transform = [self getOrientation:orientation];
+        [BCLightView sharedInstance].transform = [self getOrientation:orientation];
     } completion:^(BOOL finished) {
         
     }];

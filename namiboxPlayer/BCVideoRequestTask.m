@@ -1,17 +1,17 @@
 //
-//  NBVideoRequestTask.m
+//  BCVideoRequestTask.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBVideoRequestTask.h"
-#import "NSString+NB.h"
-#import "NBPlayerEnvironment.h"
-#import "NBPlayerDefine.h"
+#import "BCVideoRequestTask.h"
+#import "NSString+BC.h"
+#import "BCPlayerEnvironment.h"
+#import "BCPlayerDefine.h"
 
-@interface NBVideoRequestTask()<NSURLSessionDataDelegate>
+@interface BCVideoRequestTask()<NSURLSessionDataDelegate>
 
 @property (nonatomic, strong) NSURL           *url;
 @property (nonatomic        ) NSUInteger      offset;
@@ -32,7 +32,7 @@
 
 @end
 
-@implementation NBVideoRequestTask
+@implementation BCVideoRequestTask
 
 - (instancetype)init {
     self = [super init];

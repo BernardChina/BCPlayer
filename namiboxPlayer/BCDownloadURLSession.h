@@ -1,15 +1,15 @@
 //
-//  NBDownloadURLSession.h
+//  BCDownloadURLSession.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
 @class M3U8SegmentInfo;
-@interface NBDownloadURLSession : NSObject
+@interface BCDownloadURLSession : NSObject
 
 @property (nonatomic, assign) double downloadProgress;
 @property (nonatomic, assign) BOOL startPlay;

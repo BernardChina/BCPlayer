@@ -1,36 +1,36 @@
 //
-//  NBVideoPlayer.h
+//  BCVideoPlayer.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 
-#import "NBPlayer.h"
-#import "NBPlayerDefine.h"
-#import "NBPlayerDelegate.h"
+#import "BCPlayer.h"
+#import "BCPlayerDefine.h"
+#import "BCPlayerDelegate.h"
 
-typedef NS_ENUM(NSInteger, NBPlayerState) {
-    NBPlayerStateBuffering = 1,    //正在缓存
-    NBPlayerStatePlaying,          //正在播放
-    NBPlayerStateStopped,          //播放结束
-    NBPlayerStatePause,            //暂停播放
-    NBPlayerStateFinish,           //播放完成
+typedef NS_ENUM(NSInteger, BCPlayerState) {
+    BCPlayerStateBuffering = 1,    //正在缓存
+    BCPlayerStatePlaying,          //正在播放
+    BCPlayerStateStopped,          //播放结束
+    BCPlayerStatePause,            //暂停播放
+    BCPlayerStateFinish,           //播放完成
 };
 
-@interface NBVideoPlayer : NSObject
+@interface BCVideoPlayer : NSObject
 
-@property (nonatomic, readonly) NBPlayerState  state;                   //视频Player状态
+@property (nonatomic, readonly) BCPlayerState  state;                   //视频Player状态
 @property (nonatomic, readonly) CGFloat        loadedProgress;          //缓冲的进度
 @property (nonatomic, readonly) CGFloat        duration;                //视频总时间
 @property (nonatomic, readonly) CGFloat        current;                 //当前播放时间
 //@property (nonatomic, readonly) CGFloat        progress;                //播放进度0~1之间
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
-@property (nonatomic, weak) id<NBPlayerDelegate> delegate;
+@property (nonatomic, weak) id<BCPlayerDelegate> delegate;
 
 + (instancetype)sharedInstance;
 

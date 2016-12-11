@@ -1,15 +1,15 @@
 //
-//  NSString+HCD.m
+//  NSString+BC.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NSString+NB.h"
+#import "NSString+BC.h"
 #import <CommonCrypto/CommonCrypto.h>
 
-@implementation NSString (NB)
+@implementation NSString (BC)
 
 - (NSString *)stringToMD5
 {

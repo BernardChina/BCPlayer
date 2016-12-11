@@ -1,9 +1,9 @@
 //
-//  NBPlayerDefine.h
+//  BCPlayerDefine.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

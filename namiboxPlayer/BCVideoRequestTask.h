@@ -1,25 +1,25 @@
 //
-//  NBVideoRequestTask.h
+//  BCVideoRequestTask.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
-@class NBVideoRequestTask;
+@class BCVideoRequestTask;
 
-@protocol NBVideoRequestTaskDelegate <NSObject>
+@protocol BCVideoRequestTaskDelegate <NSObject>
 
-- (void)task:(NBVideoRequestTask *)task didReciveVideoLength:(NSUInteger)videoLength mimeType:(NSString *)mimeType;
-- (void)didReciveVideoDataWithTask:(NBVideoRequestTask *)task;
-- (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task;
-- (void)didFailLoadingWithTask:(NBVideoRequestTask *)task withError:(NSInteger)errorCode;
+- (void)task:(BCVideoRequestTask *)task didReciveVideoLength:(NSUInteger)videoLength mimeType:(NSString *)mimeType;
+- (void)didReciveVideoDataWithTask:(BCVideoRequestTask *)task;
+- (void)didFinishLoadingWithTask:(BCVideoRequestTask *)task;
+- (void)didFailLoadingWithTask:(BCVideoRequestTask *)task withError:(NSInteger)errorCode;
 
 @end
 
-@interface NBVideoRequestTask : NSObject
+@interface BCVideoRequestTask : NSObject
 
 @property (nonatomic, copy) NSString *playCachePath;
 @property (nonatomic, strong, readonly) NSURL         *url;
@@ -30,7 +30,7 @@
 @property (nonatomic, readonly)         NSString      *mimeType;
 @property (nonatomic, assign)           BOOL          isFinishLoad;
 
-@property (nonatomic, weak)             id<NBVideoRequestTaskDelegate> delegate;
+@property (nonatomic, weak)             id<BCVideoRequestTaskDelegate> delegate;
 
 - (void)setUrl:(NSURL *)url offset:(NSUInteger)offset;
 

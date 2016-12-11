@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9256F3431DF4FF3E0075E952 /* NBPlayerEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3421DF4FF3E0075E952 /* NBPlayerEnvironment.m */; };
-		9256F3461DF506C10075E952 /* NBDownloadURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3451DF506C10075E952 /* NBDownloadURLSession.m */; };
-		9256F3491DF50ACA0075E952 /* NBPlayerDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */; };
-		9276E4991DF9407200B922DC /* NBPlayerM3U8Handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */; };
+		9256F3431DF4FF3E0075E952 /* BCPlayerEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3421DF4FF3E0075E952 /* BCPlayerEnvironment.m */; };
+		9256F3461DF506C10075E952 /* BCDownloadURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3451DF506C10075E952 /* BCDownloadURLSession.m */; };
+		9256F3491DF50ACA0075E952 /* BCPlayerDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9256F3481DF50ACA0075E952 /* BCPlayerDefine.m */; };
+		9276E4991DF9407200B922DC /* BCPlayerM3U8Handler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E4981DF9407200B922DC /* BCPlayerM3U8Handler.m */; };
 		9276E4E61DFA54B300B922DC /* DDData.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E49E1DFA54B300B922DC /* DDData.m */; };
 		9276E4E71DFA54B300B922DC /* DDNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E4A01DFA54B300B922DC /* DDNumber.m */; };
 		9276E4E81DFA54B300B922DC /* DDRange.m in Sources */ = {isa = PBXBuildFile; fileRef = 9276E4A21DFA54B300B922DC /* DDRange.m */; };
@@ -56,29 +56,29 @@
 		927ABD1B1DF1731800689E94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD1A1DF1731800689E94 /* Assets.xcassets */; };
 		927ABD1E1DF1731800689E94 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD1C1DF1731800689E94 /* LaunchScreen.storyboard */; };
 		927ABD271DF1751700689E94 /* VideoDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD261DF1751700689E94 /* VideoDetailViewController.m */; };
-		927ABD2D1DF1765800689E94 /* NBVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD2C1DF1765800689E94 /* NBVideoPlayer.m */; };
-		927ABD4E1DF1778200689E94 /* NBLoaderURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD4D1DF1778200689E94 /* NBLoaderURLSession.m */; };
-		927ABD511DF177A600689E94 /* NBPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD501DF177A600689E94 /* NBPlayerView.m */; };
-		927ABD541DF177BE00689E94 /* NBTimeSheetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD531DF177BE00689E94 /* NBTimeSheetView.m */; };
-		927ABD571DF177D600689E94 /* NBLightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD561DF177D600689E94 /* NBLightView.m */; };
-		927ABD5A1DF177FA00689E94 /* NBVideoRequestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD591DF177FA00689E94 /* NBVideoRequestTask.m */; };
-		927ABD5D1DF1782100689E94 /* NSString+NB.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5C1DF1782100689E94 /* NSString+NB.m */; };
-		927ABD5F1DF17E4D00689E94 /* NBPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5E1DF17E4D00689E94 /* NBPlayer.h */; };
-		927ABD611DF2547E00689E94 /* NBPlayer.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD601DF2547E00689E94 /* NBPlayer.bundle */; };
+		927ABD2D1DF1765800689E94 /* BCVideoPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD2C1DF1765800689E94 /* BCVideoPlayer.m */; };
+		927ABD4E1DF1778200689E94 /* BCLoaderURLSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD4D1DF1778200689E94 /* BCLoaderURLSession.m */; };
+		927ABD511DF177A600689E94 /* BCPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD501DF177A600689E94 /* BCPlayerView.m */; };
+		927ABD541DF177BE00689E94 /* BCTimeSheetView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD531DF177BE00689E94 /* BCTimeSheetView.m */; };
+		927ABD571DF177D600689E94 /* BCLightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD561DF177D600689E94 /* BCLightView.m */; };
+		927ABD5A1DF177FA00689E94 /* BCVideoRequestTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD591DF177FA00689E94 /* BCVideoRequestTask.m */; };
+		927ABD5D1DF1782100689E94 /* NSString+BC.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5C1DF1782100689E94 /* NSString+BC.m */; };
+		927ABD5F1DF17E4D00689E94 /* BCPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5E1DF17E4D00689E94 /* BCPlayer.h */; };
+		927ABD611DF2547E00689E94 /* BCPlayer.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD601DF2547E00689E94 /* BCPlayer.bundle */; };
 		989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		8E6C2D4EBA9BFBFCE148F162 /* Pods-namiboxVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.release.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.release.xcconfig"; sourceTree = "<group>"; };
-		9256F3411DF4FF3E0075E952 /* NBPlayerEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerEnvironment.h; sourceTree = "<group>"; };
-		9256F3421DF4FF3E0075E952 /* NBPlayerEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerEnvironment.m; sourceTree = "<group>"; };
-		9256F3441DF506C10075E952 /* NBDownloadURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBDownloadURLSession.h; sourceTree = "<group>"; };
-		9256F3451DF506C10075E952 /* NBDownloadURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBDownloadURLSession.m; sourceTree = "<group>"; };
-		9256F3471DF50ACA0075E952 /* NBPlayerDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerDefine.h; sourceTree = "<group>"; };
-		9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerDefine.m; sourceTree = "<group>"; };
-		9256F34D1DF667FE0075E952 /* NBPlayerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerDelegate.h; sourceTree = "<group>"; };
-		9276E4971DF9407200B922DC /* NBPlayerM3U8Handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerM3U8Handler.h; sourceTree = "<group>"; };
-		9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerM3U8Handler.m; sourceTree = "<group>"; };
+		9256F3411DF4FF3E0075E952 /* BCPlayerEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayerEnvironment.h; sourceTree = "<group>"; };
+		9256F3421DF4FF3E0075E952 /* BCPlayerEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCPlayerEnvironment.m; sourceTree = "<group>"; };
+		9256F3441DF506C10075E952 /* BCDownloadURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCDownloadURLSession.h; sourceTree = "<group>"; };
+		9256F3451DF506C10075E952 /* BCDownloadURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCDownloadURLSession.m; sourceTree = "<group>"; };
+		9256F3471DF50ACA0075E952 /* BCPlayerDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayerDefine.h; sourceTree = "<group>"; };
+		9256F3481DF50ACA0075E952 /* BCPlayerDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCPlayerDefine.m; sourceTree = "<group>"; };
+		9256F34D1DF667FE0075E952 /* BCPlayerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayerDelegate.h; sourceTree = "<group>"; };
+		9276E4971DF9407200B922DC /* BCPlayerM3U8Handler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayerM3U8Handler.h; sourceTree = "<group>"; };
+		9276E4981DF9407200B922DC /* BCPlayerM3U8Handler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCPlayerM3U8Handler.m; sourceTree = "<group>"; };
 		9276E49D1DFA54B300B922DC /* DDData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDData.h; sourceTree = "<group>"; };
 		9276E49E1DFA54B300B922DC /* DDData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDData.m; sourceTree = "<group>"; };
 		9276E49F1DFA54B300B922DC /* DDNumber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDNumber.h; sourceTree = "<group>"; };
@@ -160,22 +160,22 @@
 		927ABD1F1DF1731800689E94 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		927ABD251DF1751700689E94 /* VideoDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoDetailViewController.h; sourceTree = "<group>"; };
 		927ABD261DF1751700689E94 /* VideoDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoDetailViewController.m; sourceTree = "<group>"; };
-		927ABD2B1DF1765800689E94 /* NBVideoPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBVideoPlayer.h; sourceTree = "<group>"; };
-		927ABD2C1DF1765800689E94 /* NBVideoPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBVideoPlayer.m; sourceTree = "<group>"; };
-		927ABD4C1DF1778200689E94 /* NBLoaderURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBLoaderURLSession.h; sourceTree = "<group>"; };
-		927ABD4D1DF1778200689E94 /* NBLoaderURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBLoaderURLSession.m; sourceTree = "<group>"; };
-		927ABD4F1DF177A600689E94 /* NBPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayerView.h; sourceTree = "<group>"; };
-		927ABD501DF177A600689E94 /* NBPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBPlayerView.m; sourceTree = "<group>"; };
-		927ABD521DF177BE00689E94 /* NBTimeSheetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBTimeSheetView.h; sourceTree = "<group>"; };
-		927ABD531DF177BE00689E94 /* NBTimeSheetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBTimeSheetView.m; sourceTree = "<group>"; };
-		927ABD551DF177D600689E94 /* NBLightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBLightView.h; sourceTree = "<group>"; };
-		927ABD561DF177D600689E94 /* NBLightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBLightView.m; sourceTree = "<group>"; };
-		927ABD581DF177FA00689E94 /* NBVideoRequestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBVideoRequestTask.h; sourceTree = "<group>"; };
-		927ABD591DF177FA00689E94 /* NBVideoRequestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NBVideoRequestTask.m; sourceTree = "<group>"; };
-		927ABD5B1DF1782100689E94 /* NSString+NB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+NB.h"; sourceTree = "<group>"; };
-		927ABD5C1DF1782100689E94 /* NSString+NB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+NB.m"; sourceTree = "<group>"; };
-		927ABD5E1DF17E4D00689E94 /* NBPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayer.h; sourceTree = "<group>"; };
-		927ABD601DF2547E00689E94 /* NBPlayer.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NBPlayer.bundle; sourceTree = "<group>"; };
+		927ABD2B1DF1765800689E94 /* BCVideoPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCVideoPlayer.h; sourceTree = "<group>"; };
+		927ABD2C1DF1765800689E94 /* BCVideoPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCVideoPlayer.m; sourceTree = "<group>"; };
+		927ABD4C1DF1778200689E94 /* BCLoaderURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCLoaderURLSession.h; sourceTree = "<group>"; };
+		927ABD4D1DF1778200689E94 /* BCLoaderURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCLoaderURLSession.m; sourceTree = "<group>"; };
+		927ABD4F1DF177A600689E94 /* BCPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayerView.h; sourceTree = "<group>"; };
+		927ABD501DF177A600689E94 /* BCPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCPlayerView.m; sourceTree = "<group>"; };
+		927ABD521DF177BE00689E94 /* BCTimeSheetView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCTimeSheetView.h; sourceTree = "<group>"; };
+		927ABD531DF177BE00689E94 /* BCTimeSheetView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCTimeSheetView.m; sourceTree = "<group>"; };
+		927ABD551DF177D600689E94 /* BCLightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCLightView.h; sourceTree = "<group>"; };
+		927ABD561DF177D600689E94 /* BCLightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCLightView.m; sourceTree = "<group>"; };
+		927ABD581DF177FA00689E94 /* BCVideoRequestTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCVideoRequestTask.h; sourceTree = "<group>"; };
+		927ABD591DF177FA00689E94 /* BCVideoRequestTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCVideoRequestTask.m; sourceTree = "<group>"; };
+		927ABD5B1DF1782100689E94 /* NSString+BC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+BC.h"; sourceTree = "<group>"; };
+		927ABD5C1DF1782100689E94 /* NSString+BC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+BC.m"; sourceTree = "<group>"; };
+		927ABD5E1DF17E4D00689E94 /* BCPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCPlayer.h; sourceTree = "<group>"; };
+		927ABD601DF2547E00689E94 /* BCPlayer.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = BCPlayer.bundle; sourceTree = "<group>"; };
 		9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.debug.xcconfig"; sourceTree = "<group>"; };
 		F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-namiboxVideo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -409,31 +409,31 @@
 			isa = PBXGroup;
 			children = (
 				9276E49A1DFA54B300B922DC /* CocoaHTTPServer */,
-				927ABD5E1DF17E4D00689E94 /* NBPlayer.h */,
-				9256F34D1DF667FE0075E952 /* NBPlayerDelegate.h */,
-				9256F3411DF4FF3E0075E952 /* NBPlayerEnvironment.h */,
-				9256F3421DF4FF3E0075E952 /* NBPlayerEnvironment.m */,
-				927ABD2B1DF1765800689E94 /* NBVideoPlayer.h */,
-				927ABD2C1DF1765800689E94 /* NBVideoPlayer.m */,
-				927ABD4C1DF1778200689E94 /* NBLoaderURLSession.h */,
-				927ABD4D1DF1778200689E94 /* NBLoaderURLSession.m */,
-				9256F3441DF506C10075E952 /* NBDownloadURLSession.h */,
-				9256F3451DF506C10075E952 /* NBDownloadURLSession.m */,
-				9276E4971DF9407200B922DC /* NBPlayerM3U8Handler.h */,
-				9276E4981DF9407200B922DC /* NBPlayerM3U8Handler.m */,
-				927ABD581DF177FA00689E94 /* NBVideoRequestTask.h */,
-				927ABD591DF177FA00689E94 /* NBVideoRequestTask.m */,
-				927ABD4F1DF177A600689E94 /* NBPlayerView.h */,
-				927ABD501DF177A600689E94 /* NBPlayerView.m */,
-				927ABD521DF177BE00689E94 /* NBTimeSheetView.h */,
-				927ABD531DF177BE00689E94 /* NBTimeSheetView.m */,
-				927ABD551DF177D600689E94 /* NBLightView.h */,
-				927ABD561DF177D600689E94 /* NBLightView.m */,
-				927ABD5B1DF1782100689E94 /* NSString+NB.h */,
-				927ABD5C1DF1782100689E94 /* NSString+NB.m */,
-				9256F3471DF50ACA0075E952 /* NBPlayerDefine.h */,
-				9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */,
-				927ABD601DF2547E00689E94 /* NBPlayer.bundle */,
+				927ABD5E1DF17E4D00689E94 /* BCPlayer.h */,
+				9256F34D1DF667FE0075E952 /* BCPlayerDelegate.h */,
+				9256F3411DF4FF3E0075E952 /* BCPlayerEnvironment.h */,
+				9256F3421DF4FF3E0075E952 /* BCPlayerEnvironment.m */,
+				927ABD2B1DF1765800689E94 /* BCVideoPlayer.h */,
+				927ABD2C1DF1765800689E94 /* BCVideoPlayer.m */,
+				927ABD4C1DF1778200689E94 /* BCLoaderURLSession.h */,
+				927ABD4D1DF1778200689E94 /* BCLoaderURLSession.m */,
+				9256F3441DF506C10075E952 /* BCDownloadURLSession.h */,
+				9256F3451DF506C10075E952 /* BCDownloadURLSession.m */,
+				9276E4971DF9407200B922DC /* BCPlayerM3U8Handler.h */,
+				9276E4981DF9407200B922DC /* BCPlayerM3U8Handler.m */,
+				927ABD581DF177FA00689E94 /* BCVideoRequestTask.h */,
+				927ABD591DF177FA00689E94 /* BCVideoRequestTask.m */,
+				927ABD4F1DF177A600689E94 /* BCPlayerView.h */,
+				927ABD501DF177A600689E94 /* BCPlayerView.m */,
+				927ABD521DF177BE00689E94 /* BCTimeSheetView.h */,
+				927ABD531DF177BE00689E94 /* BCTimeSheetView.m */,
+				927ABD551DF177D600689E94 /* BCLightView.h */,
+				927ABD561DF177D600689E94 /* BCLightView.m */,
+				927ABD5B1DF1782100689E94 /* NSString+BC.h */,
+				927ABD5C1DF1782100689E94 /* NSString+BC.m */,
+				9256F3471DF50ACA0075E952 /* BCPlayerDefine.h */,
+				9256F3481DF50ACA0075E952 /* BCPlayerDefine.m */,
+				927ABD601DF2547E00689E94 /* BCPlayer.bundle */,
 			);
 			path = namiboxPlayer;
 			sourceTree = SOURCE_ROOT;
@@ -513,7 +513,7 @@
 				927ABD1B1DF1731800689E94 /* Assets.xcassets in Resources */,
 				927ABD191DF1731800689E94 /* Main.storyboard in Resources */,
 				9276E4FB1DFA54B300B922DC /* LICENSE.txt in Resources */,
-				927ABD611DF2547E00689E94 /* NBPlayer.bundle in Resources */,
+				927ABD611DF2547E00689E94 /* BCPlayer.bundle in Resources */,
 				9276E5071DFA54B300B922DC /* README.txt in Resources */,
 				9276E4FF1DFA54B300B922DC /* About.txt in Resources */,
 			);
@@ -581,14 +581,14 @@
 				9276E4FA1DFA54B300B922DC /* PUTResponse.m in Sources */,
 				927ABD131DF1731800689E94 /* AppDelegate.m in Sources */,
 				9276E4E71DFA54B300B922DC /* DDNumber.m in Sources */,
-				927ABD5D1DF1782100689E94 /* NSString+NB.m in Sources */,
+				927ABD5D1DF1782100689E94 /* NSString+BC.m in Sources */,
 				9276E5051DFA54B300B922DC /* ContextFilterLogFormatter.m in Sources */,
 				927ABD101DF1731800689E94 /* main.m in Sources */,
 				9276E4EE1DFA54B300B922DC /* MultipartMessageHeader.m in Sources */,
 				9276E5061DFA54B300B922DC /* DispatchQueueLogFormatter.m in Sources */,
-				927ABD2D1DF1765800689E94 /* NBVideoPlayer.m in Sources */,
+				927ABD2D1DF1765800689E94 /* BCVideoPlayer.m in Sources */,
 				9276E4F71DFA54B300B922DC /* DAVConnection.m in Sources */,
-				9256F3431DF4FF3E0075E952 /* NBPlayerEnvironment.m in Sources */,
+				9256F3431DF4FF3E0075E952 /* BCPlayerEnvironment.m in Sources */,
 				9276E4EA1DFA54B300B922DC /* HTTPConnection.m in Sources */,
 				9276E4E61DFA54B300B922DC /* DDData.m in Sources */,
 				9276E4ED1DFA54B300B922DC /* MultipartFormDataParser.m in Sources */,
@@ -596,28 +596,28 @@
 				9276E4F21DFA54B300B922DC /* HTTPDynamicFileResponse.m in Sources */,
 				9276E4EB1DFA54B300B922DC /* HTTPMessage.m in Sources */,
 				9276E4F41DFA54B300B922DC /* HTTPFileResponse.m in Sources */,
-				9256F3461DF506C10075E952 /* NBDownloadURLSession.m in Sources */,
+				9256F3461DF506C10075E952 /* BCDownloadURLSession.m in Sources */,
 				927ABD271DF1751700689E94 /* VideoDetailViewController.m in Sources */,
 				9276E4EF1DFA54B300B922DC /* MultipartMessageHeaderField.m in Sources */,
 				9276E4F61DFA54B300B922DC /* WebSocket.m in Sources */,
-				9276E4991DF9407200B922DC /* NBPlayerM3U8Handler.m in Sources */,
+				9276E4991DF9407200B922DC /* BCPlayerM3U8Handler.m in Sources */,
 				9276E4F81DFA54B300B922DC /* DAVResponse.m in Sources */,
 				9276E4F51DFA54B300B922DC /* HTTPRedirectResponse.m in Sources */,
-				927ABD4E1DF1778200689E94 /* NBLoaderURLSession.m in Sources */,
-				9256F3491DF50ACA0075E952 /* NBPlayerDefine.m in Sources */,
+				927ABD4E1DF1778200689E94 /* BCLoaderURLSession.m in Sources */,
+				9256F3491DF50ACA0075E952 /* BCPlayerDefine.m in Sources */,
 				9276E4E81DFA54B300B922DC /* DDRange.m in Sources */,
 				9276E4FE1DFA54B300B922DC /* GCDAsyncSocket.m in Sources */,
 				9276E4F91DFA54B300B922DC /* DELETEResponse.m in Sources */,
 				9276E5021DFA54B300B922DC /* DDFileLogger.m in Sources */,
-				927ABD5A1DF177FA00689E94 /* NBVideoRequestTask.m in Sources */,
+				927ABD5A1DF177FA00689E94 /* BCVideoRequestTask.m in Sources */,
 				9276E4E91DFA54B300B922DC /* HTTPAuthenticationRequest.m in Sources */,
-				927ABD511DF177A600689E94 /* NBPlayerView.m in Sources */,
-				927ABD571DF177D600689E94 /* NBLightView.m in Sources */,
+				927ABD511DF177A600689E94 /* BCPlayerView.m in Sources */,
+				927ABD571DF177D600689E94 /* BCLightView.m in Sources */,
 				9276E5041DFA54B300B922DC /* DDTTYLogger.m in Sources */,
-				927ABD5F1DF17E4D00689E94 /* NBPlayer.h in Sources */,
+				927ABD5F1DF17E4D00689E94 /* BCPlayer.h in Sources */,
 				9276E4F31DFA54B300B922DC /* HTTPErrorResponse.m in Sources */,
 				9276E4EC1DFA54B300B922DC /* HTTPServer.m in Sources */,
-				927ABD541DF177BE00689E94 /* NBTimeSheetView.m in Sources */,
+				927ABD541DF177BE00689E94 /* BCTimeSheetView.m in Sources */,
 				9276E4F11DFA54B300B922DC /* HTTPDataResponse.m in Sources */,
 				9276E4F01DFA54B300B922DC /* HTTPAsyncFileResponse.m in Sources */,
 			);

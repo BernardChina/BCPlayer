@@ -1,15 +1,15 @@
 //
-//  NBLightView.m
+//  BCLightView.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBLightView.h"
-#import "NBPlayer.h"
+#import "BCLightView.h"
+#import "BCPlayer.h"
 
-@interface NBLightView()
+@interface BCLightView()
 
 @property (nonatomic, strong) UIImageView		*backImage;
 @property (nonatomic, strong) UILabel			*title;
@@ -20,13 +20,13 @@
 
 @end
 
-@implementation NBLightView
+@implementation BCLightView
 
 + (instancetype)sharedInstance {
-    static NBLightView *instance;
+    static BCLightView *instance;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        instance = [[NBLightView alloc] init];
+        instance = [[BCLightView alloc] init];
         [[UIApplication sharedApplication].keyWindow addSubview:instance];
         [instance mas_makeConstraints:^(MASConstraintMaker *make) {
             make.centerX.equalTo([UIApplication sharedApplication].keyWindow);

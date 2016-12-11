@@ -3,15 +3,15 @@
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import "VideoDetailViewController.h"
-#import "NBPlayer.h"
+#import "BCPlayer.h"
 #import <Masonry/Masonry.h>
 
-@interface VideoDetailViewController () <NBPlayerDelegate>{
-    NBVideoPlayer *_play;
+@interface VideoDetailViewController () <BCPlayerDelegate>{
+    BCVideoPlayer *_play;
 }
 
 @end
@@ -30,7 +30,7 @@
         make.edges.equalTo(self.view).offset(0);
     }];
     
-    _play = [[NBVideoPlayer alloc]init];
+    _play = [[BCVideoPlayer alloc]init];
     UIView *videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
     [bgView addSubview:videoView];
     
@@ -41,7 +41,7 @@
           andSuperView:self.view
              cacheType:NBPlayerCacheTypePlayHLS];
     
-    NSLog(@"%f", [NBVideoPlayer allVideoCacheSize]);
+    NSLog(@"%f", [BCVideoPlayer allVideoCacheSize]);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -58,7 +58,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime {
+- (void)NBVideoPlayer:(BCVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime {
     NSLog(@"当前：%f 总共：%f",current,totalTime);
 }
 

@@ -1,13 +1,13 @@
 //
-//  NBPlayerM3U8Handler.h
+//  BCPlayerM3U8Handler.h
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/8.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "NBDownloadURLSession.h"
+#import "BCDownloadURLSession.h"
 
 @interface M3U8SegmentInfo : NSObject
 
@@ -18,9 +18,9 @@
 
 typedef void(^praseFailed)(NSError *error);
 
-@interface NBPlayerM3U8Handler : NSObject
+@interface BCPlayerM3U8Handler : NSObject
 
-@property (nonatomic, strong) NBDownloadURLSession *loadSession;
+@property (nonatomic, strong) BCDownloadURLSession *loadSession;
 @property (nonatomic, strong) praseFailed praseFailed;
 
 /**

@@ -1,15 +1,15 @@
 //
-//  NBTimeSheetView.m
+//  BCTimeSheetView.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBTimeSheetView.h"
-#import "NBPlayer.h"
+#import "BCTimeSheetView.h"
+#import "BCPlayer.h"
 
-@implementation NBTimeSheetView
+@implementation BCTimeSheetView
 
 - (instancetype)initWithFrame:(CGRect)frame {
     

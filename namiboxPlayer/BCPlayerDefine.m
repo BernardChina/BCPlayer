@@ -1,13 +1,13 @@
 //
-//  NBPlayerDefine.m
+//  BCPlayerDefine.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBPlayerDefine.h"
-#import "NBPlayer.h"
+#import "BCPlayerDefine.h"
+#import "BCPlayer.h"
 
 NSString *saveCachePathForVideo(NSString *url) {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
@@ -23,7 +23,7 @@ NSString *saveCachePathForVideo(NSString *url) {
     cacheVieoName = md5File;
     
     //这里自己写需要保存数据的路径
-    NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+    NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
     NSString *cachePath =  [document stringByAppendingPathComponent:md5File];
     
     cachePathForVideo = cachePath;

@@ -1,28 +1,28 @@
 //
-//  NBPlayerEnvironment.m
+//  BCPlayerEnvironment.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBPlayerEnvironment.h"
+#import "BCPlayerEnvironment.h"
 
-static NBPlayerEnvironment *_env;
+static BCPlayerEnvironment *_env;
 
-void NBSetWBEnviroment(NBPlayerEnvironment *env) {
+void NBSetWBEnviroment(BCPlayerEnvironment *env) {
     _env = env;
 }
 
-@interface NBPlayerEnvironment()
+@interface BCPlayerEnvironment()
 
 @end
 
-@implementation NBPlayerEnvironment
+@implementation BCPlayerEnvironment
 
 + (instancetype)defaultEnvironment {
     if (!_env) {
-        _env = [NBPlayerEnvironment new];
+        _env = [BCPlayerEnvironment new];
     }
     return _env;
 }

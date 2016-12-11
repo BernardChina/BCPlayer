@@ -1,22 +1,22 @@
 //
-//  NBLoaderURLSession.m
+//  BCLoaderURLSession.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/2.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBLoaderURLSession.h"
-#import "NBVideoRequestTask.h"
+#import "BCLoaderURLSession.h"
+#import "BCVideoRequestTask.h"
 
-@interface NBLoaderURLSession()<NBVideoRequestTaskDelegate>
+@interface BCLoaderURLSession()<BCLoaderURLSessionDelegate>
 
 @property (nonatomic, strong) NSMutableArray *pendingRequests;
 @property (nonatomic, copy  ) NSString       *videoPath;
 
 @end
 
-@implementation NBLoaderURLSession
+@implementation BCLoaderURLSession
 
 - (instancetype)init {
     self = [super init];
@@ -127,7 +127,7 @@
     }
     
     if (!self.task) {
-        self.task = [[NBVideoRequestTask alloc] init];
+        self.task = [[BCVideoRequestTask alloc] init];
         self.task.delegate = self;
         [self.task setUrl:interceptedURL offset:0];
     } else {
@@ -162,21 +162,21 @@
 
 #pragma mark - NBVideoRequestTaskDelegate
 
-- (void)task:(NBVideoRequestTask *)task didReciveVideoLength:(NSUInteger)videoLength mimeType:(NSString *)mimeType {
+- (void)task:(BCVideoRequestTask *)task didReciveVideoLength:(NSUInteger)videoLength mimeType:(NSString *)mimeType {
     
 }
 
-- (void)didReciveVideoDataWithTask:(NBVideoRequestTask *)task {
+- (void)didReciveVideoDataWithTask:(BCVideoRequestTask *)task {
     [self processPendingRequests];
 }
 
-- (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
+- (void)didFinishLoadingWithTask:(BCVideoRequestTask *)task {
     if ([self.delegate respondsToSelector:@selector(didFinishLoadingWithTask:)]) {
         [self.delegate didFinishLoadingWithTask:task];
     }
 }
 
-- (void)didFailLoadingWithTask:(NBVideoRequestTask *)task withError:(NSInteger)errorCode {
+- (void)didFailLoadingWithTask:(BCVideoRequestTask *)task withError:(NSInteger)errorCode {
     if ([self.delegate respondsToSelector:@selector(didFailLoadingWithTask:withError:)]) {
         [self.delegate didFailLoadingWithTask:task withError:errorCode];
     }

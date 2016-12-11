@@ -1,19 +1,19 @@
 //
-//  NBDownloadURLSession.m
+//  BCDownloadURLSession.m
 //  namiboxVideo
 //
 //  Created by 刘勇强 on 16/12/5.
-//  Copyright © 2016年 namibox. All rights reserved.
+//  Copyright © 2016年 BernardChina. All rights reserved.
 //
 
-#import "NBDownloadURLSession.h"
-#import "NBPlayerDefine.h"
-#import "NBPlayer.h"
-#import "NBPlayerM3U8Handler.h"
+#import "BCDownloadURLSession.h"
+#import "BCPlayerDefine.h"
+#import "BCPlayer.h"
+#import "BCPlayerM3U8Handler.h"
 #import "HTTPServer.h"
-#import "NBPlayerEnvironment.h"
+#import "BCPlayerEnvironment.h"
 
-@interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
+@interface BCDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
     NSMutableArray *_urls;  // hls中ts文件的url
@@ -26,7 +26,7 @@
 
 @end
 
-@implementation NBDownloadURLSession
+@implementation BCDownloadURLSession
 
 - (instancetype)init {
     if (self == [super init]) {
@@ -67,7 +67,7 @@
         [_urlsWidthDownloaded addObject:url];
         
         NSInteger index = [_urls indexOfObject:url];
-        NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+        NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
         cachePath =  [document stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)index]];
         
         M3U8SegmentInfo *seg = (M3U8SegmentInfo *)_segmentInfos[index];
