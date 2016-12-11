@@ -31,19 +31,23 @@
                                                 usedEncoding:&encoding
                                                        error:&error];
     
+    if (error) {
+        if (self.praseFailed) {
+            self.praseFailed(error);
+        }
+    }
+    
     if(data == nil) {
-//        if(self.delegate != nil && [self.delegate respondsToSelector:@selector(praseM3U8Failed:error:)])
-//        {
-//            [self.delegate praseM3U8Failed:self error:[NSError errorWithDomain:@"服务器返回数据为空" code:0 userInfo:nil]];
-//        }
+        if (self.praseFailed) {
+            self.praseFailed([NSError errorWithDomain:@"服务器返回数据为空" code:0 userInfo:nil]);
+        }
         return;
     }
     
     if (![data containsString:@"#EXTINF:"]) {
-//        if(self.delegate != nil && [self.delegate respondsToSelector:@selector(praseM3U8Failed:error:)])
-//        {
-//            [self.delegate praseM3U8Failed:self error:[NSError errorWithDomain:@"服务器返回数据错误" code:0 userInfo:nil]];
-//        }
+        if (self.praseFailed) {
+            self.praseFailed([NSError errorWithDomain:@"服务器返回数据错误" code:0 userInfo:nil]);
+        }
         return;
     }
     NSMutableArray *segments = [[NSMutableArray alloc] init];

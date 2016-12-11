@@ -16,9 +16,12 @@
 
 @end
 
+typedef void(^praseFailed)(NSError *error);
+
 @interface NBPlayerM3U8Handler : NSObject
 
 @property (nonatomic, strong) NBDownloadURLSession *loadSession;
+@property (nonatomic, strong) praseFailed praseFailed;
 
 /**
  解析M3U8格式文件

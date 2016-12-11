@@ -27,6 +27,6 @@
  @param player 当前的player
  @param progress 播放进度
  */
-- (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress;
+- (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime;
 
 @end

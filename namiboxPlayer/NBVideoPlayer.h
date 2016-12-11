@@ -12,6 +12,7 @@
 
 #import "NBPlayer.h"
 #import "NBPlayerDefine.h"
+#import "NBPlayerDelegate.h"
 
 typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateBuffering = 1,    //正在缓存
@@ -29,6 +30,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, readonly) CGFloat        current;                 //当前播放时间
 //@property (nonatomic, readonly) CGFloat        progress;                //播放进度0~1之间
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
+@property (nonatomic, weak) id<NBPlayerDelegate> delegate;
 
 + (instancetype)sharedInstance;
 
