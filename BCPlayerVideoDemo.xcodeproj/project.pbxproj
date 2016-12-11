@@ -53,17 +53,18 @@
 		92231E331DFD8340002A1FAB /* DispatchQueueLogFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E041DFD8340002A1FAB /* DispatchQueueLogFormatter.m */; };
 		92231E341DFD8340002A1FAB /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 92231E051DFD8340002A1FAB /* README.txt */; };
 		92231E351DFD8340002A1FAB /* NSString+BC.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E071DFD8340002A1FAB /* NSString+BC.m */; };
+		92231E5A1DFD94A0002A1FAB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E4E1DFD94A0002A1FAB /* AppDelegate.m */; };
+		92231E5B1DFD94A0002A1FAB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92231E4F1DFD94A0002A1FAB /* Assets.xcassets */; };
+		92231E5C1DFD94A0002A1FAB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92231E501DFD94A0002A1FAB /* LaunchScreen.storyboard */; };
+		92231E5D1DFD94A0002A1FAB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92231E521DFD94A0002A1FAB /* Main.storyboard */; };
+		92231E5E1DFD94A0002A1FAB /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92231E541DFD94A0002A1FAB /* Info.plist */; };
+		92231E5F1DFD94A0002A1FAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E551DFD94A0002A1FAB /* main.m */; };
+		92231E601DFD94A0002A1FAB /* VideoDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E571DFD94A0002A1FAB /* VideoDetailViewController.m */; };
+		92231E611DFD94A0002A1FAB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 92231E591DFD94A0002A1FAB /* ViewController.m */; };
 		9276E5091DFA560000B922DC /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E5081DFA560000B922DC /* libxml2.tbd */; };
 		9276E50B1DFA565100B922DC /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E50A1DFA565100B922DC /* libbz2.tbd */; };
 		9276E50D1DFA568E00B922DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E50C1DFA568E00B922DC /* MobileCoreServices.framework */; };
 		9276E50F1DFA569A00B922DC /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E50E1DFA569A00B922DC /* SystemConfiguration.framework */; };
-		927ABD101DF1731800689E94 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD0F1DF1731800689E94 /* main.m */; };
-		927ABD131DF1731800689E94 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD121DF1731800689E94 /* AppDelegate.m */; };
-		927ABD161DF1731800689E94 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD151DF1731800689E94 /* ViewController.m */; };
-		927ABD191DF1731800689E94 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD171DF1731800689E94 /* Main.storyboard */; };
-		927ABD1B1DF1731800689E94 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD1A1DF1731800689E94 /* Assets.xcassets */; };
-		927ABD1E1DF1731800689E94 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD1C1DF1731800689E94 /* LaunchScreen.storyboard */; };
-		927ABD271DF1751700689E94 /* VideoDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD261DF1751700689E94 /* VideoDetailViewController.m */; };
 		989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */; };
 /* End PBXBuildFile section */
 
@@ -159,22 +160,22 @@
 		92231E051DFD8340002A1FAB /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		92231E061DFD8340002A1FAB /* NSString+BC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+BC.h"; sourceTree = "<group>"; };
 		92231E071DFD8340002A1FAB /* NSString+BC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+BC.m"; sourceTree = "<group>"; };
+		92231E4D1DFD94A0002A1FAB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		92231E4E1DFD94A0002A1FAB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		92231E4F1DFD94A0002A1FAB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		92231E511DFD94A0002A1FAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		92231E531DFD94A0002A1FAB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		92231E541DFD94A0002A1FAB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		92231E551DFD94A0002A1FAB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		92231E561DFD94A0002A1FAB /* VideoDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoDetailViewController.h; sourceTree = "<group>"; };
+		92231E571DFD94A0002A1FAB /* VideoDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoDetailViewController.m; sourceTree = "<group>"; };
+		92231E581DFD94A0002A1FAB /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		92231E591DFD94A0002A1FAB /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		9276E5081DFA560000B922DC /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		9276E50A1DFA565100B922DC /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		9276E50C1DFA568E00B922DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		9276E50E1DFA569A00B922DC /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		927ABD0B1DF1731800689E94 /* namiboxVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = namiboxVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		927ABD0F1DF1731800689E94 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		927ABD111DF1731800689E94 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		927ABD121DF1731800689E94 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		927ABD141DF1731800689E94 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		927ABD151DF1731800689E94 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		927ABD181DF1731800689E94 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		927ABD1A1DF1731800689E94 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		927ABD1D1DF1731800689E94 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		927ABD1F1DF1731800689E94 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		927ABD251DF1751700689E94 /* VideoDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoDetailViewController.h; sourceTree = "<group>"; };
-		927ABD261DF1751700689E94 /* VideoDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoDetailViewController.m; sourceTree = "<group>"; };
 		9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.debug.xcconfig"; sourceTree = "<group>"; };
 		F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-namiboxVideo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -392,10 +393,29 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		92231E4C1DFD94A0002A1FAB /* BCPlayerVideo */ = {
+			isa = PBXGroup;
+			children = (
+				92231DA21DFD8340002A1FAB /* BCPlayer */,
+				92231E4D1DFD94A0002A1FAB /* AppDelegate.h */,
+				92231E4E1DFD94A0002A1FAB /* AppDelegate.m */,
+				92231E4F1DFD94A0002A1FAB /* Assets.xcassets */,
+				92231E501DFD94A0002A1FAB /* LaunchScreen.storyboard */,
+				92231E521DFD94A0002A1FAB /* Main.storyboard */,
+				92231E541DFD94A0002A1FAB /* Info.plist */,
+				92231E551DFD94A0002A1FAB /* main.m */,
+				92231E561DFD94A0002A1FAB /* VideoDetailViewController.h */,
+				92231E571DFD94A0002A1FAB /* VideoDetailViewController.m */,
+				92231E581DFD94A0002A1FAB /* ViewController.h */,
+				92231E591DFD94A0002A1FAB /* ViewController.m */,
+			);
+			path = BCPlayerVideo;
+			sourceTree = "<group>";
+		};
 		927ABD021DF1731800689E94 = {
 			isa = PBXGroup;
 			children = (
-				927ABD0D1DF1731800689E94 /* namiboxVideo */,
+				92231E4C1DFD94A0002A1FAB /* BCPlayerVideo */,
 				927ABD0C1DF1731800689E94 /* Products */,
 				E87DE9CF45695D2CEE6E4F0C /* Pods */,
 				4F6D7421B46B2FAB5B9202EC /* Frameworks */,
@@ -408,33 +428,6 @@
 				927ABD0B1DF1731800689E94 /* namiboxVideo.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		927ABD0D1DF1731800689E94 /* namiboxVideo */ = {
-			isa = PBXGroup;
-			children = (
-				92231DA21DFD8340002A1FAB /* BCPlayer */,
-				927ABD111DF1731800689E94 /* AppDelegate.h */,
-				927ABD121DF1731800689E94 /* AppDelegate.m */,
-				927ABD141DF1731800689E94 /* ViewController.h */,
-				927ABD151DF1731800689E94 /* ViewController.m */,
-				927ABD251DF1751700689E94 /* VideoDetailViewController.h */,
-				927ABD261DF1751700689E94 /* VideoDetailViewController.m */,
-				927ABD171DF1731800689E94 /* Main.storyboard */,
-				927ABD1A1DF1731800689E94 /* Assets.xcassets */,
-				927ABD1C1DF1731800689E94 /* LaunchScreen.storyboard */,
-				927ABD1F1DF1731800689E94 /* Info.plist */,
-				927ABD0E1DF1731800689E94 /* Supporting Files */,
-			);
-			path = namiboxVideo;
-			sourceTree = "<group>";
-		};
-		927ABD0E1DF1731800689E94 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				927ABD0F1DF1731800689E94 /* main.m */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		E87DE9CF45695D2CEE6E4F0C /* Pods */ = {
@@ -508,12 +501,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				92231E2A1DFD8340002A1FAB /* About.txt in Resources */,
-				927ABD1E1DF1731800689E94 /* LaunchScreen.storyboard in Resources */,
 				92231E0B1DFD8340002A1FAB /* BCPlayer.bundle in Resources */,
-				927ABD1B1DF1731800689E94 /* Assets.xcassets in Resources */,
+				92231E5C1DFD94A0002A1FAB /* LaunchScreen.storyboard in Resources */,
+				92231E5D1DFD94A0002A1FAB /* Main.storyboard in Resources */,
 				92231E281DFD8340002A1FAB /* LICENSE.txt in Resources */,
-				927ABD191DF1731800689E94 /* Main.storyboard in Resources */,
+				92231E5E1DFD94A0002A1FAB /* Info.plist in Resources */,
 				92231E341DFD8340002A1FAB /* README.txt in Resources */,
+				92231E5B1DFD94A0002A1FAB /* Assets.xcassets in Resources */,
 				92231E2C1DFD8340002A1FAB /* About.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -573,10 +567,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				92231E5A1DFD94A0002A1FAB /* AppDelegate.m in Sources */,
 				92231E0C1DFD8340002A1FAB /* BCPlayerDefine.m in Sources */,
 				92231E0E1DFD8340002A1FAB /* BCPlayerM3U8Handler.m in Sources */,
 				92231E151DFD8340002A1FAB /* DDRange.m in Sources */,
 				92231E261DFD8340002A1FAB /* DELETEResponse.m in Sources */,
+				92231E5F1DFD94A0002A1FAB /* main.m in Sources */,
 				92231E161DFD8340002A1FAB /* HTTPAuthenticationRequest.m in Sources */,
 				92231E271DFD8340002A1FAB /* PUTResponse.m in Sources */,
 				92231E1C1DFD8340002A1FAB /* MultipartMessageHeaderField.m in Sources */,
@@ -584,8 +580,8 @@
 				92231E2D1DFD8340002A1FAB /* DDAbstractDatabaseLogger.m in Sources */,
 				92231E2F1DFD8340002A1FAB /* DDFileLogger.m in Sources */,
 				92231E1D1DFD8340002A1FAB /* HTTPAsyncFileResponse.m in Sources */,
-				927ABD161DF1731800689E94 /* ViewController.m in Sources */,
 				92231E131DFD8340002A1FAB /* DDData.m in Sources */,
+				92231E601DFD94A0002A1FAB /* VideoDetailViewController.m in Sources */,
 				92231E221DFD8340002A1FAB /* HTTPRedirectResponse.m in Sources */,
 				92231E121DFD8340002A1FAB /* BCVideoRequestTask.m in Sources */,
 				92231E0F1DFD8340002A1FAB /* BCPlayerView.m in Sources */,
@@ -593,11 +589,10 @@
 				92231E291DFD8340002A1FAB /* README.markdown in Sources */,
 				92231E141DFD8340002A1FAB /* DDNumber.m in Sources */,
 				92231E1B1DFD8340002A1FAB /* MultipartMessageHeader.m in Sources */,
-				927ABD131DF1731800689E94 /* AppDelegate.m in Sources */,
 				92231E171DFD8340002A1FAB /* HTTPConnection.m in Sources */,
 				92231E211DFD8340002A1FAB /* HTTPFileResponse.m in Sources */,
-				927ABD101DF1731800689E94 /* main.m in Sources */,
 				92231E2E1DFD8340002A1FAB /* DDASLLogger.m in Sources */,
+				92231E611DFD94A0002A1FAB /* ViewController.m in Sources */,
 				92231E191DFD8340002A1FAB /* HTTPServer.m in Sources */,
 				92231E1A1DFD8340002A1FAB /* MultipartFormDataParser.m in Sources */,
 				92231E081DFD8340002A1FAB /* BCDownloadURLSession.m in Sources */,
@@ -612,7 +607,6 @@
 				92231E201DFD8340002A1FAB /* HTTPErrorResponse.m in Sources */,
 				92231E181DFD8340002A1FAB /* HTTPMessage.m in Sources */,
 				92231E321DFD8340002A1FAB /* ContextFilterLogFormatter.m in Sources */,
-				927ABD271DF1751700689E94 /* VideoDetailViewController.m in Sources */,
 				92231E301DFD8340002A1FAB /* DDLog.m in Sources */,
 				92231E331DFD8340002A1FAB /* DispatchQueueLogFormatter.m in Sources */,
 				92231E0D1DFD8340002A1FAB /* BCPlayerEnvironment.m in Sources */,
@@ -624,20 +618,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		927ABD171DF1731800689E94 /* Main.storyboard */ = {
+		92231E501DFD94A0002A1FAB /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				927ABD181DF1731800689E94 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		927ABD1C1DF1731800689E94 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				927ABD1D1DF1731800689E94 /* Base */,
+				92231E511DFD94A0002A1FAB /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		92231E521DFD94A0002A1FAB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				92231E531DFD94A0002A1FAB /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -743,7 +737,7 @@
 					"\"${PODS_ROOT}/Headers/Public/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				INFOPLIST_FILE = namiboxVideo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/BCPlayerVideo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -768,7 +762,7 @@
 					"\"${PODS_ROOT}/Headers/Public/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				INFOPLIST_FILE = namiboxVideo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/BCPlayerVideo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
