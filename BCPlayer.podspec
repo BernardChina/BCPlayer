@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "BCPlayer"
-  s.version      = "0.0.2"
+  s.version      = "0.0.4"
   s.summary      = "BCPlayer 是一款支持播放在线和本地资源的播放器，可以边播边缓存，同时也支持先缓存再播放，并且支持hls，m3u8格式资源."
 
   # This description is used to generate tags and improve search results.
