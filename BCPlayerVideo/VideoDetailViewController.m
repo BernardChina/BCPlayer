@@ -44,7 +44,7 @@
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
               showView:videoView
           andSuperView:self.view
-             cacheType:NBPlayerCacheTypePlayWithCache];
+             cacheType:NBPlayerCacheTypePlayHLS];
     
     NSLog(@"%f", [BCVideoPlayer allVideoCacheSize]);
 }
