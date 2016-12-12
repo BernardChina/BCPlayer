@@ -258,7 +258,11 @@ typedef enum : NSUInteger {
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         handler.praseFailed = ^(NSError *err){
             // 解析失败
-            [self.delegate NBVideoPlayer:self didCompleteWithError:err];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
+                [self.delegate NBVideoPlayer:[NBVideoPlayer sharedInstance] didCompleteWithError:err];
+            }
+            
+            
         };
         [handler praseUrl:url.absoluteString];
     }
@@ -358,7 +362,10 @@ typedef enum : NSUInteger {
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
     
     // 播放结束
-    [self.delegate NBVideoPlayer:self didCompleteWithError:nil];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
+        [self.delegate NBVideoPlayer:self didCompleteWithError:nil];
+    }
+    
 }
 
 //在监听播放器状态中处理比较准确，播放停止了，有可能是网络原因
@@ -405,7 +412,9 @@ typedef enum : NSUInteger {
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
             [self stop];
-            [self.delegate NBVideoPlayer:self didCompleteWithError:[NSError errorWithDomain:@"播放失败" code:0 userInfo:nil]];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
+                [self.delegate NBVideoPlayer:self didCompleteWithError:[NSError errorWithDomain:@"播放失败" code:0 userInfo:nil]];
+            }
         }
         
     } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
@@ -453,7 +462,9 @@ typedef enum : NSUInteger {
         // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
         // 通知外面接受到播放信息
-        [weakSelf.delegate NBVideoPlayer:weakSelf withProgress:0 currentTime:current totalTime:weakSelf.duration];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withProgress:currentTime:totalTime:)]) {
+            [weakSelf.delegate NBVideoPlayer:weakSelf withProgress:0 currentTime:current totalTime:weakSelf.duration];
+        }
         
         [strongSelf updateCurrentTime:current];
         [strongSelf updateVideoSlider:current];
