@@ -31,15 +31,20 @@
     }];
     
     _play = [[BCVideoPlayer alloc]init];
-    UIView *videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
+    UIView *videoView = [[UIView alloc] init];
     [bgView addSubview:videoView];
+    [videoView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(self.view).offset(0);
+        make.top.equalTo(self.view).offset(64);
+        make.height.equalTo(@(250));
+    }];
     
     _play.delegate = self;
     
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
               showView:videoView
           andSuperView:self.view
-             cacheType:NBPlayerCacheTypePlayHLS];
+             cacheType:NBPlayerCacheTypePlayWithCache];
     
     NSLog(@"%f", [BCVideoPlayer allVideoCacheSize]);
 }
@@ -56,6 +61,14 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)BCVideoPlayer:(BCVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime {
+
+}
+
+- (void)BCVideoPlayer:(BCVideoPlayer *)player didCompleteWithError:(NSError *)error {
+
 }
 
 - (void)NBVideoPlayer:(BCVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime {

@@ -18,7 +18,7 @@
  @param player 当前的player
  @param error 如果播放过程中有错误，回调返回error
  */
-- (void)NBVideoPlayer:(BCVideoPlayer *)player didCompleteWithError:(NSError *)error;
+- (void)BCVideoPlayer:(BCVideoPlayer *)player didCompleteWithError:(NSError *)error;
 
 
 /**
@@ -27,6 +27,6 @@
  @param player 当前的player
  @param progress 播放进度
  */
-- (void)NBVideoPlayer:(BCVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime;
+- (void)BCVideoPlayer:(BCVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime;
 
 @end
