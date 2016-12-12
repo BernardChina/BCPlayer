@@ -33,7 +33,7 @@
     self.navigationItem.backBarButtonItem = leftBar;
     
     self.view.backgroundColor = [UIColor whiteColor];
-    self.title = @"纳米盒子播放器";
+    self.title = @"BCPlayer";
     
     [self.videoList addObject:@"http://baobab.wdjcdn.com/14571455324031.mp4"];
     [self.videoList addObject:@"http://baobab.wdjcdn.com/14564977406580.mp4"];
