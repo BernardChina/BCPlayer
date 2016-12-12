@@ -46,7 +46,10 @@
 
 - (void)addDownloadTask:(NSString *)playUrl {
     _playUrl = playUrl;
-    [_segmentInfos addObject:_segmentInfo];
+    // for hls视频
+    if (_segmentInfo) {
+       [_segmentInfos addObject:_segmentInfo];
+    }
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
@@ -67,8 +70,8 @@
         [_urlsWidthDownloaded addObject:url];
         
         NSInteger index = [_urls indexOfObject:url];
-        NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
-        cachePath =  [document stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)index]];
+        
+        cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)index]];
         
         M3U8SegmentInfo *seg = (M3U8SegmentInfo *)_segmentInfos[index];
         seg.locationUrl = [httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%ld.ts",(long)index]];
@@ -128,7 +131,7 @@
 
 -(NSString*)createLocalM3U8file {
     
-    NSString *fullpath = cachePathForVideo;
+    NSString *fullpath = [cachePathForVideo stringByAppendingPathComponent:cacheVieoName];
     
 //    NSFileManager *fileManager = [NSFileManager defaultManager];
 //    if (![fileManager fileExistsAtPath:fullpath]) {

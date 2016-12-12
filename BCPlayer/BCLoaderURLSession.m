@@ -8,6 +8,7 @@
 
 #import "BCLoaderURLSession.h"
 #import "BCVideoRequestTask.h"
+#import "BCPlayerEnvironment.h"
 
 @interface BCLoaderURLSession()<BCVideoRequestTaskDelegate>
 
@@ -22,7 +23,7 @@
     self = [super init];
     if (self) {
         _pendingRequests = [NSMutableArray array];
-        NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
+        NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
         _videoPath = [document stringByAppendingPathComponent:@"temp.mp4"];
     }
     return self;

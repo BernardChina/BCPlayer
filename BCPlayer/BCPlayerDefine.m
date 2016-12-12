@@ -8,6 +8,7 @@
 
 #import "BCPlayerDefine.h"
 #import "BCPlayer.h"
+#import "BCPlayerEnvironment.h"
 
 NSString *saveCachePathForVideo(NSString *url) {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
@@ -24,9 +25,17 @@ NSString *saveCachePathForVideo(NSString *url) {
     
     //这里自己写需要保存数据的路径
     NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
-    NSString *cachePath =  [document stringByAppendingPathComponent:md5File];
+    NSString *tempPath = [document stringByAppendingString:[NSString stringWithFormat:@"/%@",[[playUrl absoluteString] stringToMD5]]];
     
-    cachePathForVideo = cachePath;
+    BOOL isDir;
+    [[NSFileManager defaultManager] fileExistsAtPath:tempPath isDirectory:&isDir];
+    if (!isDir) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:tempPath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    
+    cachePathForVideo = tempPath;
+    
+    NSString *cachePath =  [tempPath stringByAppendingPathComponent:md5File];
     
     return cachePath;
 }

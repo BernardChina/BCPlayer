@@ -10,6 +10,7 @@
 #import "NSString+BC.h"
 #import "BCPlayerEnvironment.h"
 #import "BCPlayerDefine.h"
+#import "BCPlayerEnvironment.h"
 
 @interface BCVideoRequestTask()<NSURLSessionDataDelegate>
 
@@ -38,8 +39,8 @@
     self = [super init];
     if (self) {
         _taskArr = [NSMutableArray array];
-        NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-        _tempPath =  [document stringByAppendingPathComponent:@"temp.mp4"];
+        NSString *document = [[BCPlayerEnvironment defaultEnvironment] cachePath];
+        _tempPath = [document stringByAppendingPathComponent:@"temp.mp4"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
             [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
             [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];

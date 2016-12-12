@@ -30,7 +30,13 @@ void NBSetWBEnviroment(BCPlayerEnvironment *env) {
 - (NSString *)cachePath {
     //这里自己写需要保存数据的路径
     NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    return document;
+    NSString *path = [document stringByAppendingString:@"/videos"];
+    BOOL isDir;
+    [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+    if (!isDir) {
+        [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+    return path;
 }
 
 @end
