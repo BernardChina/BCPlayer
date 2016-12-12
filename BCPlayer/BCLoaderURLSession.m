@@ -9,7 +9,7 @@
 #import "BCLoaderURLSession.h"
 #import "BCVideoRequestTask.h"
 
-@interface BCLoaderURLSession()<BCLoaderURLSessionDelegate>
+@interface BCLoaderURLSession()<BCVideoRequestTaskDelegate>
 
 @property (nonatomic, strong) NSMutableArray *pendingRequests;
 @property (nonatomic, copy  ) NSString       *videoPath;
