@@ -22,7 +22,6 @@
 
 - (void)praseUrl:(NSString *)urlstr {
     NSURL *url = [[NSURL alloc] initWithString:urlstr];
-//    NSURL *baseUrl = [url URLByDeletingLastPathComponent];
     NSError *error = nil;
     NSStringEncoding encoding;
     /** 获取到返回的响应字符串，其中包含该视频流的信息 */

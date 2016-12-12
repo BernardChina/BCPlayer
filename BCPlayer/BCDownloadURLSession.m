@@ -115,6 +115,10 @@
     NSString *statusString = [NSString stringWithFormat:@"%lldk of %lldk", kReceived, kExpected];
     NSLog(@"进度: %@",statusString);
     
+    if (!self.downloadProgress) {
+        self.downloadProgress = 0;
+    }
+    
     if (currentCacheType != NBPlayerCacheTypePlayHLS) {
         double progress = (double) downloadTask.countOfBytesReceived / (double)downloadTask.countOfBytesExpectedToReceive;
         
