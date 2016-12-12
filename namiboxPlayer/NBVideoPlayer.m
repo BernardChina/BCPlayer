@@ -191,7 +191,8 @@ typedef enum : NSUInteger {
     [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
     [self.httpServer setPort:12345]; // 设置服务器端口
     
-    NSString *webPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+//    NSString *webPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+    NSString *webPath = cachePathForVideo;
     
     NSLog(@"-------------\nSetting document root: %@\n", webPath);
     // 设置服务器路径
@@ -432,6 +433,7 @@ typedef enum : NSUInteger {
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
         // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
+        [self.player play];
         NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;

@@ -38,8 +38,8 @@
     self = [super init];
     if (self) {
         _taskArr = [NSMutableArray array];
-        NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-        _tempPath =  [document stringByAppendingPathComponent:@"temp.mp4"];
+        NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+        _tempPath = [document stringByAppendingPathComponent:@"temp.mp4"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
             [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
             [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
