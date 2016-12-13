@@ -18,9 +18,9 @@
 #import "BCDownloadURLSession.h"
 #import "BCPlayerDefine.h"
 #import "BCPlayerM3U8Handler.h"
-#import "HTTPServer.h"
 
 #import <AVKit/AVKit.h>
+#import <CocoaHTTPServer/HTTPServer.h>
 
 #define LeastMoveDistance 15
 #define TotalScreenTime 90
