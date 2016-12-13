@@ -116,11 +116,11 @@ Pod::Spec.new do |s|
   #  the lib prefix of their name.
   #
 
-  s.framework  = "UIKit", "AVFoundation", "MobileCoreServices", "Foundation"
+  # s.framework  = "UIKit", "AVFoundation", "MobileCoreServices", "Foundation"
   # s.frameworks = "SomeFramework", "AnotherFramework"
 
-  s.library   = "libxml2"
-  s.libraries = "xml2"
+  # s.library   = "libxml2"
+  # s.libraries = "xml2"
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -133,7 +133,7 @@ Pod::Spec.new do |s|
 
   s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   s.dependency "Masonry"
-  s.dependency 'CocoaHTTPServer', '~> 2.3'
+  # s.dependency 'CocoaHTTPServer', '~> 2.3'
   # s.dependency "CocoaAsyncSocket"
   # s.dependency "CocoaLumberjack"
 
