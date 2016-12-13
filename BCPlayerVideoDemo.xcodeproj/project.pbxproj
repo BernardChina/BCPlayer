@@ -467,7 +467,7 @@
 					"\"$PODS_CONFIGURATION_BUILD_DIR/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.namibox.namiboxVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bernardchina.www;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -492,7 +492,7 @@
 					"\"$PODS_CONFIGURATION_BUILD_DIR/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.namibox.namiboxVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bernardchina.www;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
