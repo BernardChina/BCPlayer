@@ -10,7 +10,6 @@
 #import "BCPlayerDefine.h"
 #import "BCPlayer.h"
 #import "BCPlayerM3U8Handler.h"
-#import "HTTPServer.h"
 #import "BCPlayerEnvironment.h"
 
 @interface BCDownloadURLSession()<NSURLSessionDownloadDelegate> {
@@ -20,9 +19,6 @@
     NSMutableArray *_urlsWidthDownloaded; // hls中ts文件已经下载的url
     NSMutableArray *_segmentInfos;
 }
-
-/** 本地服务器对象 */
-@property (nonatomic, strong)HTTPServer * httpServer;
 
 @end
 
