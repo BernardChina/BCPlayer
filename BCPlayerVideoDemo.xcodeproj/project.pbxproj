@@ -32,9 +32,11 @@
 		9276E50D1DFA568E00B922DC /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E50C1DFA568E00B922DC /* MobileCoreServices.framework */; };
 		9276E50F1DFA569A00B922DC /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9276E50E1DFA569A00B922DC /* SystemConfiguration.framework */; };
 		989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */; };
+		ECFD974D4952DEAA0569BA03 /* libPods-BCPlayerVideoDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A362772665A32778C8A033F /* libPods-BCPlayerVideoDemo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3A362772665A32778C8A033F /* libPods-BCPlayerVideoDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BCPlayerVideoDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E6C2D4EBA9BFBFCE148F162 /* Pods-namiboxVideo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.release.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.release.xcconfig"; sourceTree = "<group>"; };
 		92231DA31DFD8340002A1FAB /* BCDownloadURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCDownloadURLSession.h; sourceTree = "<group>"; };
 		92231DA41DFD8340002A1FAB /* BCDownloadURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCDownloadURLSession.m; sourceTree = "<group>"; };
@@ -76,8 +78,10 @@
 		9276E50A1DFA565100B922DC /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		9276E50C1DFA568E00B922DC /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		9276E50E1DFA569A00B922DC /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		927ABD0B1DF1731800689E94 /* namiboxVideo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = namiboxVideo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		927ABD0B1DF1731800689E94 /* BCPlayerVideoDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BCPlayerVideoDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.debug.xcconfig"; sourceTree = "<group>"; };
+		CC3A02EBAA5D692B4EA10F22 /* Pods-BCPlayerVideoDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BCPlayerVideoDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BCPlayerVideoDemo/Pods-BCPlayerVideoDemo.debug.xcconfig"; sourceTree = "<group>"; };
+		DF46982BB4FB4AC31C42D1EC /* Pods-BCPlayerVideoDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BCPlayerVideoDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-BCPlayerVideoDemo/Pods-BCPlayerVideoDemo.release.xcconfig"; sourceTree = "<group>"; };
 		F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-namiboxVideo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -91,6 +95,7 @@
 				9276E50B1DFA565100B922DC /* libbz2.tbd in Frameworks */,
 				9276E5091DFA560000B922DC /* libxml2.tbd in Frameworks */,
 				989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */,
+				ECFD974D4952DEAA0569BA03 /* libPods-BCPlayerVideoDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,6 +110,7 @@
 				9276E50A1DFA565100B922DC /* libbz2.tbd */,
 				9276E5081DFA560000B922DC /* libxml2.tbd */,
 				F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */,
+				3A362772665A32778C8A033F /* libPods-BCPlayerVideoDemo.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -173,7 +179,7 @@
 		927ABD0C1DF1731800689E94 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				927ABD0B1DF1731800689E94 /* namiboxVideo.app */,
+				927ABD0B1DF1731800689E94 /* BCPlayerVideoDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,6 +189,8 @@
 			children = (
 				9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */,
 				8E6C2D4EBA9BFBFCE148F162 /* Pods-namiboxVideo.release.xcconfig */,
+				CC3A02EBAA5D692B4EA10F22 /* Pods-BCPlayerVideoDemo.debug.xcconfig */,
+				DF46982BB4FB4AC31C42D1EC /* Pods-BCPlayerVideoDemo.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -190,9 +198,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		927ABD0A1DF1731800689E94 /* namiboxVideo */ = {
+		927ABD0A1DF1731800689E94 /* BCPlayerVideoDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 927ABD221DF1731800689E94 /* Build configuration list for PBXNativeTarget "namiboxVideo" */;
+			buildConfigurationList = 927ABD221DF1731800689E94 /* Build configuration list for PBXNativeTarget "BCPlayerVideoDemo" */;
 			buildPhases = (
 				A83806DA9356E6ABBF8CDCF7 /* [CP] Check Pods Manifest.lock */,
 				927ABD071DF1731800689E94 /* Sources */,
@@ -205,9 +213,9 @@
 			);
 			dependencies = (
 			);
-			name = namiboxVideo;
+			name = BCPlayerVideoDemo;
 			productName = namiboxVideo;
-			productReference = 927ABD0B1DF1731800689E94 /* namiboxVideo.app */;
+			productReference = 927ABD0B1DF1731800689E94 /* BCPlayerVideoDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -238,7 +246,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				927ABD0A1DF1731800689E94 /* namiboxVideo */,
+				927ABD0A1DF1731800689E94 /* BCPlayerVideoDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -286,7 +294,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BCPlayerVideoDemo/Pods-BCPlayerVideoDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EABC8C57423113902530B123 /* [CP] Embed Pods Frameworks */ = {
@@ -301,7 +309,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BCPlayerVideoDemo/Pods-BCPlayerVideoDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -441,7 +449,7 @@
 		};
 		927ABD231DF1731800689E94 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */;
+			baseConfigurationReference = CC3A02EBAA5D692B4EA10F22 /* Pods-BCPlayerVideoDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = "";
@@ -466,7 +474,7 @@
 		};
 		927ABD241DF1731800689E94 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8E6C2D4EBA9BFBFCE148F162 /* Pods-namiboxVideo.release.xcconfig */;
+			baseConfigurationReference = DF46982BB4FB4AC31C42D1EC /* Pods-BCPlayerVideoDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = "";
@@ -501,7 +509,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		927ABD221DF1731800689E94 /* Build configuration list for PBXNativeTarget "namiboxVideo" */ = {
+		927ABD221DF1731800689E94 /* Build configuration list for PBXNativeTarget "BCPlayerVideoDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				927ABD231DF1731800689E94 /* Debug */,
