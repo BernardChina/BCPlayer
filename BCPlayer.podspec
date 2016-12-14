@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "BCPlayer"
-  s.version      = "0.0.9"
+  s.version      = "0.1.0"
   s.summary      = "BCPlayer 是一款支持播放在线和本地资源的播放器，可以边播边缓存，同时也支持先缓存再播放，并且支持hls，m3u8格式资源."
 
   # This description is used to generate tags and improve search results.
@@ -64,6 +64,10 @@ Pod::Spec.new do |s|
 
   # s.platform     = :ios
   s.platform     = :ios, "7.0"
+
+  s.subspec 'CocoaHTTPServer' do |ss|
+    ss.source_files = 'BCPlayer/CocoaHTTPServer/**/*.{h,m}'
+  end
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
@@ -116,11 +120,11 @@ Pod::Spec.new do |s|
   #  the lib prefix of their name.
   #
 
-  # s.framework  = "UIKit", "AVFoundation", "MobileCoreServices", "Foundation"
+  s.framework  = "UIKit", "AVFoundation", "MobileCoreServices", "Foundation"
   # s.frameworks = "SomeFramework", "AnotherFramework"
 
   # s.library   = "libxml2"
-  # s.libraries = "xml2"
+  s.libraries = "xml2"
 
 
   # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -133,7 +137,7 @@ Pod::Spec.new do |s|
 
   s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
   s.dependency "Masonry"
-  s.dependency 'CocoaHTTPServer', '~> 2.3'
+  # s.dependency 'CocoaHTTPServer', '~> 2.3'
   # s.dependency "CocoaAsyncSocket"
   # s.dependency "CocoaLumberjack"
 
