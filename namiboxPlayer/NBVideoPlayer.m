@@ -251,6 +251,24 @@ typedef enum : NSUInteger {
 }
 // 支持hls
 - (void)playHLSWithUrl:(NSURL *)url {
+    // 不缓存
+    if (currentCacheType == NBPlayerCacheTypeNoCache) {
+        self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
+        self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
+        
+        if (!self.player) {
+            self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
+        } else {
+            [self.player replaceCurrentItemWithPlayerItem:self.currentPlayerItem];
+        }
+        
+        [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
+        
+        [self commonObserver];
+        
+        return;
+    }
+    
     self.playFinished = NO;
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
@@ -396,6 +414,8 @@ typedef enum : NSUInteger {
 - (void)playerItemPlaybackStalled:(NSNotification *)notification {
     // 这里网络不好的时候，就会进入，不做处理，会在playbackBufferEmpty里面缓存之后重新播放
     NSLog(@"buffing----buffing");
+    [self.actIndicator startAnimating];
+    self.actIndicator.hidden = NO;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
