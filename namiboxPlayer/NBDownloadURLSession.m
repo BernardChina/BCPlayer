@@ -13,16 +13,15 @@
 #import "HTTPServer.h"
 #import "NBPlayerEnvironment.h"
 
+static NSInteger const sPlayAfterCacheCount = 3;
+
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
-    NSMutableArray *_urls;  // hls中ts文件的url
     NSMutableArray *_urlsWidthDownloaded; // hls中ts文件已经下载的url
     NSMutableArray *_segmentInfos;
+    NSInteger _downloadedIndex;
 }
-
-/** 本地服务器对象 */
-@property (nonatomic, strong)HTTPServer * httpServer;
 
 @end
 
@@ -31,7 +30,6 @@
 - (instancetype)init {
     if (self == [super init]) {
         _startPlay = NO;
-        _urls = [[NSMutableArray alloc] init];
         _urlsWidthDownloaded = [[NSMutableArray alloc] init];
         _segmentInfos = [[NSMutableArray alloc] init];
         
@@ -40,6 +38,8 @@
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         sessionConfiguration.timeoutIntervalForRequest = 1000;
         session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+        
+        [self addObserver:self forKeyPath:@"currentIndex" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     }
     return self;
 }
@@ -54,7 +54,6 @@
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
     NSURLSessionDownloadTask * downloadTask = [session downloadTaskWithRequest:request];
-    [_urls addObject:url];
     [downloadTask resume];
     NSLog(@"%@",@"添加task");
 }
@@ -69,18 +68,21 @@
         // 已经下载的url
         [_urlsWidthDownloaded addObject:url];
         
-        NSInteger index = [_urls indexOfObject:url];
+        _downloadedIndex = [self.hlsUrls indexOfObject:url];
         
-        cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)index]];
+        cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)_downloadedIndex]];
         
-        M3U8SegmentInfo *seg = (M3U8SegmentInfo *)_segmentInfos[index];
-        seg.locationUrl = [httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%ld.ts",(long)index]];
+        self.downloadProgress = (double)_urlsWidthDownloaded.count/(double)self.hlsUrls.count;
         
-        self.downloadProgress = (double)_urlsWidthDownloaded.count/(double)_urls.count;
+        // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
+        if (_urlsWidthDownloaded.count - self.currentIndex == sPlayAfterCacheCount) {
+            if (!self.startPlay) {
+                self.startPlay = YES;
+            }
+        }
         
-        if (_urlsWidthDownloaded.count == _urls.count) {
-            [self createLocalM3U8file];
-            self.startPlay = YES;
+        if (self.nextTs < sPlayAfterCacheCount) {
+            self.nextTs = _downloadedIndex + 1;
         }
         
     } else {
@@ -163,6 +165,21 @@
         return  nil;
     }
     return nil;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if (context == DownloadKVOContext) {
+        if ([keyPath isEqualToString:@"currentIndex"]) {
+            if (_downloadedIndex+1 < self.hlsUrls.count && _urlsWidthDownloaded.count - self.currentIndex < 3 ) {
+                if (self.nextTs != _downloadedIndex +1) {
+                    self.nextTs = _downloadedIndex + 1;
+                }
+                
+                NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);
+            }
+            return;
+        }
+    }
 }
 
 - (void)cancel {

@@ -30,3 +30,7 @@ FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
 static void* const DownloadKVOContext = (void *)&DownloadKVOContext;
 
 extern NSString* const httpServerLocalUrl;
+
+// 播放器当前播放时间改变通知
+FOUNDATION_EXPORT NSString *const kNBPlayerCurrentTimeChangedNofification;
+

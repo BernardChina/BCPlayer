@@ -101,6 +101,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) NBPlayerControlType controlType;       //当前手势是在控制进度、声音还是亮度
 @property (nonatomic, strong) NBTimeSheetView *timeSheetView;        //左右滑动时间View
 @property (nonatomic, strong) NSString *cachePath;
+@property (nonatomic, strong) NBPlayerM3U8Handler *m3u8Handler;
+@property (nonatomic, assign) BOOL playFinished;
 
 @end
 
@@ -187,24 +189,26 @@ typedef enum : NSUInteger {
 }
 
 - (void)openHttpServer {
-    self.httpServer = [[HTTPServer alloc] init];
-    [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
-    [self.httpServer setPort:12345]; // 设置服务器端口
-    
-//    NSString *webPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
-    NSString *webPath = cachePathForVideo;
-    
-    NSLog(@"-------------\nSetting document root: %@\n", webPath);
-    // 设置服务器路径
-    [self.httpServer setDocumentRoot:webPath];
-    NSError *error;
-    if(![self.httpServer start:&error]) {
-        NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
+    if (!self.httpServer) {
+        self.httpServer = [[HTTPServer alloc] init];
+        [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
+        [self.httpServer setPort:12345]; // 设置服务器端口
+        
+        NSString *webPath = cachePathForVideo;
+        
+        NSLog(@"-------------\nSetting document root: %@\n", webPath);
+        // 设置服务器路径
+        [self.httpServer setDocumentRoot:webPath];
+        NSError *error;
+        if(![self.httpServer start:&error]) {
+            NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
+        }
     }
 }
 
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
+    [self releasePlayer];
     if (currentCacheType == NBPlayerCacheTypePlayHLS) {
         [self openHttpServer];
         
@@ -249,23 +253,31 @@ typedef enum : NSUInteger {
 }
 // 支持hls
 - (void)playHLSWithUrl:(NSURL *)url {
-    
+    self.playFinished = NO;
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
-        NBPlayerM3U8Handler *handler = [[NBPlayerM3U8Handler alloc] init];
+        self.m3u8Handler = [[NBPlayerM3U8Handler alloc] init];
         self.downloadSession = [[NBDownloadURLSession alloc] init];
-        handler.loadSession = self.downloadSession;
+        self.m3u8Handler.loadSession = self.downloadSession;
         [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
-        handler.praseFailed = ^(NSError *err){
+        
+        __weak __typeof(self)weakSelf = self;
+        weakSelf.m3u8Handler.praseFailed = ^(NSError *err){
             // 解析失败
-            if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
-                [self.delegate NBVideoPlayer:[NBVideoPlayer sharedInstance] didCompleteWithError:err];
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+            
+            if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
+                [strongSelf.delegate NBVideoPlayer:[NBVideoPlayer sharedInstance] didCompleteWithError:err];
             }
             
-            
         };
-        [handler praseUrl:url.absoluteString];
+        weakSelf.m3u8Handler.playFinished = ^{
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
+            strongSelf.playFinished = YES;
+        };
+        
+        [self.m3u8Handler praseUrl:url.absoluteString];
     }
 }
 
@@ -356,6 +368,13 @@ typedef enum : NSUInteger {
      当播放结束后，播放头移动到playerItem的末尾，如果此时调用play方法是没有效果的，应该先把播放头移到player item起始位置。如果需要实现循环播放的功能，可以监听通知AVPlayerItemDidPlayToEndTimeNotification，当收到这个通知的时候，调用seekToTime：把播放头移动到起始位置[player seekToTime:kCMTimeZero];
      */
     //重新播放
+    
+    if (currentCacheType == NBPlayerCacheTypePlayHLS && !self.playFinished) {
+        [self localUrlPlayer];
+        [self seekToTime:_current];
+        return;
+    }
+    
     self.repeatBtn.hidden = NO;
     [self toolViewHidden];
     self.state = NBPlayerStateFinish;
@@ -432,9 +451,7 @@ typedef enum : NSUInteger {
             [self bufferingSomeSecond];
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
-        // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。
-        [self.player play];
-        NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
+        // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;
         static float staticHeight = 0;
@@ -460,9 +477,13 @@ typedef enum : NSUInteger {
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
     self.playbackTimeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
+        NSLog(@"%@",@"实时监听当前播放时间");
+        
         __strong __typeof(weakSelf)strongSelf = weakSelf;
         // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
+        _current = current;
+        
         // 通知外面接受到播放信息
         if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withProgress:currentTime:totalTime:)]) {
             [weakSelf.delegate NBVideoPlayer:weakSelf withProgress:0 currentTime:current totalTime:weakSelf.duration];
@@ -470,6 +491,9 @@ typedef enum : NSUInteger {
         
         [strongSelf updateCurrentTime:current];
         [strongSelf updateVideoSlider:current];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
+        
         if (strongSelf.isPauseByUser == NO) {
             strongSelf.state = NBPlayerStatePlaying;
         }
@@ -530,6 +554,10 @@ typedef enum : NSUInteger {
         isBuffering = NO;
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             [self bufferingSomeSecond];
+            if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+                [self localUrlPlayer];
+                [self seekToTime:_current];
+            }
         }
     });
 }
@@ -1291,6 +1319,14 @@ typedef enum : NSUInteger {
     // 播放停顿后，调用此通知，有可能原因网络慢，不能正常加载
     // 当某些媒体未及时到达以继续播放时发布
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerItemPlaybackStalled:) name:AVPlayerItemPlaybackStalledNotification object:self.currentPlayerItem];
+}
+
+- (void)localUrlPlayer {
+    NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+        localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+    }
+    [self playWithLocalUrl:localURL];
 }
 
 #pragma mark - NBLoaderURLSessionDelegate

@@ -7,21 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "NBDownloadURLSession.h"
 
 @interface M3U8SegmentInfo : NSObject
 
 @property(nonatomic,assign) NSInteger duration;
-@property(nonatomic,copy) NSString* locationUrl;
+@property(nonatomic,copy) NSString *locationUrl;
 
 @end
 
 typedef void(^praseFailed)(NSError *error);
+typedef void(^playFinished)(void);
 
 @interface NBPlayerM3U8Handler : NSObject
 
 @property (nonatomic, strong) NBDownloadURLSession *loadSession;
 @property (nonatomic, strong) praseFailed praseFailed;
+@property (nonatomic, strong) playFinished playFinished;
 
 /**
  解析M3U8格式文件
