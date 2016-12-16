@@ -18,7 +18,6 @@
 
 @implementation M3U8SegmentInfo
 
-
 @end
 
 @implementation NBPlayerM3U8Handler
@@ -184,6 +183,8 @@
 - (void)dealloc {
     NSLog(@"%@",@"释放了m3u8handler");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self.loadSession removeObserver:self forKeyPath:@"nextTs"];
+    [self.loadSession cancel];
 }
 
 @end

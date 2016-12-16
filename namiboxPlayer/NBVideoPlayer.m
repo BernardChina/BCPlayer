@@ -1294,7 +1294,7 @@ typedef enum : NSUInteger {
 #pragma mark - private
 
 - (void)releasePlayer {
-    if (currentCacheType == NBPlayerCacheTypePlayAfterCache && self.downloadSession) {
+    if (self.downloadSession) {
         
         [self.downloadSession removeObserver:self forKeyPath:@"downloadProgress"];
         [self.downloadSession removeObserver:self forKeyPath:@"startPlay"];

@@ -164,6 +164,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
 - (void)dealloc {
     NSLog(@"%@",@"NBDownloadUrlSession dealloc");
     [self cancel];
+    [self removeObserver:self forKeyPath:@"currentIndex"];
 }
 
 @end
