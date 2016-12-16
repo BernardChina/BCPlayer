@@ -22,11 +22,6 @@
 @property (nonatomic, assign) BOOL startPlay;
 
 /**
- m3u8格式视频，解析为ts的对象
- */
-@property (nonatomic, strong) M3U8SegmentInfo *segmentInfo;
-
-/**
  下一个ts，监听这个值，当此值变化的时候，开始缓存这个ts
  */
 @property (nonatomic, assign) NSInteger nextTs;

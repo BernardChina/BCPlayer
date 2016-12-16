@@ -209,7 +209,7 @@ typedef enum : NSUInteger {
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
     [self releasePlayer];
-    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+    if (isHLS) {
         [self openHttpServer];
         
     }
@@ -234,8 +234,6 @@ typedef enum : NSUInteger {
             self.state = NBPlayerStatePlaying;
         }
     }
-    
-    [self setVideoToolView];
 }
 
 // 缓存后播放
@@ -284,6 +282,9 @@ typedef enum : NSUInteger {
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
     
     _playUrl = url;
+    if ([url.lastPathComponent rangeOfString:@".m3u8" options:NSBackwardsSearch].length > 0 ) {
+        isHLS = YES;
+    }
     currentCacheType = cacheType;
     
     self.cachePath = saveCachePathForVideo(url.absoluteString);
@@ -301,13 +302,20 @@ typedef enum : NSUInteger {
     _showView.backgroundColor = [UIColor blackColor];
     _playerSuperView = superView;
     
+    [self setVideoToolView];
+    
     // 假如有缓存文件，首先播放缓存文件
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
         NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-        if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+        if (isHLS) {
             localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
         }
         [self playWithLocalUrl:localURL];
+        return;
+    }
+    // 支持hls
+    if (isHLS) {
+        [self playHLSWithUrl:url];
         return;
     }
     
@@ -320,12 +328,8 @@ typedef enum : NSUInteger {
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
         [self playAfterCacheWithVideoUrl:url];
     }
-    // 支持hls
-    if (cacheType == NBPlayerCacheTypePlayHLS) {
-        [self playHLSWithUrl:url];
-    }
     
-    [self setVideoToolView];
+    
 }
 
 - (void)fullScreen {
@@ -369,7 +373,7 @@ typedef enum : NSUInteger {
      */
     //重新播放
     
-    if (currentCacheType == NBPlayerCacheTypePlayHLS && !self.playFinished) {
+    if (isHLS && !self.playFinished && currentCacheType == NBPlayerCacheTypePlayWithCache) {
         [self localUrlPlayer];
         [self seekToTime:_current];
         return;
@@ -412,7 +416,7 @@ typedef enum : NSUInteger {
             
             if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
                 NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-                if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+                if (isHLS) {
                     localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
                 }
                 [self playWithLocalUrl:localURL];
@@ -492,7 +496,10 @@ typedef enum : NSUInteger {
         [strongSelf updateCurrentTime:current];
         [strongSelf updateVideoSlider:current];
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
+        // 当只有hls格式视频，并且边播边缓存的时候，才发送通知
+        if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
+        }
         
         if (strongSelf.isPauseByUser == NO) {
             strongSelf.state = NBPlayerStatePlaying;
@@ -554,7 +561,7 @@ typedef enum : NSUInteger {
         isBuffering = NO;
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             [self bufferingSomeSecond];
-            if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+            if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
                 [self localUrlPlayer];
                 [self seekToTime:_current];
             }
@@ -1323,7 +1330,7 @@ typedef enum : NSUInteger {
 
 - (void)localUrlPlayer {
     NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+    if (isHLS) {
         localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
     }
     [self playWithLocalUrl:localURL];

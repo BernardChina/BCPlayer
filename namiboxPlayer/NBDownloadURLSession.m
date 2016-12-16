@@ -19,7 +19,6 @@ static NSInteger const sPlayAfterCacheCount = 3;
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
     NSMutableArray *_urlsWidthDownloaded; // hls中ts文件已经下载的url
-    NSMutableArray *_segmentInfos;
     NSInteger _downloadedIndex;
 }
 
@@ -31,7 +30,6 @@ static NSInteger const sPlayAfterCacheCount = 3;
     if (self == [super init]) {
         _startPlay = NO;
         _urlsWidthDownloaded = [[NSMutableArray alloc] init];
-        _segmentInfos = [[NSMutableArray alloc] init];
         
         [session invalidateAndCancel];
         session = nil;
@@ -46,10 +44,6 @@ static NSInteger const sPlayAfterCacheCount = 3;
 
 - (void)addDownloadTask:(NSString *)playUrl {
     _playUrl = playUrl;
-    // for hls 格式视频
-    if (_segmentInfo) {
-        [_segmentInfos addObject:_segmentInfo];
-    }
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
@@ -63,7 +57,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
     // 存储地址
     NSString *cachePath = @"";
     
-    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+    if (isHLS) {
         NSURL *url = downloadTask.response.URL;
         // 已经下载的url
         [_urlsWidthDownloaded addObject:url];
@@ -74,15 +68,31 @@ static NSInteger const sPlayAfterCacheCount = 3;
         
         self.downloadProgress = (double)_urlsWidthDownloaded.count/(double)self.hlsUrls.count;
         
-        // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
-        if (_urlsWidthDownloaded.count - self.currentIndex == sPlayAfterCacheCount) {
-            if (!self.startPlay) {
-                self.startPlay = YES;
+        switch (currentCacheType) {
+            case NBPlayerCacheTypePlayAfterCache: {
+                if (_urlsWidthDownloaded.count == self.hlsUrls.count) {
+                    self.startPlay = YES;
+                } else {
+                    self.nextTs = _downloadedIndex + 1;
+                }
             }
-        }
-        
-        if (self.nextTs < sPlayAfterCacheCount) {
-            self.nextTs = _downloadedIndex + 1;
+            break;
+                
+            case NBPlayerCacheTypePlayWithCache: {
+                // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
+                if (_urlsWidthDownloaded.count - self.currentIndex == sPlayAfterCacheCount) {
+                    if (!self.startPlay) {
+                        self.startPlay = YES;
+                    }
+                }
+                if (self.nextTs < sPlayAfterCacheCount) {
+                    self.nextTs = _downloadedIndex + 1;
+                }
+            }
+            break;
+                
+            default:
+                break;
         }
         
     } else {
@@ -105,7 +115,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
         return;
     }
     
-    if (currentCacheType != NBPlayerCacheTypePlayHLS) {
+    if (!isHLS) {
         // 下载完成，开始播放
         self.startPlay = YES;
     }
@@ -124,47 +134,11 @@ static NSInteger const sPlayAfterCacheCount = 3;
         self.downloadProgress = 0;
     }
     
-    if (currentCacheType != NBPlayerCacheTypePlayHLS) {
+    if (!isHLS) {
         double progress = (double) downloadTask.countOfBytesReceived / (double)downloadTask.countOfBytesExpectedToReceive;
         
         self.downloadProgress = progress;
     }
-}
-
--(NSString*)createLocalM3U8file {
-    
-    NSString *fullpath = [cachePathForVideo stringByAppendingPathComponent:cacheVieoName];
-    
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    if (![fileManager fileExistsAtPath:fullpath]) {
-//        return nil;
-//    }
-    
-    //创建文件头部
-    __block NSString* head = @"#EXTM3U\n#EXT-X-TARGETDURATION:30\n#EXT-X-VERSION:2\n#EXT-X-DISCONTINUITY\n";
-    
-    [_segmentInfos enumerateObjectsUsingBlock:^(M3U8SegmentInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSString* length = [NSString stringWithFormat:@"#EXTINF:%ld,\n",(long)obj.duration];
-        head = [NSString stringWithFormat:@"%@%@%@\n",head,length,obj.locationUrl];
-    }];
-    //创建尾部
-    NSString* end = @"#EXT-X-ENDLIST";
-    head = [head stringByAppendingString:end];
-    NSMutableData *writer = [[NSMutableData alloc] init];
-    [writer appendData:[head dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    NSError *error;
-    BOOL bSucc =[writer writeToFile:fullpath options:(NSDataWritingAtomic )  error:&error];
-    
-    
-    if(bSucc) {
-        NSLog(@"create m3u8file succeed; fullpath:%@, content:%@",fullpath,head);
-        return  fullpath;
-    } else {
-        NSLog(@"create m3u8file failed:%@", error);
-        return  nil;
-    }
-    return nil;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {

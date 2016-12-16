@@ -11,8 +11,8 @@
 typedef NS_ENUM(NSInteger, NBPlayerCacheType) {
     NBPlayerCacheTypeNoCache,       // 不缓存，直接播放
     NBPlayerCacheTypePlayWithCache, // 边播放边缓存
-    NBPlayerCacheTypePlayAfterCache, // 先缓存，再播放
-    NBPlayerCacheTypePlayHLS    // 支持hls
+    NBPlayerCacheTypePlayAfterCache // 先缓存，再播放
+//    NBPlayerCacheTypePlayHLS    // 支持hls
 };
 
 extern NSString *saveCachePathForVideo(NSString *url);
@@ -21,6 +21,7 @@ extern NSString *cachePathForVideo;
 extern NSString *cacheVieoName;
 extern NSURL *getSchemeVideoURL(NSString *url);
 extern NBPlayerCacheType currentCacheType;
+extern BOOL isHLS;
 
 // 暴漏出来的通知
 FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;

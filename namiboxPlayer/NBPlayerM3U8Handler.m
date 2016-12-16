@@ -87,7 +87,6 @@
     
     if (self.segments.firstObject) {
         M3U8SegmentInfo * segment = self.segments.firstObject;
-        self.loadSession.segmentInfo = segment;
         [self.loadSession addDownloadTask:segment.locationUrl];
         [self.loadSession addObserver:self forKeyPath:@"nextTs" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     }
@@ -108,7 +107,6 @@
             NSInteger nextTs = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
             M3U8SegmentInfo * segment = [self.segments objectAtIndex:nextTs];
             if (segment) {
-                self.loadSession.segmentInfo = segment;
                 [self.loadSession addDownloadTask:segment.locationUrl];
             }
             return;

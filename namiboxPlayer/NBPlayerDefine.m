@@ -14,7 +14,7 @@ NSString *saveCachePathForVideo(NSString *url) {
     components.scheme = @"streaming";
     NSURL *playUrl = [components URL];
     NSString *md5File = @"";
-    if (currentCacheType == NBPlayerCacheTypePlayHLS) {
+    if (isHLS) {
         md5File = [NSString stringWithFormat:@"%@.m3u8", [[playUrl absoluteString] stringToMD5]];
     } else {
         md5File = [NSString stringWithFormat:@"%@.mp4", [[playUrl absoluteString] stringToMD5]];
@@ -49,6 +49,7 @@ NSURL *getSchemeVideoURL(NSString *url) {
 }
 
 NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;
+BOOL isHLS = NO;
 
 NSString *const kNBPlayerStateChangedNotification    = @"NBPlayerStateChangedNotification";
 NSString *const kNBPlayerProgressChangedNotification = @"NBPlayerProgressChangedNotification";
