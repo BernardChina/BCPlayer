@@ -184,7 +184,6 @@
     NSLog(@"%@",@"释放了m3u8handler");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.loadSession removeObserver:self forKeyPath:@"nextTs"];
-    [self.loadSession cancel];
 }
 
 @end

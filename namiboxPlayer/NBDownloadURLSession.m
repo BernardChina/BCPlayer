@@ -49,7 +49,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
     NSURLSessionDownloadTask * downloadTask = [session downloadTaskWithRequest:request];
     [downloadTask resume];
-    NSLog(@"%@",@"添加task");
+    NSLog(@"%@ %@",@"添加task",playUrl);
 }
 
 // Handle download completion from the task
@@ -157,6 +157,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
 }
 
 - (void)cancel {
+    NSLog(@"%@",@"cancel 11111111111111");
     [session invalidateAndCancel];
     session = nil;
 }

@@ -153,6 +153,7 @@ typedef enum : NSUInteger {
     return self;
 }
 
+// 假如不缓存 或者 边播边缓存
 - (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
     
     NSString *str = [url absoluteString];
@@ -177,7 +178,7 @@ typedef enum : NSUInteger {
     
     [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
     
-    [self commonObserver];
+    [self commonPlayerObserver];
     
     // 如果已经在NBPlayerStateBuffering，则直接发通知，否则设置状态
     if (self.state == NBPlayerStateBuffering) {
@@ -188,30 +189,11 @@ typedef enum : NSUInteger {
     
 }
 
-- (void)openHttpServer {
-    if (!self.httpServer) {
-        self.httpServer = [[HTTPServer alloc] init];
-        [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
-        [self.httpServer setPort:12345]; // 设置服务器端口
-        
-        NSString *webPath = cachePathForVideo;
-        
-        NSLog(@"-------------\nSetting document root: %@\n", webPath);
-        // 设置服务器路径
-        [self.httpServer setDocumentRoot:webPath];
-        NSError *error;
-        if(![self.httpServer start:&error]) {
-            NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
-        }
-    }
-}
-
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
-    [self releasePlayer];
+    [self removeCommonPlayerObserver];
     if (isHLS) {
         [self openHttpServer];
-        
     }
     self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
@@ -224,7 +206,7 @@ typedef enum : NSUInteger {
     
     [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
     
-    [self commonObserver];
+    [self commonPlayerObserver];
     
     if ([url.scheme isEqualToString:@"file"]) {
         // 如果已经在NBPlayerStatePlaying，则直接发通知，否则设置状态
@@ -264,7 +246,7 @@ typedef enum : NSUInteger {
         
         [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
         
-        [self commonObserver];
+        [self commonPlayerObserver];
         
         return;
     }
@@ -307,7 +289,6 @@ typedef enum : NSUInteger {
     
     self.cachePath = saveCachePathForVideo(url.absoluteString);
     
-    [self.player pause];
     [self releasePlayer];
     
     self.isPauseByUser = NO;
@@ -346,7 +327,6 @@ typedef enum : NSUInteger {
     if (cacheType == NBPlayerCacheTypePlayAfterCache) {
         [self playAfterCacheWithVideoUrl:url];
     }
-    
     
 }
 
@@ -430,7 +410,7 @@ typedef enum : NSUInteger {
             return;
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
-            // 下载完成
+            // 开始播放
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
@@ -1233,11 +1213,11 @@ typedef enum : NSUInteger {
     self.duration = 0;
     self.current  = 0;
     self.state = NBPlayerStateStopped;
-    [self.player pause];
     [self releasePlayer];
     self.repeatBtn.hidden = YES;
     [self toolViewHidden];
     [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerProgressChangedNotification object:nil];
+    self.m3u8Handler = nil;
 }
 
 #pragma mark - 计算播放进度
@@ -1293,16 +1273,31 @@ typedef enum : NSUInteger {
 
 #pragma mark - private
 
-- (void)releasePlayer {
+- (void)removeDownloadSessionObserver {
     if (self.downloadSession) {
         
         [self.downloadSession removeObserver:self forKeyPath:@"downloadProgress"];
         [self.downloadSession removeObserver:self forKeyPath:@"startPlay"];
         
+    }
+}
+
+- (void)releaseDownloadSession {
+    if (self.downloadSession) {
         [self.downloadSession cancel];
         self.downloadSession = nil;
     }
-    
+}
+
+- (void)releaseResouerLoader {
+    if (self.resouerLoader.task) {
+        [self.resouerLoader.task cancel];
+        self.resouerLoader.task = nil;
+        self.resouerLoader = nil;
+    }
+}
+
+- (void)removeCommonPlayerObserver {
     if (!self.currentPlayerItem) {
         return;
     }
@@ -1316,17 +1311,47 @@ typedef enum : NSUInteger {
     [self.player removeTimeObserver:self.playbackTimeObserver];
     self.playbackTimeObserver = nil;
     self.currentPlayerItem = nil;
+}
+
+- (void)releasePlayer {
+    [self.player pause];
+    [self removeDownloadSessionObserver];
+    [self releaseDownloadSession];
+    [self removeCommonPlayerObserver];
+    [self releaseResouerLoader];
+//    if (self.downloadSession) {
+//        
+//        [self.downloadSession removeObserver:self forKeyPath:@"downloadProgress"];
+//        [self.downloadSession removeObserver:self forKeyPath:@"startPlay"];
+//        
+//        [self.downloadSession cancel];
+//        self.downloadSession = nil;
+//    }
     
-    if (self.resouerLoader.task) {
-        [self.resouerLoader.task cancel];
-        self.resouerLoader.task = nil;
-        self.resouerLoader = nil;
-    }
+//    if (!self.currentPlayerItem) {
+//        return;
+//    }
+//    
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath];
+//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath];
+//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath];
+//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath];
+//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath];
+//    [self.player removeTimeObserver:self.playbackTimeObserver];
+//    self.playbackTimeObserver = nil;
+//    self.currentPlayerItem = nil;
+    
+//    if (self.resouerLoader.task) {
+//        [self.resouerLoader.task cancel];
+//        self.resouerLoader.task = nil;
+//        self.resouerLoader = nil;
+//    }
     
 }
 
 // 基本的监听
-- (void)commonObserver {
+- (void)commonPlayerObserver {
     
     // status.播放器的播放状态
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath options:NSKeyValueObservingOptionNew context:nil];
@@ -1354,6 +1379,24 @@ typedef enum : NSUInteger {
         localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
     }
     [self playWithLocalUrl:localURL];
+}
+
+- (void)openHttpServer {
+    if (!self.httpServer) {
+        self.httpServer = [[HTTPServer alloc] init];
+        [self.httpServer setType:@"_http._tcp."];  // 设置服务类型
+        [self.httpServer setPort:12345]; // 设置服务器端口
+        
+        NSString *webPath = cachePathForVideo;
+        
+        NSLog(@"-------------\nSetting document root: %@\n", webPath);
+        // 设置服务器路径
+        [self.httpServer setDocumentRoot:webPath];
+        NSError *error;
+        if(![self.httpServer start:&error]) {
+            NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
+        }
+    }
 }
 
 #pragma mark - NBLoaderURLSessionDelegate
@@ -1568,9 +1611,8 @@ typedef enum : NSUInteger {
 
 - (void)dealloc {
     NSLog(@"%@",@"NBVideoPlayer dealloc");
-    [self.player pause];
-    [self releasePlayer];
     [self unmonitoringPlayback];
+    
 }
 
 @end
