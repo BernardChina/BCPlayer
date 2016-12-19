@@ -303,6 +303,12 @@ typedef enum : NSUInteger {
     
     [self setVideoToolView];
     
+    // 支持hls
+    if (isHLS) {
+        [self playHLSWithUrl:url];
+        return;
+    }
+    
     // 假如有缓存文件，首先播放缓存文件
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
         NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
@@ -310,11 +316,6 @@ typedef enum : NSUInteger {
             localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
         }
         [self playWithLocalUrl:localURL];
-        return;
-    }
-    // 支持hls
-    if (isHLS) {
-        [self playHLSWithUrl:url];
         return;
     }
     
@@ -497,7 +498,7 @@ typedef enum : NSUInteger {
         [strongSelf updateVideoSlider:current];
         
         // 当只有hls格式视频，并且边播边缓存的时候，才发送通知
-        if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
+        if (isHLS ) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
         }
         

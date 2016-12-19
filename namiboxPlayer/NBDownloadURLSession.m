@@ -12,13 +12,13 @@
 #import "NBPlayerM3U8Handler.h"
 #import "HTTPServer.h"
 #import "NBPlayerEnvironment.h"
+#import "NSFileManager+NB.h"
 
 static NSInteger const sPlayAfterCacheCount = 3;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
-    NSMutableArray *_urlsWidthDownloaded; // hls中ts文件已经下载的url
     NSInteger _downloadedIndex;
 }
 
@@ -29,7 +29,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
 - (instancetype)init {
     if (self == [super init]) {
         _startPlay = NO;
-        _urlsWidthDownloaded = [[NSMutableArray alloc] init];
+        _downloadedIndex = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - 1;
         
         [session invalidateAndCancel];
         session = nil;
@@ -58,19 +58,23 @@ static NSInteger const sPlayAfterCacheCount = 3;
     NSString *cachePath = @"";
     
     if (isHLS) {
-        NSURL *url = downloadTask.response.URL;
+//        NSURL *url = downloadTask.response.URL;
         // 已经下载的url
-        [_urlsWidthDownloaded addObject:url];
+//        [_urlsWidthDownloaded addObject:url];
         
-        _downloadedIndex = [self.hlsUrls indexOfObject:url];
+//        _downloadedIndex = [self.hlsUrls indexOfObject:url];
+        
+        NSUInteger downloadedCount = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count + 1;
+        
+        _downloadedIndex = downloadedCount -1;
         
         cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)_downloadedIndex]];
         
-        self.downloadProgress = (double)_urlsWidthDownloaded.count/(double)self.hlsUrls.count;
+        self.downloadProgress = (double)downloadedCount/(double)self.hlsUrls.count;
         
         switch (currentCacheType) {
             case NBPlayerCacheTypePlayAfterCache: {
-                if (_urlsWidthDownloaded.count == self.hlsUrls.count) {
+                if (downloadedCount == self.hlsUrls.count) {
                     self.startPlay = YES;
                 } else {
                     self.nextTs = _downloadedIndex + 1;
@@ -80,7 +84,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
                 
             case NBPlayerCacheTypePlayWithCache: {
                 // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
-                if (_urlsWidthDownloaded.count - self.currentIndex == sPlayAfterCacheCount) {
+                if (downloadedCount - self.currentIndex == sPlayAfterCacheCount) {
                     if (!self.startPlay) {
                         self.startPlay = YES;
                     }
@@ -144,12 +148,11 @@ static NSInteger const sPlayAfterCacheCount = 3;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == DownloadKVOContext) {
         if ([keyPath isEqualToString:@"currentIndex"]) {
-            if (_downloadedIndex+1 < self.hlsUrls.count && _urlsWidthDownloaded.count - self.currentIndex < 3 ) {
+            if (_downloadedIndex+1 < self.hlsUrls.count && [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex < sPlayAfterCacheCount ) {
                 if (self.nextTs != _downloadedIndex +1) {
                     self.nextTs = _downloadedIndex + 1;
+                    NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);
                 }
-                
-                NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);
             }
             return;
         }

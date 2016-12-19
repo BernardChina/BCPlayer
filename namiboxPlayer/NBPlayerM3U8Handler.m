@@ -9,6 +9,7 @@
 #import "NBPlayerM3U8Handler.h"
 #import "NBDownloadURLSession.h"
 #import "NBPlayerDefine.h"
+#import "NSFileManager+NB.h"
 
 @interface NBPlayerM3U8Handler()
 
@@ -70,7 +71,7 @@
             M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
             segment.duration = [temp[0] intValue];
             segment.locationUrl = [self removeSpaceAndNewlineAndOtherFlag:temp[1]];
-            if (![segment.locationUrl hasSuffix:@"http"]) {
+            if (![segment.locationUrl hasPrefix:@"http"]) {
                 
                 segment.locationUrl = [baseUrl stringByAppendingString:segment.locationUrl];
             }
@@ -80,14 +81,24 @@
         }
     }];
     
-    [self createLocalM3U8file];
-    
     self.loadSession.hlsUrls = urls;
+    
+    [self.loadSession addObserver:self forKeyPath:@"nextTs" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+    
+    NSError *errord = nil;
+    NSArray *fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cachePathForVideo error:&errord];
+    
+    // 说明没有下载完成，只是下载了一部分
+    if (fileList.count - 1 < self.segments.count) {
+        self.loadSession.startPlay =  YES;
+        return;
+    }
+    
+    [self createLocalM3U8file];
     
     if (self.segments.firstObject) {
         M3U8SegmentInfo * segment = self.segments.firstObject;
         [self.loadSession addDownloadTask:segment.locationUrl];
-        [self.loadSession addObserver:self forKeyPath:@"nextTs" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     }
 }
 

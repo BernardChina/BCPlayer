@@ -65,6 +65,7 @@
 		927ABD5D1DF1782100689E94 /* NSString+NB.m in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5C1DF1782100689E94 /* NSString+NB.m */; };
 		927ABD5F1DF17E4D00689E94 /* NBPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5E1DF17E4D00689E94 /* NBPlayer.h */; };
 		927ABD611DF2547E00689E94 /* NBPlayer.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD601DF2547E00689E94 /* NBPlayer.bundle */; };
+		92EB48DC1E053916006BAF42 /* NSFileManager+NB.m in Sources */ = {isa = PBXBuildFile; fileRef = 92EB48DB1E053916006BAF42 /* NSFileManager+NB.m */; };
 		989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */; };
 /* End PBXBuildFile section */
 
@@ -176,6 +177,8 @@
 		927ABD5C1DF1782100689E94 /* NSString+NB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+NB.m"; sourceTree = "<group>"; };
 		927ABD5E1DF17E4D00689E94 /* NBPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NBPlayer.h; sourceTree = "<group>"; };
 		927ABD601DF2547E00689E94 /* NBPlayer.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NBPlayer.bundle; sourceTree = "<group>"; };
+		92EB48DA1E053916006BAF42 /* NSFileManager+NB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+NB.h"; sourceTree = "<group>"; };
+		92EB48DB1E053916006BAF42 /* NSFileManager+NB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NB.m"; sourceTree = "<group>"; };
 		9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.debug.xcconfig"; sourceTree = "<group>"; };
 		F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-namiboxVideo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -431,6 +434,8 @@
 				927ABD561DF177D600689E94 /* NBLightView.m */,
 				927ABD5B1DF1782100689E94 /* NSString+NB.h */,
 				927ABD5C1DF1782100689E94 /* NSString+NB.m */,
+				92EB48DA1E053916006BAF42 /* NSFileManager+NB.h */,
+				92EB48DB1E053916006BAF42 /* NSFileManager+NB.m */,
 				9256F3471DF50ACA0075E952 /* NBPlayerDefine.h */,
 				9256F3481DF50ACA0075E952 /* NBPlayerDefine.m */,
 				927ABD601DF2547E00689E94 /* NBPlayer.bundle */,
@@ -610,6 +615,7 @@
 				9276E4F91DFA54B300B922DC /* DELETEResponse.m in Sources */,
 				9276E5021DFA54B300B922DC /* DDFileLogger.m in Sources */,
 				927ABD5A1DF177FA00689E94 /* NBVideoRequestTask.m in Sources */,
+				92EB48DC1E053916006BAF42 /* NSFileManager+NB.m in Sources */,
 				9276E4E91DFA54B300B922DC /* HTTPAuthenticationRequest.m in Sources */,
 				927ABD511DF177A600689E94 /* NBPlayerView.m in Sources */,
 				927ABD571DF177D600689E94 /* NBLightView.m in Sources */,
