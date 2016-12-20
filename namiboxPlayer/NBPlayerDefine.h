@@ -34,4 +34,6 @@ extern NSString* const httpServerLocalUrl;
 
 // 播放器当前播放时间改变通知
 FOUNDATION_EXPORT NSString *const kNBPlayerCurrentTimeChangedNofification;
+// 记录hls格式视频，并且边播边缓存模式下的视频时长
+extern double durationWithHLS;
 

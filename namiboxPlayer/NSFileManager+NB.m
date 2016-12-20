@@ -21,8 +21,8 @@
         }
     }];
     
-    NSArray *files = [temp sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        return NSOrderedAscending;
+    NSArray *files = [temp sortedArrayUsingComparator:^NSComparisonResult(NSString *obj1,NSString *obj2) {
+        return [obj1 compare:obj2 options:NSNumericSearch];
     }];
     
     return files;

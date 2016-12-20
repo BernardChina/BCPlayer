@@ -65,31 +65,36 @@
     NSArray *array = [remainData componentsSeparatedByString:@"#EXTINF:"];
     NSString *baseUrl = [@"http://" stringByAppendingString:url.host];
     
+    __block double duration = 0;
+    
     [array enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (idx != 0) {
             NSArray *temp = [obj componentsSeparatedByString:@","];
             M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
             segment.duration = [temp[0] intValue];
             segment.locationUrl = [self removeSpaceAndNewlineAndOtherFlag:temp[1]];
-            if (![segment.locationUrl hasPrefix:@"http"]) {
+            if (!([segment.locationUrl hasPrefix:@"http"] || [segment.locationUrl hasPrefix:@"https"])) {
                 
                 segment.locationUrl = [baseUrl stringByAppendingString:segment.locationUrl];
             }
             [urls addObject:[NSURL URLWithString:segment.locationUrl]];
             
             [self.segments addObject:segment];
+            
+            duration += segment.duration;
         }
     }];
+    
+    durationWithHLS = duration;
     
     self.loadSession.hlsUrls = urls;
     
     [self.loadSession addObserver:self forKeyPath:@"nextTs" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     
-    NSError *errord = nil;
-    NSArray *fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cachePathForVideo error:&errord];
+    NSArray *fileList = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo];
     
-    // 说明没有下载完成，只是下载了一部分
-    if (fileList.count - 1 < self.segments.count) {
+    // 说明没有下载完成，只是下载了一部分或者下载完成
+    if (fileList.count - 1 <= self.segments.count) {
         self.loadSession.startPlay =  YES;
         return;
     }

@@ -58,3 +58,5 @@ NSString *const kNBPlayerLoadProgressChangedNotification = @"NBPlayerLoadProgres
 NSString* const httpServerLocalUrl = @"http://127.0.0.1:12345/";
 
 NSString *const kNBPlayerCurrentTimeChangedNofification = @"NBPlayerCurrentTimeChangedNofification";
+
+double durationWithHLS = 0;

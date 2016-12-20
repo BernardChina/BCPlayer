@@ -282,9 +282,11 @@ typedef enum : NSUInteger {
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
     
     _playUrl = url;
-    if ([url.lastPathComponent rangeOfString:@".m3u8" options:NSBackwardsSearch].length > 0 ) {
+    
+    if ([url.lastPathComponent hasSuffix:@".m3u8"]) {
         isHLS = YES;
     }
+    
     currentCacheType = cacheType;
     
     self.cachePath = saveCachePathForVideo(url.absoluteString);
@@ -444,7 +446,10 @@ typedef enum : NSUInteger {
         
     } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
         //监听播放器的下载进度
-        [self calculateDownloadProgress:playerItem];
+        NSLog(@"%@",@"监听播放器的下载进度");
+        if (!isHLS) {
+            [self calculateDownloadProgress:playerItem];
+        }
         
     } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
         //监听播放器在缓冲数据的状态
@@ -474,6 +479,9 @@ typedef enum : NSUInteger {
 - (void)monitoringPlayback:(AVPlayerItem *)playerItem {
     // playerItem.duration. 表示项目媒体的持续时间
     self.duration = playerItem.duration.value / playerItem.duration.timescale; //视频总时间
+    if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
+        self.duration = durationWithHLS;
+    }
     [self.player play];
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
@@ -488,6 +496,8 @@ typedef enum : NSUInteger {
         // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
         _current = current;
+        
+        NSLog(@"2222222222222 player item:%@",playerItem);
         
         // 通知外面接受到播放信息
         if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withProgress:currentTime:totalTime:)]) {
@@ -535,6 +545,9 @@ typedef enum : NSUInteger {
     NSTimeInterval timeInterval = startSeconds + durationSeconds;// 计算缓冲总进度
     CMTime duration = playerItem.duration;
     CGFloat totalDuration = CMTimeGetSeconds(duration);
+    if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
+        self.duration = durationWithHLS;
+    }
     self.loadedProgress = timeInterval / totalDuration;
     [self.videoProgressView setProgress:timeInterval / totalDuration animated:YES];
 }
