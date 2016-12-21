@@ -443,9 +443,7 @@ typedef enum : NSUInteger {
     } else if ([NBVideoPlayerItemLoadedTimeRangesKeyPath isEqualToString:keyPath]) {
         //监听播放器的下载进度
         NSLog(@"%@",@"监听播放器的下载进度");
-        if (!isHLS) {
-            [self calculateDownloadProgress:playerItem];
-        }
+        [self calculateDownloadProgress:playerItem];
         
     } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
         //监听播放器在缓冲数据的状态
@@ -1395,6 +1393,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)localUrlPlayer {
+    [self.player pause];
     NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
     if (isHLS) {
         localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
@@ -1423,7 +1422,6 @@ typedef enum : NSUInteger {
 #pragma mark - NBLoaderURLSessionDelegate
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
-
     
 }
 
