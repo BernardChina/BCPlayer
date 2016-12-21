@@ -423,8 +423,17 @@ typedef enum : NSUInteger {
                         }
                         [self playWithLocalUrl:localURL];
                     }
+                    
+                    return;
                 }
             }
+            
+            // 用户设置不是自动播放，应该显示播放按钮，暂时先显示重播按钮（因为没有ui）
+            self.repeatBtn.hidden = NO;
+            [self toolViewHidden];
+            self.state = NBPlayerStateFinish;
+            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
+            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
             
             return;
         }
