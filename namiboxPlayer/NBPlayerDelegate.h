@@ -29,4 +29,13 @@
  */
 - (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime;
 
+
+/**
+ 缓存完成之后，是否自动播放
+
+ @param player 当前的播放器
+ @return 是否自动播放
+ */
+- (BOOL)NBVideoPlayeraShouldAutoPlay:(NBVideoPlayer *)player;
+
 @end

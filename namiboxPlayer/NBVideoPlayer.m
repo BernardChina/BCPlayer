@@ -410,15 +410,20 @@ typedef enum : NSUInteger {
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
             // 开始播放
+            
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
-            if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
-                NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-                if (isHLS) {
-                    localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+            if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayeraShouldAutoPlay:)]) {
+                if ([self.delegate NBVideoPlayeraShouldAutoPlay:self]) {
+                    if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+                        NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+                        if (isHLS) {
+                            localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+                        }
+                        [self playWithLocalUrl:localURL];
+                    }
                 }
-                [self playWithLocalUrl:localURL];
             }
             
             return;
@@ -1075,21 +1080,20 @@ typedef enum : NSUInteger {
     
     [self.player pause];
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
-        self.isPauseByUser = NO;
-        [self.player play];
         if (finished) {
+            self.isPauseByUser = NO;
+            [self.player play];
             NSLog(@"是否结束：%@",@"完成");
+            
+            if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
+                self.state = NBPlayerStateBuffering;
+                
+                self.actIndicator.hidden = NO;
+                [self.actIndicator startAnimating];
+            }
         } else {
             NSLog(@"是否结束：%@",@"失败");
         }
-        
-        if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
-            self.state = NBPlayerStateBuffering;
-            
-            self.actIndicator.hidden = NO;
-            [self.actIndicator startAnimating];
-        }
-        
     }];
 }
 

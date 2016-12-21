@@ -89,7 +89,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
                         self.startPlay = YES;
                     }
                 }
-                if (self.nextTs < sPlayAfterCacheCount) {
+                if (self.nextTs < sPlayAfterCacheCount-1) {
                     self.nextTs = _downloadedIndex + 1;
                 }
             }
