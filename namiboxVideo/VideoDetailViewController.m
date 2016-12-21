@@ -39,7 +39,7 @@
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
               showView:videoView
           andSuperView:self.view
-             cacheType:NBPlayerCacheTypePlayHLS];
+             cacheType:NBPlayerCacheTypePlayWithCache];
     
     NSLog(@"%f", [NBVideoPlayer allVideoCacheSize]);
 }
@@ -50,7 +50,7 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-//    [_play stop];
+    [_play stop];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -60,6 +60,12 @@
 
 - (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime {
     NSLog(@"当前：%f 总共：%f",current,totalTime);
+}
+
+- (void)NBVideoPlayer:(NBVideoPlayer *)player didCompleteWithError:(NSError *)error {
+    if (error) {
+        NSLog(@"%@",error);
+    }
 }
 
 

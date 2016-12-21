@@ -27,8 +27,8 @@ NSString *saveCachePathForVideo(NSString *url) {
     NSString *tempPath = [document stringByAppendingString:[NSString stringWithFormat:@"/%@",[[playUrl absoluteString] stringToMD5]]];
     
     BOOL isDir;
-    [[NSFileManager defaultManager] fileExistsAtPath:tempPath isDirectory:&isDir];
-    if (!isDir) {
+    BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:tempPath isDirectory:&isDir];
+    if (!(isExist && isDir)) {
         [[NSFileManager defaultManager] createDirectoryAtPath:tempPath withIntermediateDirectories:YES attributes:nil error:nil];
     }
     

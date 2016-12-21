@@ -40,8 +40,8 @@
     
     //    [self.videoList addObject:@"http://baobab.wdjcdn.com/1457716884751linghunbanlv_x264.mp4"];
     [self.videoList addObject:@"http://baobab.wdjcdn.com/14587897797934.mp4"];
-    [self.videoList addObject:@"http://v.namibox.com/material_video/v_001424/v_001424.m3u8?pm3u8/0&e=1481284473&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:ypqnLePiR03TXVpp30HG7-0l9p8="];
-    [self.videoList addObject:@"http://7xne8z.media1.z0.glb.clouddn.com/u7wPKxRMeOWP3oNt3QCX7_8Ot1w=/llQ-0TAqbb854sFrW3OHkCu7lZus/000000.ts?e=1481232284&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:_iZWtPYEqW2AACy4RfUqoRa-Chw"];
+    [self.videoList addObject:@"http://v.namibox.com/material_video/v_002464/v_002464.m3u8?pm3u8/0&e=1481998894&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:vymvDpRIm6GqJHprjNzVRpCx_-A="];
+    [self.videoList addObject:@"http://v.namibox.com/material_video/v_002635/v_002635.m3u8?pm3u8/0&e=1482369533&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:H-cRUmmdCSMIpm4CpXqzYyqm2O4="];
     
     [self.view addSubview:self.tableView];
 }

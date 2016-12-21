@@ -32,8 +32,8 @@ void NBSetWBEnviroment(NBPlayerEnvironment *env) {
     NSString *document = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
     NSString *path = [document stringByAppendingString:@"/videos"];
     BOOL isDir;
-    [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
-    if (!isDir) {
+    BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+    if (!(isExist && isDir)) {
         [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
     }
     return path;

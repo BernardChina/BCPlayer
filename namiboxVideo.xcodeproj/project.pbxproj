@@ -66,6 +66,8 @@
 		927ABD5F1DF17E4D00689E94 /* NBPlayer.h in Sources */ = {isa = PBXBuildFile; fileRef = 927ABD5E1DF17E4D00689E94 /* NBPlayer.h */; };
 		927ABD611DF2547E00689E94 /* NBPlayer.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 927ABD601DF2547E00689E94 /* NBPlayer.bundle */; };
 		92EB48DC1E053916006BAF42 /* NSFileManager+NB.m in Sources */ = {isa = PBXBuildFile; fileRef = 92EB48DB1E053916006BAF42 /* NSFileManager+NB.m */; };
+		92EB48E11E08E447006BAF42 /* CacheCleanerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 92EB48DE1E08E447006BAF42 /* CacheCleanerPlugin.m */; };
+		92EB48E21E08E447006BAF42 /* RetainCycleLoggerPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 92EB48E01E08E447006BAF42 /* RetainCycleLoggerPlugin.m */; };
 		989C08EED6AA8B4B35021379 /* libPods-namiboxVideo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */; };
 /* End PBXBuildFile section */
 
@@ -179,6 +181,10 @@
 		927ABD601DF2547E00689E94 /* NBPlayer.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NBPlayer.bundle; sourceTree = "<group>"; };
 		92EB48DA1E053916006BAF42 /* NSFileManager+NB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+NB.h"; sourceTree = "<group>"; };
 		92EB48DB1E053916006BAF42 /* NSFileManager+NB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+NB.m"; sourceTree = "<group>"; };
+		92EB48DD1E08E447006BAF42 /* CacheCleanerPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CacheCleanerPlugin.h; sourceTree = "<group>"; };
+		92EB48DE1E08E447006BAF42 /* CacheCleanerPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CacheCleanerPlugin.m; sourceTree = "<group>"; };
+		92EB48DF1E08E447006BAF42 /* RetainCycleLoggerPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RetainCycleLoggerPlugin.h; sourceTree = "<group>"; };
+		92EB48E01E08E447006BAF42 /* RetainCycleLoggerPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RetainCycleLoggerPlugin.m; sourceTree = "<group>"; };
 		9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-namiboxVideo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-namiboxVideo/Pods-namiboxVideo.debug.xcconfig"; sourceTree = "<group>"; };
 		F4EFACE295F3A47D3B458FF4 /* libPods-namiboxVideo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-namiboxVideo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -391,6 +397,10 @@
 				927ABD151DF1731800689E94 /* ViewController.m */,
 				927ABD251DF1751700689E94 /* VideoDetailViewController.h */,
 				927ABD261DF1751700689E94 /* VideoDetailViewController.m */,
+				92EB48DD1E08E447006BAF42 /* CacheCleanerPlugin.h */,
+				92EB48DE1E08E447006BAF42 /* CacheCleanerPlugin.m */,
+				92EB48DF1E08E447006BAF42 /* RetainCycleLoggerPlugin.h */,
+				92EB48E01E08E447006BAF42 /* RetainCycleLoggerPlugin.m */,
 				927ABD171DF1731800689E94 /* Main.storyboard */,
 				927ABD1A1DF1731800689E94 /* Assets.xcassets */,
 				927ABD1C1DF1731800689E94 /* LaunchScreen.storyboard */,
@@ -486,6 +496,7 @@
 				TargetAttributes = {
 					927ABD0A1DF1731800689E94 = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = L7JLWB6FU8;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -591,6 +602,7 @@
 				927ABD101DF1731800689E94 /* main.m in Sources */,
 				9276E4EE1DFA54B300B922DC /* MultipartMessageHeader.m in Sources */,
 				9276E5061DFA54B300B922DC /* DispatchQueueLogFormatter.m in Sources */,
+				92EB48E11E08E447006BAF42 /* CacheCleanerPlugin.m in Sources */,
 				927ABD2D1DF1765800689E94 /* NBVideoPlayer.m in Sources */,
 				9276E4F71DFA54B300B922DC /* DAVConnection.m in Sources */,
 				9256F3431DF4FF3E0075E952 /* NBPlayerEnvironment.m in Sources */,
@@ -624,6 +636,7 @@
 				9276E4F31DFA54B300B922DC /* HTTPErrorResponse.m in Sources */,
 				9276E4EC1DFA54B300B922DC /* HTTPServer.m in Sources */,
 				927ABD541DF177BE00689E94 /* NBTimeSheetView.m in Sources */,
+				92EB48E21E08E447006BAF42 /* RetainCycleLoggerPlugin.m in Sources */,
 				9276E4F11DFA54B300B922DC /* HTTPDataResponse.m in Sources */,
 				9276E4F01DFA54B300B922DC /* HTTPAsyncFileResponse.m in Sources */,
 			);
@@ -744,7 +757,8 @@
 			baseConfigurationReference = 9A808EEC35B01B2F4B51E923 /* Pods-namiboxVideo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = L7JLWB6FU8;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",
@@ -759,8 +773,10 @@
 					"\"$PODS_CONFIGURATION_BUILD_DIR/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.namibox.namiboxVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.notepassword.pwd;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "f7b993bb-5777-428d-93cb-de0b93eacea7";
+				PROVISIONING_PROFILE_SPECIFIER = "NOTE PASSWORD";
 			};
 			name = Debug;
 		};
@@ -769,7 +785,8 @@
 			baseConfigurationReference = 8E6C2D4EBA9BFBFCE148F162 /* Pods-namiboxVideo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = L7JLWB6FU8;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Headers/Public\"",
@@ -784,8 +801,10 @@
 					"\"$PODS_CONFIGURATION_BUILD_DIR/Masonry\"",
 					"${SDK_DIR}/usr/include/libxml2",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.namibox.namiboxVideo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.notepassword.pwd;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "f7b993bb-5777-428d-93cb-de0b93eacea7";
+				PROVISIONING_PROFILE_SPECIFIER = "NOTE PASSWORD";
 			};
 			name = Release;
 		};

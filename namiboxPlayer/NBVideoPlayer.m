@@ -191,12 +191,18 @@ typedef enum : NSUInteger {
 
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
+    NSLog(@"11111111111111当钱item:---%@",self.currentPlayerItem);
     [self removeCommonPlayerObserver];
+    
+    NSLog(@"11111111111111:%@---%@",self.currentPlayerItem,self.playbackTimeObserver);
+    
     if (isHLS) {
         [self openHttpServer];
     }
     self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
+    
+    NSLog(@"aaaaaaaaaaaaa:%@---%@",self.currentPlayerItem,self.playbackTimeObserver);
     
     if (!self.player) {
         self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
@@ -486,13 +492,20 @@ typedef enum : NSUInteger {
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
     
+    NSLog(@"3333333333333 player item:%@",playerItem);
+    
     __weak __typeof(self)weakSelf = self;
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
-    self.playbackTimeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
+    weakSelf.playbackTimeObserver = [weakSelf.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
         NSLog(@"%@",@"实时监听当前播放时间");
         
-        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        __strong __typeof(self)strongSelf = weakSelf;
+        
+        if (![playerItem isEqual:strongSelf.currentPlayerItem]) {
+            return ;
+        }
+        
         // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
         _current = current;
@@ -575,7 +588,7 @@ typedef enum : NSUInteger {
         isBuffering = NO;
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             [self bufferingSomeSecond];
-            if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
+            if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache && !self.playFinished) {
                 [self localUrlPlayer];
                 [self seekToTime:_current];
             }
@@ -1079,6 +1092,12 @@ typedef enum : NSUInteger {
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
         self.isPauseByUser = NO;
         [self.player play];
+        if (finished) {
+            NSLog(@"是否结束：%@",@"完成");
+        } else {
+            NSLog(@"是否结束：%@",@"失败");
+        }
+        
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             self.state = NBPlayerStateBuffering;
             
@@ -1322,9 +1341,11 @@ typedef enum : NSUInteger {
     [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath];
     [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath];
     [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath];
-    [self.player removeTimeObserver:self.playbackTimeObserver];
-    self.playbackTimeObserver = nil;
+    
+    [self unmonitoringPlayback];
+    
     self.currentPlayerItem = nil;
+    NSLog(@"%@",@"55555555555555555");
 }
 
 - (void)releasePlayer {

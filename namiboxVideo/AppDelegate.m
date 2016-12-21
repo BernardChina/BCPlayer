@@ -9,7 +9,14 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 
-@interface AppDelegate ()
+#import <FBMemoryProfiler/FBMemoryProfiler.h>
+#import <FBRetainCycleDetector/FBRetainCycleDetector.h>
+#import "CacheCleanerPlugin.h"
+#import "RetainCycleLoggerPlugin.h"
+
+@interface AppDelegate () {
+    FBMemoryProfiler *memoryProfiler;
+}
 
 @end
 
@@ -18,6 +25,22 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    NSArray *filters = @[FBFilterBlockWithObjectIvarRelation([UIView class], @"_subviewCache"),
+                         FBFilterBlockWithObjectIvarRelation([UIPanGestureRecognizer class], @"_internalActiveTouches")];
+    
+    FBObjectGraphConfiguration *configuration =
+    [[FBObjectGraphConfiguration alloc] initWithFilterBlocks:filters
+                                         shouldInspectTimers:NO];
+    
+    memoryProfiler = [[FBMemoryProfiler alloc] initWithPlugins:@[[CacheCleanerPlugin new],
+                                                                 [RetainCycleLoggerPlugin new]]
+                              retainCycleDetectorConfiguration:configuration];
+    [memoryProfiler enable];
+    
+   
+    
+    
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
