@@ -34,7 +34,7 @@ static NSInteger const sPlayAfterCacheCount = 3;
         [session invalidateAndCancel];
         session = nil;
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        sessionConfiguration.timeoutIntervalForRequest = 1000;
+        sessionConfiguration.timeoutIntervalForRequest = 10;
         session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
         
         [self addObserver:self forKeyPath:@"currentIndex" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];

@@ -94,9 +94,27 @@
     NSArray *fileList = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo];
     
     // 说明没有下载完成，只是下载了一部分或者下载完成
+    
     if (fileList.count - 1 <= self.segments.count) {
-        self.loadSession.startPlay =  YES;
-        return;
+        switch (currentCacheType) {
+            case NBPlayerCacheTypePlayWithCache:{
+                self.loadSession.startPlay =  YES;
+                return;
+            }
+                break;
+            case NBPlayerCacheTypePlayAfterCache:{
+                if (self.segments.count >= fileList.count) {
+                    M3U8SegmentInfo * segment = self.segments[fileList.count];
+                    [self.loadSession addDownloadTask:segment.locationUrl];
+                    self.loadSession.downloadProgress = (double)fileList.count/(double)urls.count;
+                }
+                return;
+            }
+                break;
+                
+            default:
+                break;
+        }
     }
     
     [self createLocalM3U8file];
