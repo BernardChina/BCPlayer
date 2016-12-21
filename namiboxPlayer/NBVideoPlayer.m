@@ -180,12 +180,7 @@ typedef enum : NSUInteger {
     
     [self commonPlayerObserver];
     
-    // 如果已经在NBPlayerStateBuffering，则直接发通知，否则设置状态
-    if (self.state == NBPlayerStateBuffering) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
-    } else {
-        self.state = NBPlayerStateBuffering;
-    }
+    self.state = NBPlayerStateBuffering;
     
 }
 
@@ -215,12 +210,7 @@ typedef enum : NSUInteger {
     [self commonPlayerObserver];
     
     if ([url.scheme isEqualToString:@"file"]) {
-        // 如果已经在NBPlayerStatePlaying，则直接发通知，否则设置状态
-        if (self.state == NBPlayerStatePlaying) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
-        } else {
-            self.state = NBPlayerStatePlaying;
-        }
+        self.state = NBPlayerStatePlaying;
     }
 }
 
@@ -535,7 +525,6 @@ typedef enum : NSUInteger {
             if (strongSelf.current > strongSelf.duration) {
                 strongSelf.duration = strongSelf.current;
             }
-            [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerProgressChangedNotification object:nil];
         }
         
     }];
@@ -602,7 +591,6 @@ typedef enum : NSUInteger {
     }
     
     _loadedProgress = loadedProgress;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerLoadProgressChangedNotification object:nil];
 }
 
 - (void)setState:(NBPlayerState)state {
@@ -616,7 +604,6 @@ typedef enum : NSUInteger {
     }
     
     _state = state;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerStateChangedNotification object:nil];
     
 }
 
@@ -1249,7 +1236,6 @@ typedef enum : NSUInteger {
     [self releasePlayer];
     self.repeatBtn.hidden = YES;
     [self toolViewHidden];
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerProgressChangedNotification object:nil];
     self.m3u8Handler = nil;
 }
 

@@ -23,11 +23,6 @@ extern NSURL *getSchemeVideoURL(NSString *url);
 extern NBPlayerCacheType currentCacheType;
 extern BOOL isHLS;
 
-// 暴漏出来的通知
-FOUNDATION_EXPORT NSString *const kNBPlayerStateChangedNotification;
-FOUNDATION_EXPORT NSString *const kNBPlayerProgressChangedNotification;
-FOUNDATION_EXPORT NSString *const kNBPlayerLoadProgressChangedNotification;
-
 static void* const DownloadKVOContext = (void *)&DownloadKVOContext;
 
 extern NSString* const httpServerLocalUrl;

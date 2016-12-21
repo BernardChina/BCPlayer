@@ -51,10 +51,6 @@ NSURL *getSchemeVideoURL(NSString *url) {
 NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;
 BOOL isHLS = NO;
 
-NSString *const kNBPlayerStateChangedNotification    = @"NBPlayerStateChangedNotification";
-NSString *const kNBPlayerProgressChangedNotification = @"NBPlayerProgressChangedNotification";
-NSString *const kNBPlayerLoadProgressChangedNotification = @"NBPlayerLoadProgressChangedNotification";
-
 NSString* const httpServerLocalUrl = @"http://127.0.0.1:12345/";
 
 NSString *const kNBPlayerCurrentTimeChangedNofification = @"NBPlayerCurrentTimeChangedNofification";
