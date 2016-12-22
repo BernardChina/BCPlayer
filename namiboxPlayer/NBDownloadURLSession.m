@@ -34,7 +34,7 @@ static NSInteger const sPlayAfterCacheCount = 5;
         [session invalidateAndCancel];
         session = nil;
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        sessionConfiguration.timeoutIntervalForRequest = 10;
+        sessionConfiguration.timeoutIntervalForRequest = 3;
         session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
         
         [self addObserver:self forKeyPath:@"currentIndex" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
@@ -58,11 +58,6 @@ static NSInteger const sPlayAfterCacheCount = 5;
     NSString *cachePath = @"";
     
     if (isHLS) {
-//        NSURL *url = downloadTask.response.URL;
-        // 已经下载的url
-//        [_urlsWidthDownloaded addObject:url];
-        
-//        _downloadedIndex = [self.hlsUrls indexOfObject:url];
         
         NSUInteger downloadedCount = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count + 1;
         
@@ -116,6 +111,9 @@ static NSInteger const sPlayAfterCacheCount = 5;
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if (error) {
         NSLog(@"Task %@ failed: %@", task, error);
+        if (self.downloadFailed) {
+            self.downloadFailed(error, task, _nextTs);
+        }
         return;
     }
     

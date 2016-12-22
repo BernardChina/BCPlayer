@@ -33,4 +33,6 @@ typedef void(^playFinished)(void);
  */
 -(void)praseUrl:(NSString*)urlstr;
 
+-(void)refreshTask:(NSInteger)textTs;
+
 @end

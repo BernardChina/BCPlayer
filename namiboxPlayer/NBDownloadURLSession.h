@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void(^downloadFailed)(NSError *error, NSURLSessionTask *task, NSInteger nextTs);
+
 @class M3U8SegmentInfo;
 @interface NBDownloadURLSession : NSObject
 
@@ -35,6 +37,8 @@
  但前播放的ts
  */
 @property (nonatomic, assign) NSInteger currentIndex;
+
+@property (nonatomic, strong) downloadFailed downloadFailed;
 
 - (void)cancel;
 

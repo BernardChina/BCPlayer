@@ -88,6 +88,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UIButton       *stopButton;             //播放暂停按钮
 @property (nonatomic, strong) UIButton       *screenButton;           //全屏按钮
 @property (nonatomic, strong) UIButton       *repeatBtn;              //重播按钮
+@property (nonatomic, strong) UIView         *netWorkPoorView;            //网络不佳view
 @property (nonatomic, assign) BOOL           isFullScreen;
 @property (nonatomic, assign) BOOL           canFullScreen;
 @property (nonatomic, strong) UIActivityIndicatorView *actIndicator;  //加载视频时的旋转菊花
@@ -103,6 +104,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NSString *cachePath;
 @property (nonatomic, strong) NBPlayerM3U8Handler *m3u8Handler;
 @property (nonatomic, assign) BOOL playFinished;
+@property (nonatomic, assign) BOOL downloadFailed;
+
+@property (nonatomic, assign) NSInteger nextTs;
 
 @end
 
@@ -257,6 +261,18 @@ typedef enum : NSUInteger {
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         
         __weak __typeof(self)weakSelf = self;
+        
+        self.downloadSession.downloadFailed = ^(NSError *error, NSURLSessionTask *task, NSInteger nextTs){
+            if (error) {
+                __strong __typeof(weakSelf) strongSelf = weakSelf;
+                strongSelf.downloadFailed = YES;
+                strongSelf.nextTs= nextTs;
+                if (strongSelf.state == NBPlayerStateStopped) {
+                    [strongSelf showNetWorkPoorView];
+                }
+            }
+        };
+        
         weakSelf.m3u8Handler.praseFailed = ^(NSError *err){
             // 解析失败
             __strong __typeof(weakSelf)strongSelf = weakSelf;
@@ -466,8 +482,11 @@ typedef enum : NSUInteger {
         //监听播放器在缓冲数据的状态
         //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
         NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
-        [self.actIndicator startAnimating];
-        self.actIndicator.hidden = NO;
+        if (!self.downloadFailed) {
+            [self.actIndicator startAnimating];
+            self.actIndicator.hidden = NO;
+        }
+        
         if (playerItem.isPlaybackBufferEmpty) {
             self.state = NBPlayerStateBuffering;
             [self bufferingSomeSecond];
@@ -594,7 +613,7 @@ typedef enum : NSUInteger {
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             [self bufferingSomeSecond];
             if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache && !self.playFinished) {
-//                [self localUrlPlayer];
+                [self localUrlPlayer];
                 [self seekToTime:_current];
             }
         }
@@ -737,6 +756,14 @@ typedef enum : NSUInteger {
         _repeatBtn.hidden = YES;
     }
     return _repeatBtn;
+}
+
+- (UIView *)netWorkPoorView {
+    if (!_netWorkPoorView) {
+        _netWorkPoorView = [[UIView alloc] init];
+        _netWorkPoorView.hidden = YES;
+    }
+    return _netWorkPoorView;
 }
 
 - (UIActivityIndicatorView *)actIndicator {
@@ -902,6 +929,26 @@ typedef enum : NSUInteger {
         make.center.equalTo(_showView);
     }];
     
+    [self.netWorkPoorView removeFromSuperview];
+    [_showView addSubview:self.netWorkPoorView];
+    [self.netWorkPoorView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(_showView).offset(0);
+    }];
+    UILabel *label = [[UILabel alloc] init];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont systemFontOfSize:12];
+    label.text = @"网络不佳，请点击屏幕重试";
+    label.textColor = [UIColor whiteColor];
+    [self.netWorkPoorView addSubview:label];
+    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.equalTo(self.netWorkPoorView).offset(0);
+        make.centerY.equalTo(self.netWorkPoorView);
+        make.height.equalTo(@(100));
+    }];
+    
+    UITapGestureRecognizer *tapRefresh = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapRefresh:)];
+    [self.netWorkPoorView addGestureRecognizer:tapRefresh];
+    
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction:)];
     tap.numberOfTapsRequired = 1;
     tap.numberOfTouchesRequired = 1;
@@ -944,6 +991,11 @@ typedef enum : NSUInteger {
     } else if(tap.numberOfTapsRequired == 2){
         [self resumeOrPause];
     }
+}
+
+- (void)tapRefresh:(UITapGestureRecognizer *)tap {
+    [self.m3u8Handler refreshTask:self.nextTs];
+    [self hideNetWorkPoorView];
 }
 
 - (void)sliderTapAction:(UITapGestureRecognizer *)tap {
@@ -1096,6 +1148,10 @@ typedef enum : NSUInteger {
         if (finished) {
             self.isPauseByUser = NO;
             [self.player play];
+            
+            self.netWorkPoorView.hidden = YES;
+            self.downloadFailed = NO;
+            
             NSLog(@"是否结束：%@",@"完成");
             
             if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
@@ -1106,6 +1162,10 @@ typedef enum : NSUInteger {
             }
         } else {
             NSLog(@"是否结束：%@",@"失败");
+            if (self.downloadFailed) {
+                [self showNetWorkPoorView];
+                [self.player pause];
+            }
         }
     }];
 }
@@ -1306,6 +1366,20 @@ typedef enum : NSUInteger {
 }
 
 #pragma mark - private
+
+- (void)showNetWorkPoorView {
+    self.netWorkPoorView.hidden = NO;
+    self.downloadFailed = YES;
+    self.actIndicator.hidden = YES;
+    [self.actIndicator stopAnimating];
+}
+
+- (void)hideNetWorkPoorView {
+    self.netWorkPoorView.hidden = YES;
+    self.downloadFailed = NO;
+    self.actIndicator.hidden = NO;
+    [self.actIndicator startAnimating];
+}
 
 - (void)removeDownloadSessionObserver {
     if (self.downloadSession) {

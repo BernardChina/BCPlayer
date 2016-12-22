@@ -149,6 +149,13 @@
     }
 }
 
+- (void)refreshTask:(NSInteger)textTs {
+    M3U8SegmentInfo * segment = [self.segments objectAtIndex:textTs];
+    if (segment) {
+        [self.loadSession addDownloadTask:segment.locationUrl];
+    }
+}
+
 - (void)currentTimeChanged:(NSNotification *)notification {
     
     if (notification) {
