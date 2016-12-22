@@ -14,7 +14,7 @@
 #import "NBPlayerEnvironment.h"
 #import "NSFileManager+NB.h"
 
-static NSInteger const sPlayAfterCacheCount = 3;
+static NSInteger const sPlayAfterCacheCount = 5;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;

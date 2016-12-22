@@ -370,8 +370,11 @@ typedef enum : NSUInteger {
      */
     //重新播放
     
+    NSLog(@"%@",@"playerItemDidPlayToEnd");
+    
     if (isHLS && !self.playFinished && currentCacheType == NBPlayerCacheTypePlayWithCache) {
         [self localUrlPlayer];
+        
         [self seekToTime:_current];
         return;
     }
@@ -462,6 +465,7 @@ typedef enum : NSUInteger {
     } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
         //监听播放器在缓冲数据的状态
         //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
+        NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
         [self.actIndicator startAnimating];
         self.actIndicator.hidden = NO;
         if (playerItem.isPlaybackBufferEmpty) {
@@ -590,7 +594,7 @@ typedef enum : NSUInteger {
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             [self bufferingSomeSecond];
             if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache && !self.playFinished) {
-                [self localUrlPlayer];
+//                [self localUrlPlayer];
                 [self seekToTime:_current];
             }
         }

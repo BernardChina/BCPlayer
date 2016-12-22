@@ -103,10 +103,12 @@
             }
                 break;
             case NBPlayerCacheTypePlayAfterCache:{
-                if (self.segments.count >= fileList.count) {
+                if (self.segments.count > fileList.count) {
                     M3U8SegmentInfo * segment = self.segments[fileList.count];
                     [self.loadSession addDownloadTask:segment.locationUrl];
                     self.loadSession.downloadProgress = (double)fileList.count/(double)urls.count;
+                } else if(self.segments.count == fileList.count) {
+                    self.loadSession.startPlay = YES;
                 }
                 return;
             }
