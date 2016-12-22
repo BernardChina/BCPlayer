@@ -31,7 +31,9 @@ typedef void(^downloadFailed)(NSError *error, NSURLSessionTask *task, NSInteger 
 /**
  ts文件list
  */
-@property (nonatomic, strong) NSArray *hlsUrls;
+//@property (nonatomic, strong) NSArray *hlsUrls;
+
+@property (nonatomic, assign) double taskCount;
 
 /**
  但前播放的ts

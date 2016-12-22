@@ -17,7 +17,7 @@
 
 @end
 
-typedef void(^praseFailed)(NSError *error);
+typedef void(^praseFailed)(NSError *error, NSInteger nextTs);
 typedef void(^playFinished)(void);
 
 @interface NBPlayerM3U8Handler : NSObject
@@ -33,6 +33,6 @@ typedef void(^playFinished)(void);
  */
 -(void)praseUrl:(NSString*)urlstr;
 
--(void)refreshTask:(NSInteger)textTs;
+-(void)refreshTask:(NSInteger)textTs completeWithError:(praseFailed)error;
 
 @end

@@ -106,7 +106,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL playFinished;
 @property (nonatomic, assign) BOOL downloadFailed;
 
-@property (nonatomic, assign) NSInteger nextTs;
+@property (nonatomic, assign) NSInteger nextTs; // 只有解析失败的时候，才会记录
 
 @end
 
@@ -273,10 +273,14 @@ typedef enum : NSUInteger {
             }
         };
         
-        weakSelf.m3u8Handler.praseFailed = ^(NSError *err){
+        weakSelf.m3u8Handler.praseFailed = ^(NSError *err, NSInteger nextTs){
             // 解析失败
             __strong __typeof(weakSelf)strongSelf = weakSelf;
             
+            strongSelf.nextTs= nextTs;
+            if (strongSelf.state == NBPlayerStateStopped) {
+                [strongSelf showNetWorkPoorView];
+            }
             if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
                 [strongSelf.delegate NBVideoPlayer:[NBVideoPlayer sharedInstance] didCompleteWithError:err];
             }
@@ -994,8 +998,17 @@ typedef enum : NSUInteger {
 }
 
 - (void)tapRefresh:(UITapGestureRecognizer *)tap {
-    [self.m3u8Handler refreshTask:self.nextTs];
     [self hideNetWorkPoorView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.m3u8Handler refreshTask:self.nextTs completeWithError:^(NSError *error, NSInteger nextTs) {
+            if (error) {
+                [self showNetWorkPoorView];
+                return ;
+            }
+        }];
+        
+    });
 }
 
 - (void)sliderTapAction:(UITapGestureRecognizer *)tap {

@@ -65,11 +65,11 @@ static NSInteger const sPlayAfterCacheCount = 5;
         
         cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)_downloadedIndex]];
         
-        self.downloadProgress = (double)downloadedCount/(double)self.hlsUrls.count;
+        self.downloadProgress = (double)downloadedCount/(double)self.taskCount;
         
         switch (currentCacheType) {
             case NBPlayerCacheTypePlayAfterCache: {
-                if (downloadedCount == self.hlsUrls.count) {
+                if (downloadedCount == self.taskCount) {
                     self.startPlay = YES;
                 } else {
                     self.nextTs = _downloadedIndex + 1;
@@ -146,7 +146,7 @@ static NSInteger const sPlayAfterCacheCount = 5;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == DownloadKVOContext) {
         if ([keyPath isEqualToString:@"currentIndex"]) {
-            if (_downloadedIndex+1 < self.hlsUrls.count && [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex < sPlayAfterCacheCount ) {
+            if (_downloadedIndex+1 < self.taskCount && [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex < sPlayAfterCacheCount ) {
                 if (self.nextTs != _downloadedIndex +1) {
                     self.nextTs = _downloadedIndex + 1;
                     NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);
