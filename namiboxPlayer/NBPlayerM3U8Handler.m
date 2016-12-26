@@ -84,6 +84,16 @@ SCNetworkReachabilityRef reachability;
         
         durationWithHLS = duration;
         
+        NSString *lastObject = [array lastObject];
+        
+        NSString *lastFileName = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo];
+        
+        if ([lastFileName isEqualToString:[[lastObject lastPathComponent] stringByDeletingPathExtension]] && self.durations.count != fileList.count) {
+            [[NSFileManager defaultManager] removeItemAtPath:cachePathForVideo error:nil];
+            [self praseUrlFromNetWork:urlstr];
+            return;
+        }
+        
         if (fileList.count <= self.durations.count) {
             switch (currentCacheType) {
                 case NBPlayerCacheTypePlayWithCache:{
@@ -269,6 +279,10 @@ SCNetworkReachabilityRef reachability;
 -(NSString*)createLocalM3U8file {
     
     NSString *fullpath = [cachePathForVideo stringByAppendingPathComponent:cacheVieoName];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fullpath]) {
+        saveCachePathForVideo(self.url);
+    }
     
     //    NSFileManager *fileManager = [NSFileManager defaultManager];
     //    if (![fileManager fileExistsAtPath:fullpath]) {
