@@ -18,4 +18,14 @@
  */
 - (NSArray *)getFilesWithSuffix:(NSString *)suffix path:(NSString *)path;
 
+
+/**
+ 获取最后一个文件的文件名
+
+ @param suffix 后缀名
+ @param path 文件路径
+ @return 文件名
+ */
+- (NSString *)getLastFileNameWithSuffix:(NSString *)suffix path:(NSString *)path;
+
 @end

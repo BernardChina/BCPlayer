@@ -19,7 +19,7 @@ static NSInteger const sPlayAfterCacheCount = 5;
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *session;
     NSString *_playUrl; // 其他格式的文件的url
-    NSInteger _downloadedIndex;
+    NSInteger _downloadedIndex; // 已经下载的index
 }
 
 @end
@@ -29,7 +29,7 @@ static NSInteger const sPlayAfterCacheCount = 5;
 - (instancetype)init {
     if (self == [super init]) {
         _startPlay = NO;
-        _downloadedIndex = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - 1;
+        _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
         
         [session invalidateAndCancel];
         session = nil;
@@ -61,7 +61,14 @@ static NSInteger const sPlayAfterCacheCount = 5;
         
         NSUInteger downloadedCount = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count + 1;
         
-        _downloadedIndex = downloadedCount -1;
+        _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
+        
+        _downloadedIndex = downloadedCount == 1?0: _downloadedIndex +1;
+        
+        if (_downloadedIndex < self.currentIndex) {
+            _downloadedIndex = self.currentIndex;
+            self.startPlay = YES;
+        }
         
         cachePath =  [cachePathForVideo stringByAppendingPathComponent:[NSString stringWithFormat:@"%ld.ts",(long)_downloadedIndex]];
         
@@ -146,7 +153,14 @@ static NSInteger const sPlayAfterCacheCount = 5;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == DownloadKVOContext) {
         if ([keyPath isEqualToString:@"currentIndex"]) {
-            if (_downloadedIndex+1 < self.taskCount && [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex < sPlayAfterCacheCount ) {
+            NSInteger sds =[[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex;
+            BOOL s = sds < sPlayAfterCacheCount;
+            if (_downloadedIndex+1 < self.taskCount && s ) {
+                NSLog(@"当45666666666666666:%ld",(long)self.currentIndex);
+                if (_downloadedIndex < self.currentIndex) {
+                    _downloadedIndex = self.currentIndex - 1;
+                    NSLog(@"开始缓存下一个111111111111：%ld",(long)self.nextTs);
+                }
                 if (self.nextTs != _downloadedIndex +1) {
                     self.nextTs = _downloadedIndex + 1;
                     NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);

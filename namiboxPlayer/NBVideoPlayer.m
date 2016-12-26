@@ -445,6 +445,7 @@ typedef enum : NSUInteger {
                             localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
                         }
                         [self playWithLocalUrl:localURL];
+                        [self seekToTime:_current];
                     }
                     
                     return;
@@ -527,7 +528,7 @@ typedef enum : NSUInteger {
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
     weakSelf.playbackTimeObserver = [weakSelf.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
-        NSLog(@"%@",@"实时监听当前播放时间");
+        
         
         __strong __typeof(self)strongSelf = weakSelf;
         
@@ -537,7 +538,12 @@ typedef enum : NSUInteger {
         
         // playerItem.currentTime. 返回项目的当前时间
         CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
+        if (_current > current) {
+            return;
+        }
         _current = current;
+        
+        NSLog(@"实时监听当前播放时间%f",current);
         
         NSLog(@"2222222222222 player item:%@",playerItem);
         
@@ -1156,8 +1162,11 @@ typedef enum : NSUInteger {
     seconds = MAX(0, seconds);
     seconds = MIN(seconds, self.duration);
     
+    NSLog(@"播放跳跃播放播放跳跃播放播放跳跃播放%f:",seconds);
+    
     [self.player pause];
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
+        NSLog(@"实际条转的时间是多少%f:",seconds);
         if (finished) {
             self.isPauseByUser = NO;
             [self.player play];
@@ -1185,10 +1194,22 @@ typedef enum : NSUInteger {
 
 //手指结束拖动，播放器从当前点开始播放，开启滑竿的时间走动
 - (void)playSliderChangeEnd:(UISlider *)slider {
+    NSLog(@"slider.valueddddddddd:%f",slider.value);
+    _current = slider.value;
+    [self.player pause];
+    [self unmonitoringPlayback];
+    
     [self seekToTime:slider.value];
     [self updateCurrentTime:slider.value];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
+    
+    if (isHLS ) {
+        NSLog(@"%@",@"dddddddddddddddddddddd");
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(slider.value)}];
+        return ;
+    }
 }
 
 //手指正在拖动，播放器继续播放，但是停止滑竿的时间走动
@@ -1243,6 +1264,7 @@ typedef enum : NSUInteger {
  *  @param currentSecond 但前播放时间进度
  */
 - (void)updateVideoSlider:(CGFloat)currentSecond {
+    NSLog(@"但前播放时间进度: %f",currentSecond);
     [self.playSlider setValue:currentSecond animated:YES];
 }
 

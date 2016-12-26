@@ -243,6 +243,7 @@ SCNetworkReachabilityRef reachability;
             return;
         }
         NSInteger current = [dic[@"currentTime"] integerValue];
+        NSLog(@"当钱条装世界：%ld",(long)current);
         __block NSInteger currentIndex = 0;//当前播放到哪一个ts
         __block NSInteger temp = 0;
         

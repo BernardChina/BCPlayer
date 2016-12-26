@@ -29,4 +29,10 @@
     
 }
 
+- (NSString *)getLastFileNameWithSuffix:(NSString *)suffix path:(NSString *)path {
+    NSArray *files = [self getFilesWithSuffix:suffix path:path];
+    
+    return [files.lastObject stringByDeletingPathExtension];
+}
+
 @end
