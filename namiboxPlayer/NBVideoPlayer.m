@@ -1302,6 +1302,7 @@ typedef enum : NSUInteger {
  *  重播
  */
 - (void)repeatPlay {
+    _current = 0;
     [self showToolView];
     [self resumeOrPause];
 }
