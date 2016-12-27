@@ -268,7 +268,7 @@ SCNetworkReachabilityRef reachability;
         self.loadSession.currentIndex = currentIndex;
         NSLog(@"当钱播放的index：%ld",(long)currentIndex);
         
-        if (currentIndex == self.segments.count - 1) {
+        if (currentIndex == self.durations.count - 1) {
             if (self.playFinished) {
                 self.playFinished();
             }
