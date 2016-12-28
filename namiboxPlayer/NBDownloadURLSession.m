@@ -17,7 +17,7 @@
 static NSInteger const sPlayAfterCacheCount = 5;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
-    NSURLSession *session;
+    NSURLSession *_session;
     NSString *_playUrl; // 其他格式的文件的url
     NSInteger _downloadedIndex; // 已经下载的index
 }
@@ -31,11 +31,11 @@ static NSInteger const sPlayAfterCacheCount = 5;
         _startPlay = NO;
         _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
         
-        [session invalidateAndCancel];
-        session = nil;
+        [_session invalidateAndCancel];
+        _session = nil;
         NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
         sessionConfiguration.timeoutIntervalForRequest = 3;
-        session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+        _session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
         
         [self addObserver:self forKeyPath:@"currentIndex" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
     }
@@ -47,7 +47,7 @@ static NSInteger const sPlayAfterCacheCount = 5;
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
-    NSURLSessionDownloadTask * downloadTask = [session downloadTaskWithRequest:request];
+    NSURLSessionDownloadTask * downloadTask = [_session downloadTaskWithRequest:request];
     [downloadTask resume];
     NSLog(@"%@ %@",@"添加task",playUrl);
 }
@@ -173,8 +173,8 @@ static NSInteger const sPlayAfterCacheCount = 5;
 
 - (void)cancel {
     NSLog(@"%@",@"cancel 11111111111111");
-    [session invalidateAndCancel];
-    session = nil;
+    [_session invalidateAndCancel];
+    _session = nil;
 }
 
 - (void)dealloc {

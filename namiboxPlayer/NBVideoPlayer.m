@@ -445,7 +445,10 @@ typedef enum : NSUInteger {
                             localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
                         }
                         [self playWithLocalUrl:localURL];
-                        [self seekToTime:_current];
+                        if (isHLS && self.player.currentItem.status != AVPlayerStatusReadyToPlay) {
+                            [self seekToTime:_current];
+                        }
+                        
                     }
                     
                     return;
