@@ -22,6 +22,9 @@ static NSInteger const sPlayAfterCacheCount = 5;
     NSInteger _downloadedIndex; // 已经下载的index
 }
 
+@property (nonatomic, strong) NSString *errorUrlString; // 下载失败的url
+@property (nonatomic, assign) int retryCount;   // 重试下载次数
+
 @end
 
 @implementation NBDownloadURLSession
@@ -118,9 +121,22 @@ static NSInteger const sPlayAfterCacheCount = 5;
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if (error) {
         NSLog(@"Task %@ failed: %@", task, error);
-        if (self.downloadFailed) {
+        if (![self.errorUrlString isEqualToString:task.currentRequest.URL.absoluteString]) {
+            self.retryCount = 0;
+        }
+        NSData *data = error.userInfo[@"NSURLSessionDownloadTaskResumeData"];
+        if (!data || (self.retryCount >= 3 && self.downloadFailed)) {
             self.downloadFailed(error, task, _nextTs);
         }
+        
+        if (data && self.retryCount < 3) {
+            NSLog(@"重新下载");
+            self.errorUrlString = task.currentRequest.URL.absoluteString;
+            NSURLSessionDownloadTask * downloadTask=[_session downloadTaskWithResumeData:data];
+            [downloadTask resume];
+            self.retryCount ++;
+        }
+        
         return;
     }
     
