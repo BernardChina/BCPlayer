@@ -88,7 +88,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UIButton       *stopButton;             //播放暂停按钮
 @property (nonatomic, strong) UIButton       *screenButton;           //全屏按钮
 @property (nonatomic, strong) UIButton       *repeatBtn;              //重播按钮
-@property (nonatomic, strong) UIView         *netWorkPoorView;            //网络不佳view
+@property (nonatomic, strong) UIView         *netWorkPoorView;        //网络不佳view
+@property (nonatomic, strong) UILabel        *errorLabel;           //错误文案
 @property (nonatomic, assign) BOOL           isFullScreen;
 @property (nonatomic, assign) BOOL           canFullScreen;
 @property (nonatomic, strong) UIActivityIndicatorView *actIndicator;  //加载视频时的旋转菊花
@@ -276,6 +277,21 @@ typedef enum : NSUInteger {
         weakSelf.m3u8Handler.praseFailed = ^(NSError *err, NSInteger nextTs){
             // 解析失败
             __strong __typeof(weakSelf)strongSelf = weakSelf;
+            
+            switch (err.code) {
+                case 3000:
+                    weakSelf.errorLabel.text = @"网络不可用，请点击屏幕重试";
+                    break;
+                case 3001:
+                    weakSelf.errorLabel.text = @"服务器返回数据为空, 请点击屏幕重试";
+                    break;
+                case 3002:
+                    weakSelf.errorLabel.text = @"服务器返回数据错误, 请点击屏幕重试";
+                    break;
+                    
+                default:
+                    break;
+            }
             
             strongSelf.nextTs= nextTs;
             if (strongSelf.state == NBPlayerStateStopped) {
@@ -779,6 +795,13 @@ typedef enum : NSUInteger {
     return _netWorkPoorView;
 }
 
+- (UILabel *)errorLabel {
+    if (!_errorLabel) {
+        _errorLabel = [[UILabel alloc] init];
+    }
+    return _errorLabel;
+}
+
 - (UIActivityIndicatorView *)actIndicator {
     if (!_actIndicator) {
         _actIndicator = [[UIActivityIndicatorView alloc]init];
@@ -947,13 +970,14 @@ typedef enum : NSUInteger {
     [self.netWorkPoorView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(_showView).offset(0);
     }];
-    UILabel *label = [[UILabel alloc] init];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:12];
-    label.text = @"网络不佳，请点击屏幕重试";
-    label.textColor = [UIColor whiteColor];
-    [self.netWorkPoorView addSubview:label];
-    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+    
+    [self.errorLabel removeFromSuperview];
+    self.errorLabel.textAlignment = NSTextAlignmentCenter;
+    self.errorLabel.font = [UIFont systemFontOfSize:12];
+    self.errorLabel.text = @"网络不佳，请点击屏幕重试";
+    self.errorLabel.textColor = [UIColor whiteColor];
+    [self.netWorkPoorView addSubview:self.errorLabel];
+    [self.errorLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.right.equalTo(self.netWorkPoorView).offset(0);
         make.centerY.equalTo(self.netWorkPoorView);
         make.height.equalTo(@(100));

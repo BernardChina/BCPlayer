@@ -120,12 +120,16 @@ SCNetworkReachabilityRef reachability;
     }
     [self praseUrlFromNetWork:urlstr];
 }
-
+/*
+ code == 3000 网络不可用
+ code == 3001 服务器返回数据为空
+ code == 3002 服务器返回数据错误
+ */
 - (void)praseUrlFromNetWork:(NSString *)urlstr {
     // 此时判断是否有网络，如果没有网络处理，
     if (![self networkAvailable]) {
         if (self.praseFailed) {
-            self.praseFailed([NSError errorWithDomain:@"网络不可用" code:0 userInfo:nil],self.loadSession.nextTs);
+            self.praseFailed([NSError errorWithDomain:@"网络不可用" code:3000 userInfo:nil],self.loadSession.nextTs);
         }
         return;
     }
@@ -146,14 +150,14 @@ SCNetworkReachabilityRef reachability;
     
     if(data == nil) {
         if (self.praseFailed) {
-            self.praseFailed([NSError errorWithDomain:@"服务器返回数据为空" code:0 userInfo:nil],self.loadSession.nextTs);
+            self.praseFailed([NSError errorWithDomain:@"服务器返回数据为空" code:3001 userInfo:nil],self.loadSession.nextTs);
         }
         return;
     }
     
     if (![data containsString:@"#EXTINF:"]) {
         if (self.praseFailed) {
-            self.praseFailed([NSError errorWithDomain:@"服务器返回数据错误" code:0 userInfo:nil], self.loadSession.nextTs);
+            self.praseFailed([NSError errorWithDomain:@"服务器返回数据错误" code:3002 userInfo:nil], self.loadSession.nextTs);
         }
         return;
     }
