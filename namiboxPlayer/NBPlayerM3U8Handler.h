@@ -12,7 +12,7 @@
 
 @interface M3U8SegmentInfo : NSObject
 
-@property(nonatomic,assign) NSInteger duration;
+@property(nonatomic,assign) double duration;
 @property(nonatomic,copy) NSString *locationUrl;
 
 @end

@@ -72,7 +72,7 @@ SCNetworkReachabilityRef reachability;
             if (idx != 0) {
                 NSArray *temp = [obj componentsSeparatedByString:@","];
                 M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
-                segment.duration = [temp[0] intValue];
+                segment.duration = [temp[0] doubleValue];
                 
                 [self.durations addObject:@(segment.duration)];
                 
@@ -172,7 +172,7 @@ SCNetworkReachabilityRef reachability;
         if (idx != 0) {
             NSArray *temp = [obj componentsSeparatedByString:@","];
             M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
-            segment.duration = [temp[0] intValue];
+            segment.duration = [temp[0] doubleValue];
             segment.locationUrl = [self removeSpaceAndNewlineAndOtherFlag:temp[1]];
             if (!([segment.locationUrl hasPrefix:@"http"] || [segment.locationUrl hasPrefix:@"https"])) {
                 
