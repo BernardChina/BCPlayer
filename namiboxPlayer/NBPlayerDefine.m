@@ -42,12 +42,6 @@ NSString *saveCachePathForVideo(NSString *url) {
 NSString *cachePathForVideo = @"";
 NSString *cacheVieoName = @"";
 
-NSURL *getSchemeVideoURL(NSString *url) {
-    NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
-    components.scheme = @"streaming";
-    return [components URL];
-}
-
 NBPlayerCacheType currentCacheType = NBPlayerCacheTypeNoCache;
 BOOL isHLS = NO;
 

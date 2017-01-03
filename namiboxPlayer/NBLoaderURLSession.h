@@ -18,11 +18,11 @@
 
 @end
 
-@interface NBLoaderURLSession : NSURLConnection <AVAssetResourceLoaderDelegate>
+@interface NBLoaderURLSession : NSURLSession <AVAssetResourceLoaderDelegate>
 
 @property (nonatomic, copy) NSString *playCachePath;
 @property (nonatomic, strong) NBVideoRequestTask *task;
-@property (nonatomic, weak  ) id<NBLoaderURLSessionDelegate> delegate;
+@property (nonatomic, weak  ) id<NBLoaderURLSessionDelegate> loaderURLSessionDelegate;
 - (NSURL *)getSchemeVideoURL:(NSURL *)url;
 
 @end

@@ -113,16 +113,16 @@ typedef enum : NSUInteger {
 
 @implementation NBVideoPlayer
 
-+ (instancetype)sharedInstance {
-    
-    static dispatch_once_t onceToken;
-    static NBVideoPlayer *instance;
-    
-    dispatch_once(&onceToken, ^{
-        instance = [[self alloc]init];
-    });
-    return instance;
-}
+//+ (instancetype)sharedInstance {
+//    
+//    static dispatch_once_t onceToken;
+//    static NBVideoPlayer *instance;
+//    
+//    dispatch_once(&onceToken, ^{
+//        instance = [[self alloc]init];
+//    });
+//    return instance;
+//}
 
 - (instancetype)init {
     self = [super init];
@@ -161,15 +161,13 @@ typedef enum : NSUInteger {
 // 假如不缓存 或者 边播边缓存
 - (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
     
-    NSString *str = [url absoluteString];
-    
-    if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
+    if ([url.scheme isEqualToString:@"https"] || [url.scheme isEqualToString:@"http"]) {
         
         self.resouerLoader          = [[NBLoaderURLSession alloc] init];
         self.resouerLoader.playCachePath = self.cachePath;
-        self.resouerLoader.delegate = self;
+        self.resouerLoader.loaderURLSessionDelegate = self;
         
-        NSURL *playUrl              = getSchemeVideoURL(str);
+        NSURL *playUrl              = [self.resouerLoader getSchemeVideoURL:url];
         self.videoURLAsset          = [AVURLAsset URLAssetWithURL:playUrl options:nil];
         [_videoURLAsset.resourceLoader setDelegate:self.resouerLoader queue:dispatch_get_main_queue()];
         self.currentPlayerItem      = [AVPlayerItem playerItemWithAsset:_videoURLAsset];
@@ -298,7 +296,7 @@ typedef enum : NSUInteger {
                 [strongSelf showNetWorkPoorView];
             }
             if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
-                [strongSelf.delegate NBVideoPlayer:[NBVideoPlayer sharedInstance] didCompleteWithError:err];
+                [strongSelf.delegate NBVideoPlayer:strongSelf didCompleteWithError:err];
             }
             
         };

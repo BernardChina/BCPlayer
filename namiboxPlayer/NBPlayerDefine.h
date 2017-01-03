@@ -19,7 +19,6 @@ extern NSString *saveCachePathForVideo(NSString *url);
 extern NSString *cachePathForVideo;
 // 加密后的视频名称
 extern NSString *cacheVieoName;
-extern NSURL *getSchemeVideoURL(NSString *url);
 extern NBPlayerCacheType currentCacheType;
 extern BOOL isHLS;
 

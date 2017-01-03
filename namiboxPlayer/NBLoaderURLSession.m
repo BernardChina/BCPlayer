@@ -9,11 +9,13 @@
 #import "NBLoaderURLSession.h"
 #import "NBVideoRequestTask.h"
 #import "NBPlayerEnvironment.h"
+#import "NBPlayerDefine.h"
 
 @interface NBLoaderURLSession()<NBVideoRequestTaskDelegate>
 
 @property (nonatomic, strong) NSMutableArray *pendingRequests;
 @property (nonatomic, copy  ) NSString       *videoPath;
+@property (nonatomic, strong) NSURL *url;
 
 @end
 
@@ -23,8 +25,8 @@
     self = [super init];
     if (self) {
         _pendingRequests = [NSMutableArray array];
-        NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
-        _videoPath = [document stringByAppendingPathComponent:@"temp.mp4"];
+        _videoPath = [cachePathForVideo stringByAppendingPathComponent:@"temp.mp4"];
+        
     }
     return self;
 }
@@ -130,6 +132,7 @@
     if (!self.task) {
         self.task = [[NBVideoRequestTask alloc] init];
         self.task.delegate = self;
+        self.task.url = self.url;
         [self.task setUrl:interceptedURL offset:0];
     } else {
         // 如果新的rang的起始位置比当前缓存的位置还大300k，则重新按照range请求数据
@@ -146,16 +149,15 @@
 }
 
 
-- (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
-{
+- (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
     NSLog(@"%@",@"为什么cancel了");
     NSLog(@"%@",loadingRequest);
     [self.pendingRequests removeObject:loadingRequest];
     
 }
 
-- (NSURL *)getSchemeVideoURL:(NSURL *)url
-{
+- (NSURL *)getSchemeVideoURL:(NSURL *)url {
+    self.url = url;
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:url resolvingAgainstBaseURL:NO];
     components.scheme = @"streaming";
     return [components URL];
@@ -172,14 +174,14 @@
 }
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
-    if ([self.delegate respondsToSelector:@selector(didFinishLoadingWithTask:)]) {
-        [self.delegate didFinishLoadingWithTask:task];
+    if ([self.loaderURLSessionDelegate respondsToSelector:@selector(didFinishLoadingWithTask:)]) {
+        [self.loaderURLSessionDelegate didFinishLoadingWithTask:task];
     }
 }
 
 - (void)didFailLoadingWithTask:(NBVideoRequestTask *)task withError:(NSInteger)errorCode {
-    if ([self.delegate respondsToSelector:@selector(didFailLoadingWithTask:withError:)]) {
-        [self.delegate didFailLoadingWithTask:task withError:errorCode];
+    if ([self.loaderURLSessionDelegate respondsToSelector:@selector(didFailLoadingWithTask:withError:)]) {
+        [self.loaderURLSessionDelegate didFailLoadingWithTask:task withError:errorCode];
     }
 }
 

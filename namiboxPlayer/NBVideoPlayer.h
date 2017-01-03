@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @interface NBVideoPlayer : NSObject
 
 @property (nonatomic, readonly) NBPlayerState  state;                   //视频Player状态
+@property (nonatomic, readonly) NSURL *playUrl;
 @property (nonatomic, readonly) CGFloat        loadedProgress;          //缓冲的进度
 @property (nonatomic, readonly) CGFloat        duration;                //视频总时间
 @property (nonatomic, readonly) CGFloat        current;                 //当前播放时间
@@ -32,7 +33,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
 @property (nonatomic, weak) id<NBPlayerDelegate> delegate;
 
-+ (instancetype)sharedInstance;
+//+ (instancetype)sharedInstance;
 
 /**
  播放视频(本地或服务器),缓存文件url经过md5加密

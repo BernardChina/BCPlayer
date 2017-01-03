@@ -13,10 +13,9 @@
 
 @interface NBVideoRequestTask()<NSURLSessionDataDelegate>
 
-@property (nonatomic, strong) NSURL           *url;
-@property (nonatomic        ) NSUInteger      offset;
+@property (nonatomic, assign) NSUInteger      offset;
 
-@property (nonatomic        ) NSUInteger      videoLength;
+@property (nonatomic, assign) NSUInteger      videoLength;
 @property (nonatomic, strong) NSString        *mimeType;
 
 @property (nonatomic, strong) NSURLSession *session;
@@ -38,8 +37,7 @@
     self = [super init];
     if (self) {
         _taskArr = [NSMutableArray array];
-        NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
-        _tempPath = [document stringByAppendingPathComponent:@"temp.mp4"];
+        _tempPath = [cachePathForVideo stringByAppendingPathComponent:@"temp.mp4"];
         if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
             [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
             [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
@@ -54,7 +52,6 @@
 
 - (void)setUrl:(NSURL *)url offset:(NSUInteger)offset {
     NSLog(@"%@",@"执行了seturl");
-    _url = url;
     _offset = offset;
     
     //如果建立第二次请求，先移除原来文件，再创建新的
@@ -65,8 +62,7 @@
     
     _downLoadingOffset = 0;
     
-    NSURLComponents *actualURLComponents = [[NSURLComponents alloc] initWithURL:url resolvingAgainstBaseURL:NO];
-    actualURLComponents.scheme = @"http";
+    NSURLComponents *actualURLComponents = [[NSURLComponents alloc] initWithURL:self.url resolvingAgainstBaseURL:NO];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[actualURLComponents URL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
     
@@ -206,7 +202,7 @@
 
 - (void)continueLoading {
     _once = YES;
-    NSURLComponents *actualURLComponents = [[NSURLComponents alloc] initWithURL:_url resolvingAgainstBaseURL:NO];
+    NSURLComponents *actualURLComponents = [[NSURLComponents alloc] initWithURL:self.url resolvingAgainstBaseURL:NO];
     actualURLComponents.scheme = @"http";
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[actualURLComponents URL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
