@@ -64,7 +64,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) NBPlayerState state;
 @property (nonatomic, assign) CGFloat        loadedProgress;
 @property (nonatomic, assign) CGFloat        duration;
-@property (nonatomic, assign) CGFloat        current;
+@property (nonatomic, assign) double        current;
 
 @property (nonatomic, strong) AVURLAsset     *videoURLAsset;
 @property (nonatomic, strong) AVAsset        *videoAsset;
@@ -554,7 +554,7 @@ typedef enum : NSUInteger {
         }
         
         // playerItem.currentTime. 返回项目的当前时间
-        CGFloat current = playerItem.currentTime.value / playerItem.currentTime.timescale;
+        double current = playerItem.currentTime.value / playerItem.currentTime.timescale;
         if (_current > current) {
             return;
         }

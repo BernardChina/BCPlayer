@@ -84,11 +84,11 @@ SCNetworkReachabilityRef reachability;
         
         durationWithHLS = duration;
         
-        NSString *lastObject = [array lastObject];
+//        NSString *lastObject = [array lastObject];
         
         NSString *lastFileName = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo];
         
-        if ([lastFileName isEqualToString:[[lastObject lastPathComponent] stringByDeletingPathExtension]] && self.durations.count != fileList.count) {
+        if ([lastFileName intValue] +1 != fileList.count) {
             [[NSFileManager defaultManager] removeItemAtPath:cachePathForVideo error:nil];
             [self praseUrlFromNetWork:urlstr];
             return;
@@ -167,6 +167,8 @@ SCNetworkReachabilityRef reachability;
     NSString *baseUrl = [url.scheme stringByAppendingString:url.host];
     
     __block double duration = 0;
+    
+    [self.durations removeAllObjects];
     
     [array enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (idx != 0) {
@@ -259,10 +261,10 @@ SCNetworkReachabilityRef reachability;
         NSInteger current = [dic[@"currentTime"] integerValue];
         NSLog(@"当钱条装世界：%ld",(long)current);
         __block NSInteger currentIndex = 0;//当前播放到哪一个ts
-        __block NSInteger temp = 0;
+        __block double temp = 0;
         
         [self.durations enumerateObjectsUsingBlock:^(id  _Nonnull  obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            temp += [obj integerValue];
+            temp += [obj doubleValue];
             if (current <= temp) {
                 currentIndex = idx;
                 *stop = YES;
@@ -294,11 +296,11 @@ SCNetworkReachabilityRef reachability;
     //    }
     
     //创建文件头部
-    __block NSString* head = @"#EXTM3U\n#EXT-X-TARGETDURATION:30\n#EXT-X-VERSION:2\n#EXT-X-DISCONTINUITY\n";
+    __block NSString* head = @"#EXTM3U\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-ALLOW-CACHE:YES\n#EXT-X-TARGETDURATION:30\n#EXT-X-VERSION:3\n#EXT-X-DISCONTINUITY\n";
     
     [self.segments enumerateObjectsUsingBlock:^(M3U8SegmentInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString *localUrl = [httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%ld.ts",(long)idx]];
-        NSString* length = [NSString stringWithFormat:@"#EXTINF:%ld,\n",(long)obj.duration];
+        NSString* length = [NSString stringWithFormat:@"#EXTINF:%f,\n",obj.duration];
         head = [NSString stringWithFormat:@"%@%@%@\n",head,length,localUrl];
         
     }];

@@ -28,7 +28,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, readonly) NSURL *playUrl;
 @property (nonatomic, readonly) CGFloat        loadedProgress;          //缓冲的进度
 @property (nonatomic, readonly) CGFloat        duration;                //视频总时间
-@property (nonatomic, readonly) CGFloat        current;                 //当前播放时间
+@property (nonatomic, readonly) double        current;                 //当前播放时间
 //@property (nonatomic, readonly) CGFloat        progress;                //播放进度0~1之间
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
 @property (nonatomic, weak) id<NBPlayerDelegate> delegate;
@@ -58,12 +58,12 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 /**
  * 恢复播放
  */
-//- (void)resume;
+- (void)resume;
 
 /**
  *  暂停播放
  */
-//- (void)pause;
+- (void)pause;
 
 /**
  *  停止播放
