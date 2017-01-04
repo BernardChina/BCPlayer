@@ -84,8 +84,6 @@ SCNetworkReachabilityRef reachability;
         
         durationWithHLS = duration;
         
-//        NSString *lastObject = [array lastObject];
-        
         NSString *lastFileName = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo];
         
         if ([lastFileName intValue] +1 != fileList.count) {
@@ -296,7 +294,7 @@ SCNetworkReachabilityRef reachability;
     //    }
     
     //创建文件头部
-    __block NSString* head = @"#EXTM3U\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-ALLOW-CACHE:YES\n#EXT-X-TARGETDURATION:30\n#EXT-X-VERSION:3\n#EXT-X-DISCONTINUITY\n";
+    __block NSString* head = @"#EXTM3U\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-ALLOW-CACHE:YES\n#EXT-X-TARGETDURATION:19\n#EXT-X-VERSION:3\n";
     
     [self.segments enumerateObjectsUsingBlock:^(M3U8SegmentInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSString *localUrl = [httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%ld.ts",(long)idx]];

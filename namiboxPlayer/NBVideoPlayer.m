@@ -341,12 +341,16 @@ typedef enum : NSUInteger {
         return;
     }
     
+    // 如果是本地文件url
+    if ([url.scheme isEqualToString:@"file"]) {
+        [self playWithLocalUrl:url];
+        return;
+    }
+    
     // 假如有缓存文件，首先播放缓存文件
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
         NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-        if (isHLS) {
-            localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
-        }
+        
         [self playWithLocalUrl:localURL];
         return;
     }
@@ -554,7 +558,7 @@ typedef enum : NSUInteger {
         }
         
         // playerItem.currentTime. 返回项目的当前时间
-        double current = playerItem.currentTime.value / playerItem.currentTime.timescale;
+        double current = (double)playerItem.currentTime.value / (double)playerItem.currentTime.timescale;
         if (_current > current) {
             return;
         }
@@ -1107,6 +1111,7 @@ typedef enum : NSUInteger {
         }
         
         if (NBPlayerControlTypeProgress == _controlType) {
+            [self.player pause];
             float value = [self moveProgressControllWithTempPoint:touchPoint];
             [self timeValueChangingWithValue:value];
         } else if (NBPlayerControlTypeVoice == _controlType) {
@@ -1142,8 +1147,17 @@ typedef enum : NSUInteger {
         if (_hasMoved) {
             if (NBPlayerControlTypeProgress == _controlType) {
                 float value = [self moveProgressControllWithTempPoint:touchPoint];
+                
+                _current = value;
+                
+                [self unmonitoringPlayback];
                 [self seekToTime:value];
                 self.timeSheetView.hidden = YES;
+                [self updateCurrentTime:value];
+                [self updateVideoSlider:value];
+                if (isHLS ) {
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(value)}];
+                }
             }
         }
     }
@@ -1193,8 +1207,6 @@ typedef enum : NSUInteger {
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
         NSLog(@"实际条转的时间是多少%f:",seconds);
         if (finished) {
-            self.isPauseByUser = NO;
-            [self.player play];
             
             self.netWorkPoorView.hidden = YES;
             self.downloadFailed = NO;
@@ -1206,6 +1218,9 @@ typedef enum : NSUInteger {
                 
                 self.actIndicator.hidden = NO;
                 [self.actIndicator startAnimating];
+            } else {
+                self.isPauseByUser = NO;
+                [self.player play];
             }
         } else {
             NSLog(@"是否结束：%@",@"失败");
@@ -1568,6 +1583,8 @@ typedef enum : NSUInteger {
         if(![self.httpServer start:&error]) {
             NSLog(@"-------------\nError starting HTTP Server: %@\n", error);
         }
+    } else {
+        [self.httpServer setDocumentRoot:cachePathForVideo];
     }
 }
 

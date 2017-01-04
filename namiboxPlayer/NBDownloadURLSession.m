@@ -14,7 +14,7 @@
 #import "NBPlayerEnvironment.h"
 #import "NSFileManager+NB.h"
 
-static NSInteger const sPlayAfterCacheCount = 5;
+static NSInteger const sPlayAfterCacheCount = 2;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *_session;
@@ -110,7 +110,8 @@ static NSInteger const sPlayAfterCacheCount = 5;
     
     // Copy temporary file
     NSError * error;
-    [[NSFileManager defaultManager] copyItemAtURL:location toURL:[NSURL fileURLWithPath:cachePath] error:&error];
+    // move
+    [[NSFileManager defaultManager] moveItemAtURL:location toURL:[NSURL fileURLWithPath:cachePath] error:&error];
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes {
