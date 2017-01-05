@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
 @property (nonatomic, weak) id<NBPlayerDelegate> delegate;
 @property (nonatomic, assign) BOOL isShowFullScreen;
+@property (nonatomic, assign) BOOL autoPlay;    // 是否自动播放
 
 //+ (instancetype)sharedInstance;
 

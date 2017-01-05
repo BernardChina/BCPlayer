@@ -455,22 +455,19 @@ typedef enum : NSUInteger {
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
-            if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayeraShouldAutoPlay:)]) {
-                if ([self.delegate NBVideoPlayeraShouldAutoPlay:self]) {
-                    if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
-                        NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
-                        if (isHLS) {
-                            localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
-                        }
-                        [self playWithLocalUrl:localURL];
-                        if (isHLS && self.player.currentItem.status != AVPlayerStatusReadyToPlay) {
-                            [self seekToTime:_current];
-                        }
-                        
+            if (self.autoPlay) {
+                if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+                    NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+                    if (isHLS) {
+                        localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
                     }
-                    
-                    return;
+                    [self playWithLocalUrl:localURL];
+                    if (isHLS && self.player.currentItem.status != AVPlayerStatusReadyToPlay) {
+                        [self seekToTime:_current];
+                    }
                 }
+                
+                return;
             }
             
             // 用户设置不是自动播放，应该显示播放按钮，暂时先显示重播按钮（因为没有ui）
@@ -572,8 +569,10 @@ typedef enum : NSUInteger {
             [weakSelf.delegate NBVideoPlayer:weakSelf withProgress:0 currentTime:current totalTime:weakSelf.duration];
         }
         
-        [strongSelf updateCurrentTime:current];
-        [strongSelf updateVideoSlider:current];
+        if (!strongSelf.playSlider.isSelected) {
+            [strongSelf updateCurrentTime:current];
+            [strongSelf updateVideoSlider:current];
+        }
         
         // 当只有hls格式视频，并且边播边缓存的时候，才发送通知
         if (isHLS ) {
@@ -1169,7 +1168,7 @@ typedef enum : NSUInteger {
                 
                 _current = value;
                 
-                [self unmonitoringPlayback];
+//                [self unmonitoringPlayback];
                 [self seekToTime:value];
                 self.timeSheetView.hidden = YES;
                 [self updateCurrentTime:value];
@@ -1254,9 +1253,10 @@ typedef enum : NSUInteger {
 //手指结束拖动，播放器从当前点开始播放，开启滑竿的时间走动
 - (void)playSliderChangeEnd:(UISlider *)slider {
     NSLog(@"slider.valueddddddddd:%f",slider.value);
+    self.playSlider.selected = NO;
     _current = slider.value;
     [self.player pause];
-    [self unmonitoringPlayback];
+//    [self unmonitoringPlayback];
     
     [self seekToTime:slider.value];
     [self updateCurrentTime:slider.value];
@@ -1273,6 +1273,7 @@ typedef enum : NSUInteger {
 
 //手指正在拖动，播放器继续播放，但是停止滑竿的时间走动
 - (void)playSliderChange:(UISlider *)slider {
+    self.playSlider.selected = YES;
     [_hiddenTimer invalidate];
     [self updateCurrentTime:slider.value];
 }
@@ -1369,7 +1370,7 @@ typedef enum : NSUInteger {
 
 - (void)startPlay {
     _current = 0;
-    
+    self.autoPlay = YES;
     _playBtn.hidden = YES;
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
