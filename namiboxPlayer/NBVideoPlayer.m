@@ -487,7 +487,7 @@ typedef enum : NSUInteger {
     if ([NBVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
         if ([playerItem status] == AVPlayerStatusReadyToPlay) {
             
-            _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
+            [self createTimer];
             [self monitoringPlayback:playerItem];// 给播放器添加计时器
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
@@ -1273,6 +1273,7 @@ typedef enum : NSUInteger {
 
 //手指正在拖动，播放器继续播放，但是停止滑竿的时间走动
 - (void)playSliderChange:(UISlider *)slider {
+    [_hiddenTimer invalidate];
     [self updateCurrentTime:slider.value];
 }
 
@@ -1470,12 +1471,8 @@ typedef enum : NSUInteger {
     if ([UIApplication sharedApplication].statusBarHidden) {
         [[UIApplication sharedApplication] setStatusBarHidden:NO];
     }
-    if (!_hiddenTimer.valid) {
-        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
-    }else{
-        [_hiddenTimer invalidate];
-        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
-    }
+    
+    [self createTimer];
 }
 
 #pragma mark - private
@@ -1542,35 +1539,6 @@ typedef enum : NSUInteger {
     [self releaseDownloadSession];
     [self removeCommonPlayerObserver];
     [self releaseResouerLoader];
-//    if (self.downloadSession) {
-//        
-//        [self.downloadSession removeObserver:self forKeyPath:@"downloadProgress"];
-//        [self.downloadSession removeObserver:self forKeyPath:@"startPlay"];
-//        
-//        [self.downloadSession cancel];
-//        self.downloadSession = nil;
-//    }
-    
-//    if (!self.currentPlayerItem) {
-//        return;
-//    }
-//    
-//    [[NSNotificationCenter defaultCenter] removeObserver:self];
-//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemStatusKeyPath];
-//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemLoadedTimeRangesKeyPath];
-//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackBufferEmptyKeyPath];
-//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath];
-//    [self.currentPlayerItem removeObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath];
-//    [self.player removeTimeObserver:self.playbackTimeObserver];
-//    self.playbackTimeObserver = nil;
-//    self.currentPlayerItem = nil;
-    
-//    if (self.resouerLoader.task) {
-//        [self.resouerLoader.task cancel];
-//        self.resouerLoader.task = nil;
-//        self.resouerLoader = nil;
-//    }
-    
 }
 
 // 基本的监听
@@ -1622,6 +1590,15 @@ typedef enum : NSUInteger {
         }
     } else {
         [self.httpServer setDocumentRoot:cachePathForVideo];
+    }
+}
+
+- (void)createTimer {
+    if (!_hiddenTimer.valid) {
+        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
+    }else{
+        [_hiddenTimer invalidate];
+        _hiddenTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(toolViewHidden) userInfo:nil repeats:NO];
     }
 }
 
