@@ -13,6 +13,7 @@
 #import "NBPlayer.h"
 #import "NBPlayerDefine.h"
 #import "NBPlayerDelegate.h"
+#import "NBPlayerView.h"
 
 typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateBuffering = 1,    //正在缓存
@@ -30,8 +31,10 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, readonly) CGFloat        duration;                //视频总时间
 @property (nonatomic, readonly) double        current;                 //当前播放时间
 //@property (nonatomic, readonly) CGFloat        progress;                //播放进度0~1之间
+@property (nonatomic, strong) NBPlayerView  *playerView;
 @property (nonatomic, assign  ) BOOL           stopInBackground;        //是否在后台播放，默认YES
 @property (nonatomic, weak) id<NBPlayerDelegate> delegate;
+@property (nonatomic, assign) BOOL isShowFullScreen;
 
 //+ (instancetype)sharedInstance;
 
@@ -40,12 +43,10 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 
  @param url 视频地址
  @param showView 显示的view
- @param superView 显示view的父view
  @param cacheType 播放缓存机制，不缓存，边播边缓存，先缓存再播放
  */
 - (void)playWithUrl:(NSURL *)url
            showView:(UIView *)showView
-       andSuperView:(UIView *)superView
           cacheType:(NBPlayerCacheType)cacheType;
 
 /**

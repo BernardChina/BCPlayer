@@ -43,6 +43,10 @@
     [self.videoList addObject:@"http://v.namibox.com/material_video/v_002464/v_002464.m3u8?pm3u8/0&e=1481998894&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:vymvDpRIm6GqJHprjNzVRpCx_-A="];
     [self.videoList addObject:@"http://v.namibox.com/material_video/v_002635/v_002635.m3u8?pm3u8/0&e=1482369533&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:H-cRUmmdCSMIpm4CpXqzYyqm2O4="];
     
+    [self.videoList addObject:@"https://v.namibox.com/material_video/v_003122/v_003122.mp4?e=1483630222&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:VidYE6nSV17BMuZwY3rWQ8Ne0kM="];
+    
+    [self.videoList addObject:@"https://v.namibox.com/material_video/v_002297/v_002297.m3u8?pm3u8/0&e=1483628240&token=yN-wMdOklbPBGDK9HQ9rauvZshy1EfeAFPA8kWLq:PTXuPufxwA9NCp--c09Dyhxb_g0="];
+    
     [self.view addSubview:self.tableView];
 }
 

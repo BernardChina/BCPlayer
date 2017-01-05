@@ -22,7 +22,7 @@
     [super viewDidLoad];
     
     // Do any additional setup after loading the view, typically from a nib.
-    
+    [self.navigationController setNavigationBarHidden:YES];
     UIView *bgView = [[UIView alloc] init];
     bgView.backgroundColor = [UIColor whiteColor];
     [self.view addSubview:bgView];
@@ -31,17 +31,25 @@
     }];
     
     _play = [[NBVideoPlayer alloc]init];
-    UIView *videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
-    [bgView addSubview:videoView];
+//    UIView *videoView = [[UIView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
+//    [bgView addSubview:videoView];
     
     _play.delegate = self;
+    _play.isShowFullScreen = NO;
+    _play.playerView = [[NBPlayerView alloc]initWithFrame:CGRectMake(0, 64, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width * 0.5625)];
+    
+    
+    [bgView addSubview:_play.playerView];
     
     [_play playWithUrl:[NSURL URLWithString:self.videoUrlStr]
-              showView:videoView
-          andSuperView:self.view
+              showView:self.view
              cacheType:NBPlayerCacheTypePlayWithCache];
     
     NSLog(@"%f", [NBVideoPlayer allVideoCacheSize]);
+}
+
+- (BOOL)NBVideoPlayeraShouldAutoPlay:(NBVideoPlayer *)player {
+    return YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {

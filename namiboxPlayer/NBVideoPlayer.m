@@ -75,9 +75,8 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, weak  ) UIView         *showView;
 @property (nonatomic, assign) CGRect         showViewRect;            //视频展示ViewRect
-@property (nonatomic, strong) NBPlayerView  *playerView;
+//@property (nonatomic, strong) NBPlayerView  *playerView;
 @property (nonatomic, strong) UIView         *touchView;              //事件响应View
-@property (nonatomic, weak  ) UIView         *playerSuperView;        //播放界面的父页面
 
 @property (nonatomic, strong) UIView         *statusBarBgView;        //全屏状态栏的背景view
 @property (nonatomic, strong) UIView         *toolView;
@@ -159,7 +158,7 @@ typedef enum : NSUInteger {
 }
 
 // 假如不缓存 或者 边播边缓存
-- (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView {
+- (void)playWithVideoUrl:(NSURL *)url showView:(UIView *)showView {
     
     if ([url.scheme isEqualToString:@"https"] || [url.scheme isEqualToString:@"http"]) {
         
@@ -308,13 +307,14 @@ typedef enum : NSUInteger {
         [self.m3u8Handler praseUrl:url.absoluteString];
     }
 }
-
-- (void)playWithUrl:(NSURL *)url showView:(UIView *)showView andSuperView:(UIView *)superView cacheType:(NBPlayerCacheType)cacheType {
+- (void)playWithUrl:(NSURL *)url showView:(UIView *)showView cacheType:(NBPlayerCacheType)cacheType {
     
     _playUrl = url;
     
     if ([url.lastPathComponent hasSuffix:@".m3u8"]) {
         isHLS = YES;
+    } else {
+        isHLS = NO;
     }
     
     currentCacheType = cacheType;
@@ -329,9 +329,8 @@ typedef enum : NSUInteger {
     self.current  = 0;
     
     _showView = showView;
-    _showViewRect = showView.frame;
+    _showViewRect = _playerView.frame;
     _showView.backgroundColor = [UIColor blackColor];
-    _playerSuperView = superView;
     
     [self setVideoToolView];
     
@@ -357,7 +356,7 @@ typedef enum : NSUInteger {
     
     // 假如不缓存 或者 边播边缓存
     if (cacheType == NBPlayerCacheTypeNoCache || cacheType == NBPlayerCacheTypePlayWithCache) {
-        [self playWithVideoUrl:url showView:showView andSuperView:superView];
+        [self playWithVideoUrl:url showView:showView];
     }
     
     // 缓存后再播放
@@ -547,6 +546,7 @@ typedef enum : NSUInteger {
     
     __weak __typeof(self)weakSelf = self;
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
+    
     weakSelf.playbackTimeObserver = [weakSelf.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
         
@@ -836,38 +836,41 @@ typedef enum : NSUInteger {
     return _timeSheetView;
 }
 
+- (void)setIsShowFullScreen:(BOOL)isShowFullScreen {
+    self.screenButton.hidden = !isShowFullScreen;
+}
+
 #pragma mark - 设置进度条、暂停、全屏等组件
 
 - (void)setVideoToolView {
     __weak typeof(self) weakSelf = self;
     
-    _showView.userInteractionEnabled = YES;
+    self.playerView.userInteractionEnabled = YES;
     
-    [self.playerView removeFromSuperview];
-    [_showView addSubview:self.playerView];
-    [self.playerView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(0);
-        make.right.mas_equalTo(0);
-        make.bottom.mas_equalTo(0);
-        make.left.mas_equalTo(0);
-    }];
+//    [self.playerView removeFromSuperview];
+//    [_showView addSubview:self.playerView];
+//    [self.playerView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.mas_equalTo(0);
+//        make.right.mas_equalTo(0);
+//        make.bottom.mas_equalTo(0);
+//        make.left.mas_equalTo(0);
+//    }];
     
     // 横屏的时候显示status bar
-    [self.statusBarBgView removeFromSuperview];
-    [_showView addSubview:self.statusBarBgView];
-    [self.statusBarBgView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(0);
-        make.top.mas_equalTo(0);
-        make.right.mas_equalTo(0);
-        make.height.mas_equalTo(20);
-    }];
+//    [self.statusBarBgView removeFromSuperview];
+//    [self.playerView addSubview:self.statusBarBgView];
+//    [self.statusBarBgView mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.left.mas_equalTo(0);
+//        make.top.mas_equalTo(0);
+//        make.right.mas_equalTo(0);
+//        make.height.mas_equalTo(20);
+//    }];
     
     [self.toolView removeFromSuperview];
-    [_showView addSubview:self.toolView];
+    [self.playerView addSubview:self.toolView];
     [self.toolView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(0);
-        make.bottom.equalTo(weakSelf.showView);
-        make.right.mas_equalTo(0);
+        make.left.right.equalTo(self.playerView);
+        make.bottom.equalTo(self.playerView).offset(0);
         make.height.mas_equalTo(44);
     }];
     
@@ -913,34 +916,33 @@ typedef enum : NSUInteger {
     [self.playSlider removeFromSuperview];
     [self.toolView addSubview:self.playSlider];
     [self.playSlider mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(weakSelf.currentTimeLbl.mas_right);
-        make.top.mas_equalTo(0);
-        make.right.equalTo(weakSelf.totalTimeLbl.mas_left);
-        make.bottom.mas_equalTo(0);
+        make.left.equalTo(self.currentTimeLbl.mas_right);
+        make.top.bottom.equalTo(self.toolView);
+        make.right.equalTo(self.totalTimeLbl.mas_left);
     }];
     
     // 进度条
     [self.videoProgressView removeFromSuperview];
     [self.toolView addSubview:self.videoProgressView];
     [self.videoProgressView mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(weakSelf.currentTimeLbl.mas_right);
-        make.right.equalTo(weakSelf.totalTimeLbl.mas_left);
+        make.left.equalTo(self.currentTimeLbl.mas_right);
+        make.right.equalTo(self.totalTimeLbl.mas_left);
         make.centerY.equalTo(weakSelf.playSlider.mas_centerY).offset(1);
         make.height.mas_equalTo(1);
     }];
     
     // 加载旋转菊花
     [self.actIndicator removeFromSuperview];
-    [_showView addSubview:self.actIndicator];
+    [self.playerView addSubview:self.actIndicator];
     [self.actIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(weakSelf.playerView);
-        make.centerY.equalTo(weakSelf.playerView);
+        make.centerX.equalTo(self.playerView);
+        make.centerY.equalTo(self.playerView);
         make.width.mas_equalTo(44);
         make.height.mas_equalTo(44);
     }];
     
     [self.touchView removeFromSuperview];
-    [_showView addSubview:self.touchView];
+    [self.playerView addSubview:self.touchView];
     [self.touchView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(weakSelf.playerView);
         make.left.equalTo(weakSelf.playerView);
@@ -950,27 +952,27 @@ typedef enum : NSUInteger {
     
     // 音量控制view
     [self.volumeView removeFromSuperview];
-    [_showView addSubview:self.volumeView];
+    [self.playerView addSubview:self.volumeView];
     
     // 快进⏩
     [self.timeSheetView removeFromSuperview];
-    [_showView addSubview:self.timeSheetView];
+    [self.playerView addSubview:self.timeSheetView];
     [self.timeSheetView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.center.equalTo(_showView);
+        make.center.equalTo(self.playerView);
         make.width.equalTo(@(120));
         make.height.equalTo(@60);
     }];
     
     [self.repeatBtn removeFromSuperview];
-    [_showView addSubview:self.repeatBtn];
+    [self.playerView addSubview:self.repeatBtn];
     [self.repeatBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.center.equalTo(_showView);
+        make.center.equalTo(self.playerView);
     }];
     
     [self.netWorkPoorView removeFromSuperview];
-    [_showView addSubview:self.netWorkPoorView];
+    [self.playerView addSubview:self.netWorkPoorView];
     [self.netWorkPoorView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(_showView).offset(0);
+        make.edges.equalTo(self.playerView).offset(0);
     }];
     
     [self.errorLabel removeFromSuperview];
@@ -1658,60 +1660,32 @@ typedef enum : NSUInteger {
         return;
     }
     
-    //    UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
     if (_currentOrientation == orientation) {
         return;
     }
     
     if (orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        [self.showView removeFromSuperview];
-        [self.playerSuperView addSubview:self.showView];
+        NSNumber *va = [NSNumber numberWithInt:orientation];
+        [[UIDevice currentDevice] setValue:va forKey:@"Orientation"];
+        [self.playerView setFrame:self.showViewRect];
         
-        NBLightView *lightView = [NBLightView sharedInstance];
-        [[UIApplication sharedApplication].keyWindow bringSubviewToFront:lightView];
-        __weak NBVideoPlayer * weakSelf = self;
-        [self.showView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.top.mas_equalTo(CGRectGetMinY(weakSelf.showViewRect));
-            make.left.mas_equalTo(CGRectGetMinX(weakSelf.showViewRect));
-            make.width.mas_equalTo(CGRectGetWidth(weakSelf.showViewRect));
-            make.height.mas_equalTo(CGRectGetHeight(weakSelf.showViewRect));
-        }];
+        self.isFullScreen = NO;
         
-        [lightView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.centerX.equalTo([UIApplication sharedApplication].keyWindow);
-            make.centerY.equalTo([UIApplication sharedApplication].keyWindow).offset(-5);
-            make.width.mas_equalTo(155);
-            make.height.mas_equalTo(155);
-        }];
     } else if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
-        [self.showView removeFromSuperview];
-        [[UIApplication sharedApplication].keyWindow addSubview:self.showView];
         
-        // 亮度view加到window最上层
-        NBLightView *lightView = [NBLightView sharedInstance];
-        [[UIApplication sharedApplication].keyWindow insertSubview:self.showView belowSubview:lightView];
+        NSNumber *va = [NSNumber numberWithInt:orientation];
+        [[UIDevice currentDevice] setValue:va forKey:@"Orientation"];
         
-        [self.showView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.width.equalTo(@(kScreenHeight));
-            make.height.equalTo(@(kScreenWidth));
-            make.center.equalTo([[UIApplication sharedApplication].delegate window]);
+        [self.playerView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.bottom.left.right.equalTo(_showView);
         }];
-        
-        [lightView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.centerX.equalTo([UIApplication sharedApplication].keyWindow);
-            make.centerY.equalTo([UIApplication sharedApplication].keyWindow);
-            make.width.mas_equalTo(155);
-            make.height.mas_equalTo(155);
-        }];
+        self.isFullScreen = YES;
     }
     
     _currentOrientation = orientation;
     
+    
     [UIView animateWithDuration:0.5 animations:^{
-        [[UIApplication sharedApplication] setStatusBarOrientation:_currentOrientation animated:YES];
-        //旋转视频播放的view和显示亮度的view
-        self.showView.transform = [self getOrientation:orientation];
-        [NBLightView sharedInstance].transform = [self getOrientation:orientation];
     } completion:^(BOOL finished) {
         
     }];
