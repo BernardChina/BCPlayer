@@ -103,11 +103,4 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  */
 + (double)allVideoCacheSize;
 
-/**
- *  清楚某个链接的缓存
- *
- *  @param url 链接地址
- */
-+ (void)clearVideoCache:(NSString *)url;
-
 @end

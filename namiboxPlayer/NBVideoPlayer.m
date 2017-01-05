@@ -1774,15 +1774,9 @@ typedef enum : NSUInteger {
     NSFileManager *fileManager=[NSFileManager defaultManager];
     //这里自己写需要保存数据的路径
     NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
-    NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
-    for (NSString *fileName in childFiles) {
-        //如有需要，加入条件，过滤掉不想删除的文件
-        NSLog(@"%@", fileName);
-        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
-            NSString *absolutePath=[cachPath stringByAppendingPathComponent:fileName];
-            [fileManager removeItemAtPath:absolutePath error:nil];
-        }
-    }
+    cachPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
+    [fileManager removeItemAtPath:cachPath error:nil];
+    
 }
 
 + (double)allVideoCacheSize {
@@ -1792,11 +1786,12 @@ typedef enum : NSUInteger {
     NSFileManager *fileManager=[NSFileManager defaultManager];
     //这里自己写需要保存数据的路径
     NSString *cachPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;
+    cachPath = [[NBPlayerEnvironment defaultEnvironment] cachePath];
     NSArray *childFiles = [fileManager subpathsAtPath:cachPath];
     for (NSString *fileName in childFiles) {
         //如有需要，加入条件，过滤掉不想删除的文件
         NSLog(@"%@", fileName);
-        if ([fileName.pathExtension isEqualToString:@"mp4"]) {
+        if ([fileName.pathExtension isEqualToString:@"mp4"] || [fileName.pathExtension isEqualToString:@"ts"]) {
             NSString *path = [cachPath stringByAppendingPathComponent: fileName];
             NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath: path error: nil ];
             cacheVideoSize += ((double)([fileAttributes fileSize ]) / 1024.0 / 1024.0);
