@@ -83,6 +83,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UILabel        *currentTimeLbl;         //当前播放时间
 @property (nonatomic, strong) UILabel        *totalTimeLbl;           //总共播放时间
 @property (nonatomic, strong) UIProgressView *videoProgressView;      //缓冲进度条
+@property (nonatomic, strong) UIProgressView *bottomProgress;
 @property (nonatomic, strong) UISlider       *playSlider;             //滑竿
 @property (nonatomic, strong) UIButton       *stopButton;             //播放暂停按钮
 @property (nonatomic, strong) UIButton       *screenButton;           //全屏按钮
@@ -445,6 +446,7 @@ typedef enum : NSUInteger {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
             // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
+            [self.bottomProgress setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
             [self.actIndicator startAnimating];
             self.actIndicator.hidden = NO;
             return;
@@ -616,6 +618,7 @@ typedef enum : NSUInteger {
     }
     self.loadedProgress = timeInterval / totalDuration;
     [self.videoProgressView setProgress:timeInterval / totalDuration animated:YES];
+    [self.bottomProgress setProgress:timeInterval / totalDuration animated:YES];
 }
 
 - (void)bufferingSomeSecond {
@@ -740,6 +743,20 @@ typedef enum : NSUInteger {
         _videoProgressView.transform = transform;
     }
     return _videoProgressView;
+}
+
+- (UIProgressView *)bottomProgress {
+    if (!_bottomProgress) {
+        _bottomProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+        _bottomProgress.progressTintColor = [UIColor blueColor];//填充部分颜色
+        _bottomProgress.trackTintColor = [UIColor clearColor];   // 未填充部分颜色
+        _bottomProgress.layer.cornerRadius = 0.5;
+        _bottomProgress.layer.masksToBounds = YES;
+        CGAffineTransform transform = CGAffineTransformMakeScale(1.0, 1.0);
+        _bottomProgress.transform = transform;
+        _bottomProgress.hidden = YES;
+    }
+    return _bottomProgress;
 }
 
 - (UISlider *)playSlider {
@@ -939,6 +956,15 @@ typedef enum : NSUInteger {
         make.centerY.equalTo(weakSelf.playSlider.mas_centerY).offset(1);
         make.height.mas_equalTo(1);
     }];
+    
+    [self.bottomProgress removeFromSuperview];
+    [self.playerView addSubview:self.bottomProgress];
+    [self.bottomProgress mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.bottom.equalTo(self.playerView);
+        make.height.mas_equalTo(2);
+    }];
+    
+//    [self.bottomProgress addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:nil];
     
     // 加载旋转菊花
     [self.actIndicator removeFromSuperview];
@@ -1450,9 +1476,11 @@ typedef enum : NSUInteger {
     self.toolView.hidden = YES;
     self.statusBarBgView.hidden = YES;
     
-    if (_isFullScreen) {
-        [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    }
+    self.bottomProgress.hidden = NO;
+    
+//    if (_isFullScreen) {
+//        [[UIApplication sharedApplication] setStatusBarHidden:YES];
+//    }
     [_hiddenTimer invalidate];
 }
 
@@ -1462,6 +1490,7 @@ typedef enum : NSUInteger {
         return;
     }
     self.toolView.hidden = NO;
+    self.bottomProgress.hidden = YES;
     
     if (_isFullScreen) {
         self.statusBarBgView.hidden = NO;
@@ -1469,9 +1498,9 @@ typedef enum : NSUInteger {
         self.statusBarBgView.hidden = YES;
     }
     
-    if ([UIApplication sharedApplication].statusBarHidden) {
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    }
+//    if ([UIApplication sharedApplication].statusBarHidden) {
+//        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+//    }
     
     [self createTimer];
 }
@@ -1702,48 +1731,6 @@ typedef enum : NSUInteger {
     } completion:^(BOOL finished) {
         
     }];
-}
-
-//根据状态条旋转的方向来旋转 avplayerView
--(CGAffineTransform)getOrientation:(UIInterfaceOrientation)orientation {
-    //    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    
-    if (orientation == UIInterfaceOrientationPortrait) {
-        [self toPortraitUpdate];
-        return CGAffineTransformIdentity;
-    } else if (orientation == UIInterfaceOrientationLandscapeLeft){
-        [self toLandscapeUpdate];
-        return CGAffineTransformMakeRotation(-M_PI_2);
-    } else if (orientation == UIInterfaceOrientationLandscapeRight){
-        [self toLandscapeUpdate];
-        return CGAffineTransformMakeRotation(M_PI_2);
-    } else if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
-        [self toPortraitUpdate];
-        return CGAffineTransformMakeRotation(M_PI);
-    }
-    return CGAffineTransformIdentity;
-}
-
--(void)toPortraitUpdate {
-    _isFullScreen = NO;
-    self.toolView.hidden = YES;
-    //处理状态条
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    if ([UIApplication sharedApplication].statusBarHidden) {
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    }
-}
-
--(void)toLandscapeUpdate {
-    _isFullScreen = YES;
-    
-    //处理状态条
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    if (self.toolView.hidden) {
-        [[UIApplication sharedApplication] setStatusBarHidden:YES];
-    }else{
-        [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    }
 }
 
 #pragma mark - 对外的API
