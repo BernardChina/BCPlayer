@@ -87,6 +87,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) UIButton       *stopButton;             //播放暂停按钮
 @property (nonatomic, strong) UIButton       *screenButton;           //全屏按钮
 @property (nonatomic, strong) UIButton       *repeatBtn;              //重播按钮
+@property (nonatomic, strong) UIButton *playBtn;
 @property (nonatomic, strong) UIView         *netWorkPoorView;        //网络不佳view
 @property (nonatomic, strong) UILabel        *errorLabel;           //错误文案
 @property (nonatomic, assign) BOOL           isFullScreen;
@@ -330,7 +331,7 @@ typedef enum : NSUInteger {
     
     _showView = showView;
     _showViewRect = _playerView.frame;
-    _showView.backgroundColor = [UIColor blackColor];
+    _playerView.backgroundColor = [UIColor blackColor];
     
     [self setVideoToolView];
     
@@ -473,11 +474,9 @@ typedef enum : NSUInteger {
             }
             
             // 用户设置不是自动播放，应该显示播放按钮，暂时先显示重播按钮（因为没有ui）
-            self.repeatBtn.hidden = NO;
-            [self toolViewHidden];
-            self.state = NBPlayerStateFinish;
-            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
-            [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
+            
+            self.state = NBPlayerStateStopped;
+            self.playBtn.hidden = NO;
             
             return;
         }
@@ -789,6 +788,17 @@ typedef enum : NSUInteger {
     return _repeatBtn;
 }
 
+- (UIButton *)playBtn {
+    if (!_playBtn) {
+        _playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_playBtn setTitle:@"点击屏幕，开始播放" forState:UIControlStateNormal];
+        [_playBtn.titleLabel setFont:[UIFont systemFontOfSize:12]];
+        [_playBtn addTarget:self action:@selector(startPlay) forControlEvents:UIControlEventTouchUpInside];
+        _playBtn.hidden = YES;
+    }
+    return _playBtn;
+}
+
 - (UIView *)netWorkPoorView {
     if (!_netWorkPoorView) {
         _netWorkPoorView = [[UIView alloc] init];
@@ -967,6 +977,13 @@ typedef enum : NSUInteger {
     [self.playerView addSubview:self.repeatBtn];
     [self.repeatBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.playerView);
+    }];
+    
+    [self.playBtn removeFromSuperview];
+    [self.playerView addSubview:self.playBtn];
+    [self.playBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.equalTo(self.playerView);
+//        make.center.equalTo(self.playerView);
     }];
     
     [self.netWorkPoorView removeFromSuperview];
@@ -1347,6 +1364,24 @@ typedef enum : NSUInteger {
     _current = 0;
     [self showToolView];
     [self resumeOrPause];
+}
+
+- (void)startPlay {
+    _current = 0;
+    
+    _playBtn.hidden = YES;
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+        NSURL *localURL = [NSURL fileURLWithPath:self.cachePath];
+        if (isHLS) {
+            localURL = [NSURL URLWithString:[httpServerLocalUrl stringByAppendingString:[NSString stringWithFormat:@"%@",cacheVieoName]]];
+        }
+        [self playWithLocalUrl:localURL];
+        if (isHLS && self.player.currentItem.status != AVPlayerStatusReadyToPlay) {
+            [self seekToTime:_current];
+        }
+        
+    }
 }
 
 /**
