@@ -450,7 +450,6 @@ typedef enum : NSUInteger {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
             // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
-            [self.bottomProgress setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
             
             if (self.state != NBPlayerStatePlaying) {
                 [self.actIndicator startAnimating];
@@ -629,7 +628,6 @@ typedef enum : NSUInteger {
     }
     self.loadedProgress = timeInterval / totalDuration;
     [self.videoProgressView setProgress:timeInterval / totalDuration animated:YES];
-    [self.bottomProgress setProgress:timeInterval / totalDuration animated:YES];
 }
 
 - (void)bufferingSomeSecond {
@@ -1363,6 +1361,8 @@ typedef enum : NSUInteger {
 - (void)updateVideoSlider:(CGFloat)currentSecond {
     NSLog(@"但前播放时间进度: %f",currentSecond);
     [self.playSlider setValue:currentSecond animated:YES];
+    
+    [self.bottomProgress setProgress:currentSecond/self.playSlider.maximumValue animated:YES];
 }
 
 #pragma mark - 暂停播放相关方法
