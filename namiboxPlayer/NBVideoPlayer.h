@@ -16,9 +16,10 @@
 #import "NBPlayerView.h"
 
 typedef NS_ENUM(NSInteger, NBPlayerState) {
+    NBPlayerStateDefault,
     NBPlayerStateBuffering = 1,    //正在缓存
     NBPlayerStatePlaying,          //正在播放
-    NBPlayerStateStopped,          //播放结束
+    NBPlayerStateFailed,          //播放结束
     NBPlayerStatePause,            //暂停播放
     NBPlayerStateFinish,           //播放完成
 };

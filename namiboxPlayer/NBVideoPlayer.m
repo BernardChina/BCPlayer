@@ -132,7 +132,7 @@ typedef enum : NSUInteger {
         _loadedProgress = 0;
         _duration = 0;
         _current  = 0;
-        _state = NBPlayerStateStopped;
+        _state = NBPlayerStateDefault;
         _stopInBackground = YES;
         _isFullScreen = NO;
         _canFullScreen = YES;
@@ -263,7 +263,7 @@ typedef enum : NSUInteger {
                 __strong __typeof(weakSelf) strongSelf = weakSelf;
                 strongSelf.downloadFailed = YES;
                 strongSelf.nextTs= nextTs;
-                if (strongSelf.state == NBPlayerStateStopped) {
+                if (strongSelf.state == NBPlayerStateDefault) {
                     [strongSelf showNetWorkPoorView];
                 }
             }
@@ -289,7 +289,7 @@ typedef enum : NSUInteger {
             }
             
             strongSelf.nextTs= nextTs;
-            if (strongSelf.state == NBPlayerStateStopped) {
+            if (strongSelf.state == NBPlayerStateDefault) {
                 [strongSelf showNetWorkPoorView];
             }
             if (strongSelf.delegate && [strongSelf.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
@@ -474,7 +474,7 @@ typedef enum : NSUInteger {
             
             // 用户设置不是自动播放，应该显示播放按钮，暂时先显示重播按钮（因为没有ui）
             
-            self.state = NBPlayerStateStopped;
+            self.state = NBPlayerStateDefault;
             self.playBtn.hidden = NO;
             
             return;
@@ -1237,7 +1237,7 @@ typedef enum : NSUInteger {
 
 // 拖动slider 播放跳跃播放
 - (void)seekToTime:(CGFloat)seconds {
-    if (self.state == NBPlayerStateStopped) {
+    if (self.state == NBPlayerStateFailed) {
         return;
     }
     
@@ -1441,7 +1441,7 @@ typedef enum : NSUInteger {
     self.loadedProgress = 0;
     self.duration = 0;
     self.current  = 0;
-    self.state = NBPlayerStateStopped;
+    self.state = NBPlayerStateFailed;
     [self releasePlayer];
     self.repeatBtn.hidden = YES;
     [self toolViewHidden];
