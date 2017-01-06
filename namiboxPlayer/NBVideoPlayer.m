@@ -227,22 +227,30 @@ typedef enum : NSUInteger {
     }
     
 }
+
+- (void)playWithNoCache:(NSURL *)url {
+    [self removeCommonPlayerObserver];
+    
+    self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
+    self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
+    
+    if (!self.player) {
+        self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
+    } else {
+        [self.player replaceCurrentItemWithPlayerItem:self.currentPlayerItem];
+    }
+    
+    [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
+    
+    [self commonPlayerObserver];
+}
+
 // 支持hls
 - (void)playHLSWithUrl:(NSURL *)url {
     // 不缓存
     if (currentCacheType == NBPlayerCacheTypeNoCache) {
-        self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
-        self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
         
-        if (!self.player) {
-            self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
-        } else {
-            [self.player replaceCurrentItemWithPlayerItem:self.currentPlayerItem];
-        }
-        
-        [(AVPlayerLayer *)self.playerView.layer setPlayer:self.player];
-        
-        [self commonPlayerObserver];
+        [self playWithNoCache:url];
         
         return;
     }
@@ -491,6 +499,10 @@ typedef enum : NSUInteger {
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
             [self stop];
+            
+            self.errorLabel.text = @"播放失败, 请点击屏幕重试";
+            [self showNetWorkPoorView];
+            
             if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
                 [self.delegate NBVideoPlayer:self didCompleteWithError:[NSError errorWithDomain:@"播放失败" code:0 userInfo:nil]];
             }
@@ -1078,6 +1090,11 @@ typedef enum : NSUInteger {
 - (void)tapRefresh:(UITapGestureRecognizer *)tap {
     [self hideNetWorkPoorView];
     
+    if (self.state == NBPlayerStateFailed) {
+        [self playWithNoCache:_playUrl];
+        return;
+    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.m3u8Handler refreshTask:self.nextTs completeWithError:^(NSError *error, NSInteger nextTs) {
             if (error) {
@@ -1237,7 +1254,7 @@ typedef enum : NSUInteger {
 
 // 拖动slider 播放跳跃播放
 - (void)seekToTime:(CGFloat)seconds {
-    if (self.state == NBPlayerStateFailed) {
+    if (self.state == NBPlayerStateFailed || self.state == NBPlayerStateDefault) {
         return;
     }
     

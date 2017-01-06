@@ -244,7 +244,7 @@ SCNetworkReachabilityRef reachability;
     if (segment) {
         [self.loadSession addDownloadTask:segment.locationUrl];
     } else {
-        error([NSError errorWithDomain:@"冲刷数据失败" code:0 userInfo:nil], self.loadSession.nextTs);
+        error([NSError errorWithDomain:@"重刷数据失败" code:0 userInfo:nil], self.loadSession.nextTs);
     }
     
 }
