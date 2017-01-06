@@ -547,6 +547,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)monitoringPlayback:(AVPlayerItem *)playerItem {
+    NSLog(@"添加了monitoringPlayback");
     // playerItem.duration. 表示项目媒体的持续时间
     self.duration = playerItem.duration.value / playerItem.duration.timescale; //视频总时间
     if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
@@ -1213,7 +1214,7 @@ typedef enum : NSUInteger {
                 
                 _current = value;
                 
-//                [self unmonitoringPlayback];
+                [self unmonitoringPlayback];
                 [self seekToTime:value];
                 self.timeSheetView.hidden = YES;
                 [self updateCurrentTime:value];
@@ -1296,7 +1297,7 @@ typedef enum : NSUInteger {
     self.playSlider.selected = NO;
     _current = slider.value;
     [self.player pause];
-//    [self unmonitoringPlayback];
+    [self unmonitoringPlayback];
     
     [self seekToTime:slider.value];
     [self updateCurrentTime:slider.value];
@@ -1364,7 +1365,7 @@ typedef enum : NSUInteger {
  *  @param currentSecond 但前播放时间进度
  */
 - (void)updateVideoSlider:(CGFloat)currentSecond {
-    NSLog(@"但前播放时间进度: %f",currentSecond);
+    NSLog(@"当前播放时间进度: %f",currentSecond);
     [self.playSlider setValue:currentSecond animated:YES];
     
     [self.bottomProgress setProgress:currentSecond/self.playSlider.maximumValue animated:YES];
@@ -1732,7 +1733,7 @@ typedef enum : NSUInteger {
         NSNumber *va = [NSNumber numberWithInt:orientation];
         [[UIDevice currentDevice] setValue:va forKey:@"Orientation"];
         
-        [self.playerView mas_makeConstraints:^(MASConstraintMaker *make) {
+        [self.playerView mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.top.bottom.left.right.equalTo(_showView);
         }];
         self.isFullScreen = YES;
