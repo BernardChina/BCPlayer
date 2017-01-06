@@ -136,6 +136,7 @@ typedef enum : NSUInteger {
         _stopInBackground = YES;
         _isFullScreen = NO;
         _canFullScreen = YES;
+        _autoPlay = YES;
         
         UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
         switch (orientation) {
@@ -190,18 +191,13 @@ typedef enum : NSUInteger {
 
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
-    NSLog(@"11111111111111当钱item:---%@",self.currentPlayerItem);
     [self removeCommonPlayerObserver];
-    
-    NSLog(@"11111111111111:%@---%@",self.currentPlayerItem,self.playbackTimeObserver);
     
     if (isHLS) {
         [self openHttpServer];
     }
     self.videoAsset = [AVURLAsset URLAssetWithURL:url options:nil];
     self.currentPlayerItem = [AVPlayerItem playerItemWithAsset:_videoAsset];
-    
-    NSLog(@"aaaaaaaaaaaaa:%@---%@",self.currentPlayerItem,self.playbackTimeObserver);
     
     if (!self.player) {
         self.player = [AVPlayer playerWithPlayerItem:self.currentPlayerItem];
@@ -447,8 +443,12 @@ typedef enum : NSUInteger {
             // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
             [self.bottomProgress setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
-            [self.actIndicator startAnimating];
-            self.actIndicator.hidden = NO;
+            
+            if (self.state != NBPlayerStatePlaying) {
+                [self.actIndicator startAnimating];
+                self.actIndicator.hidden = NO;
+            }
+            
             return;
         }
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"startPlay"]) {
@@ -505,17 +505,22 @@ typedef enum : NSUInteger {
         //监听播放器在缓冲数据的状态
         //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
         NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
-        if (!self.downloadFailed) {
-            [self.actIndicator startAnimating];
-            self.actIndicator.hidden = NO;
-        }
         
         if (playerItem.isPlaybackBufferEmpty) {
+            if (!self.downloadFailed) {
+                [self.actIndicator startAnimating];
+                self.actIndicator.hidden = NO;
+            }
             self.state = NBPlayerStateBuffering;
             [self bufferingSomeSecond];
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
-        // playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
+         //playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。;
+        NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
+        if (playerItem.isPlaybackLikelyToKeepUp) {
+            [self.actIndicator stopAnimating];
+            self.actIndicator.hidden = YES;
+        }
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;
         static float staticHeight = 0;
@@ -540,8 +545,6 @@ typedef enum : NSUInteger {
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
     
-    NSLog(@"3333333333333 player item:%@",playerItem);
-    
     __weak __typeof(self)weakSelf = self;
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
     
@@ -561,10 +564,6 @@ typedef enum : NSUInteger {
             return;
         }
         _current = current;
-        
-        NSLog(@"实时监听当前播放时间%f",current);
-        
-        NSLog(@"2222222222222 player item:%@",playerItem);
         
         // 通知外面接受到播放信息
         if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withProgress:currentTime:totalTime:)]) {
@@ -1245,11 +1244,8 @@ typedef enum : NSUInteger {
     seconds = MAX(0, seconds);
     seconds = MIN(seconds, self.duration);
     
-    NSLog(@"播放跳跃播放播放跳跃播放播放跳跃播放%f:",seconds);
-    
     [self.player pause];
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
-        NSLog(@"实际条转的时间是多少%f:",seconds);
         if (finished) {
             
             self.netWorkPoorView.hidden = YES;
@@ -1259,7 +1255,6 @@ typedef enum : NSUInteger {
             
             if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
                 self.state = NBPlayerStateBuffering;
-                
                 self.actIndicator.hidden = NO;
                 [self.actIndicator startAnimating];
             } else {
@@ -1278,7 +1273,6 @@ typedef enum : NSUInteger {
 
 //手指结束拖动，播放器从当前点开始播放，开启滑竿的时间走动
 - (void)playSliderChangeEnd:(UISlider *)slider {
-    NSLog(@"slider.valueddddddddd:%f",slider.value);
     self.playSlider.selected = NO;
     _current = slider.value;
     [self.player pause];
@@ -1290,7 +1284,6 @@ typedef enum : NSUInteger {
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
     
     if (isHLS ) {
-        NSLog(@"%@",@"dddddddddddddddddddddd");
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(slider.value)}];
         return ;
@@ -1560,7 +1553,6 @@ typedef enum : NSUInteger {
     [self unmonitoringPlayback];
     
     self.currentPlayerItem = nil;
-    NSLog(@"%@",@"55555555555555555");
 }
 
 - (void)releasePlayer {

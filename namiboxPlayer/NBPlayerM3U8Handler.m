@@ -162,7 +162,7 @@ SCNetworkReachabilityRef reachability;
     self.segments = [[NSMutableArray alloc] init];
     NSString* remainData =data;
     NSArray *array = [remainData componentsSeparatedByString:@"#EXTINF:"];
-    NSString *baseUrl = [url.scheme stringByAppendingString:url.host];
+    NSString *baseUrl = [url.scheme stringByAppendingString:[NSString stringWithFormat:@"://%@",url.host]];
     
     __block double duration = 0;
     
