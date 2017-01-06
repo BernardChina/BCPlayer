@@ -974,8 +974,6 @@ typedef enum : NSUInteger {
         make.height.mas_equalTo(2);
     }];
     
-//    [self.bottomProgress addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:nil];
-    
     // 加载旋转菊花
     [self.actIndicator removeFromSuperview];
     [self.playerView addSubview:self.actIndicator];
@@ -1013,19 +1011,21 @@ typedef enum : NSUInteger {
     [self.repeatBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.center.equalTo(self.playerView);
     }];
+    self.repeatBtn.hidden = YES;
     
     [self.playBtn removeFromSuperview];
     [self.playerView addSubview:self.playBtn];
     [self.playBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.playerView);
-//        make.center.equalTo(self.playerView);
     }];
+    self.playBtn.hidden = YES;
     
     [self.netWorkPoorView removeFromSuperview];
     [self.playerView addSubview:self.netWorkPoorView];
     [self.netWorkPoorView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.playerView).offset(0);
     }];
+    self.netWorkPoorView.hidden = YES;
     
     [self.errorLabel removeFromSuperview];
     self.errorLabel.textAlignment = NSTextAlignmentCenter;
@@ -1584,6 +1584,7 @@ typedef enum : NSUInteger {
     [self releaseDownloadSession];
     [self removeCommonPlayerObserver];
     [self releaseResouerLoader];
+    self.player = nil;
 }
 
 // 基本的监听
