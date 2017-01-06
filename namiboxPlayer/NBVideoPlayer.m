@@ -1120,6 +1120,11 @@ typedef enum : NSUInteger {
 
 - (void)handlePan:(UIPanGestureRecognizer *)recognizer {
     
+    // 只有在播放中，或者缓存中，才可以改变进度等
+    if (self.state != NBPlayerStatePlaying && self.state != NBPlayerStateBuffering) {
+        return;
+    }
+    
     CGPoint touchPoint = [recognizer locationInView:self.touchView];
     NSLog(@"(%f,%f)", touchPoint.x, touchPoint.y);
     
