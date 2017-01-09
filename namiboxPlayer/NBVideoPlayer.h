@@ -18,8 +18,9 @@
 typedef NS_ENUM(NSInteger, NBPlayerState) {
     NBPlayerStateDefault,
     NBPlayerStateBuffering = 1,    //正在缓存
+    NBPlayerStateWillPlay,         //将要播放，资源已经准备好了，但是palyer本身还没有开始播放
     NBPlayerStatePlaying,          //正在播放
-    NBPlayerStateFailed,          //播放结束
+    NBPlayerStateFailed,           //播放结束
     NBPlayerStatePause,            //暂停播放
     NBPlayerStateFinish,           //播放完成
 };

@@ -11,7 +11,7 @@
 
 @class NBVideoPlayer;
 @protocol NBPlayerDelegate <NSObject>
-
+@optional
 /**
  播放完成调用此方法
 

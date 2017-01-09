@@ -257,7 +257,7 @@ SCNetworkReachabilityRef reachability;
             return;
         }
         NSInteger current = [dic[@"currentTime"] integerValue];
-        NSLog(@"当钱条装世界：%ld",(long)current);
+//        NSLog(@"当钱条装世界：%ld",(long)current);
         __block NSInteger currentIndex = 0;//当前播放到哪一个ts
         __block double temp = 0;
         
@@ -270,7 +270,7 @@ SCNetworkReachabilityRef reachability;
             }
         }];
         self.loadSession.currentIndex = currentIndex;
-        NSLog(@"当钱播放的index：%ld",(long)currentIndex);
+//        NSLog(@"当钱播放的index：%ld",(long)currentIndex);
         
         if (currentIndex == self.durations.count - 1) {
             if (self.playFinished) {

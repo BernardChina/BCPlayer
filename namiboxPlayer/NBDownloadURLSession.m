@@ -154,7 +154,7 @@ static NSInteger const sPlayAfterCacheCount = 2;
     int64_t kReceived = downloadTask.countOfBytesReceived / 1024;
     int64_t kExpected = downloadTask.countOfBytesExpectedToReceive / 1024;
     NSString *statusString = [NSString stringWithFormat:@"%lldk of %lldk", kReceived, kExpected];
-    NSLog(@"进度: %@",statusString);
+//    NSLog(@"进度: %@",statusString);
     
     if (!self.downloadProgress) {
         self.downloadProgress = 0;
