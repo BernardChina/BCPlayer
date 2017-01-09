@@ -563,8 +563,6 @@ typedef enum : NSUInteger {
     
     weakSelf.playbackTimeObserver = [weakSelf.player addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:NULL usingBlock:^(CMTime time) {
         
-        
-        
         __strong __typeof(self)strongSelf = weakSelf;
         
         if (![playerItem isEqual:strongSelf.currentPlayerItem]) {
@@ -1383,9 +1381,9 @@ typedef enum : NSUInteger {
  */
 - (void)updateVideoSlider:(CGFloat)currentSecond {
 //    NSLog(@"当前播放时间进度: %f",currentSecond);
-    [self.playSlider setValue:currentSecond animated:YES];
+    [self.playSlider setValue:currentSecond animated:NO];
     
-    [self.bottomProgress setProgress:currentSecond/self.playSlider.maximumValue animated:YES];
+    [self.bottomProgress setProgress:currentSecond/self.playSlider.maximumValue animated:NO];
 }
 
 #pragma mark - 暂停播放相关方法
