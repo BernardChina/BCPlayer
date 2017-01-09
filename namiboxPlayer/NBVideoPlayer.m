@@ -1770,6 +1770,10 @@ typedef enum : NSUInteger {
 
 #pragma mark - 对外的API
 
+- (void)makePalyerMute:(BOOL)isMute {
+    self.player.muted = isMute;
+}
+
 - (void)seekToTime:(CGFloat)seconds {
     [self seekToTime:seconds completionHandler:nil];
 }

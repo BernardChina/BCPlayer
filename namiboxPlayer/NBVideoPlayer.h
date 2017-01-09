@@ -59,6 +59,14 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  */
 - (void)seekToTime:(CGFloat)seconds;
 
+
+/**
+ 设置静音模式
+
+ @param isMute 是否静音
+ */
+- (void)makePalyerMute:(BOOL)isMute;
+
 /**
  * 恢复播放
  */
