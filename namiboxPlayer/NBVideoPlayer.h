@@ -57,7 +57,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  *
  *  @param seconds 时间点
  */
-- (void)seekToTime:(CGFloat)seconds;
+- (void)seekToTime:(CGFloat)seconds withAutoPlay:(BOOL)autoPlay;
 
 
 /**
@@ -67,8 +67,14 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  */
 - (void)makePalyerMute:(BOOL)isMute;
 
+
 /**
- * 恢复播放
+ 开始播放，第一次播放
+ */
+- (void)startPlay;
+
+/**
+ * 恢复播放。在播放过程中，暂停了播放调用了pause，此时调用resume，可以恢复播放
  */
 - (void)resume;
 

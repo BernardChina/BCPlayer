@@ -1774,7 +1774,8 @@ typedef enum : NSUInteger {
     self.player.muted = isMute;
 }
 
-- (void)seekToTime:(CGFloat)seconds {
+- (void)seekToTime:(CGFloat)seconds withAutoPlay:(BOOL)autoPlay {
+    self.autoPlay = autoPlay;
     [self seekToTime:seconds completionHandler:nil];
 }
 
