@@ -14,7 +14,7 @@
 #import "NBPlayerEnvironment.h"
 #import "NSFileManager+NB.h"
 
-static NSInteger const sPlayAfterCacheCount = 10;
+static NSInteger sPlayAfterCacheCount = 10;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *_session;
@@ -48,6 +48,7 @@ static NSInteger const sPlayAfterCacheCount = 10;
 - (void)addDownloadTask:(NSString *)playUrl withIndex:(NSInteger)index {
     _playUrl = playUrl;
     _downloadedIndex = index;
+    sPlayAfterCacheCount = self.taskCount - 1;
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
@@ -179,7 +180,7 @@ static NSInteger const sPlayAfterCacheCount = 10;
             // 如果已经下载。
             // 1. 依当前index为基本，后面一个是否下载，如果没有下载，就进行下载，如果下载了，直接return
             
-            for (int i= 1; i < sPlayAfterCacheCount + 1; i++) {
+            for (int i= 0; i < sPlayAfterCacheCount; i++) {
                 long preDownloadIndex = self.currentIndex + i;
                 if (preDownloadIndex < self.taskCount && ![[NSFileManager defaultManager] haveDownloaded:[NSString stringWithFormat:@"%ld.ts",preDownloadIndex] withPath:cachePathForVideo]) {
                     // 如果想等说明正在下载。

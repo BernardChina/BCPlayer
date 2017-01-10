@@ -571,9 +571,9 @@ typedef enum : NSUInteger {
         
         // playerItem.currentTime. 返回项目的当前时间
         double current = (double)playerItem.currentTime.value / (double)playerItem.currentTime.timescale;
-//        if (_current > current) {
-//            return;
-//        }
+        if (_current > current) {
+            return;
+        }
         _current = current;
         
         // 通知外面接受到播放信息
