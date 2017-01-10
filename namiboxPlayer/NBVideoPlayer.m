@@ -220,7 +220,7 @@ typedef enum : NSUInteger {
     NSString *str = [url absoluteString];
     if ([str hasPrefix:@"https"] || [str hasPrefix:@"http"]) {
         self.downloadSession = [[NBDownloadURLSession alloc] init];
-        [self.downloadSession addDownloadTask:str];
+        [self.downloadSession addDownloadTask:str withIndex:0];
         
         [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
@@ -588,6 +588,8 @@ typedef enum : NSUInteger {
         
         // 当只有hls格式视频，并且边播边缓存的时候，才发送通知
         if (isHLS ) {
+            NSLog(@"playerItem：%@",playerItem);
+            NSLog(@"时间还会变吗：%f",current);
             [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
         }
         
@@ -1266,7 +1268,7 @@ typedef enum : NSUInteger {
 
 // 拖动slider 播放跳跃播放
 - (void)seekToTime:(CGFloat)seconds completionHandler:(void (^)(BOOL finished))completionHandler{
-    
+    NSLog(@"seekToTime");
     if (self.state == NBPlayerStateFailed || self.state == NBPlayerStateDefault || self.state == NBPlayerStateWillPlay) {
         return;
     }

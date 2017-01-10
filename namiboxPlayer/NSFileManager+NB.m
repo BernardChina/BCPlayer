@@ -35,4 +35,16 @@
     return [files.lastObject stringByDeletingPathExtension];
 }
 
+- (BOOL)haveDownloaded:(NSString *)fileName withPath:(NSString *)path {
+    NSArray *files = [self getFilesWithSuffix:@"ts" path:path];
+    __block BOOL downloaded = NO;
+    [files enumerateObjectsUsingBlock:^(NSString * obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj isEqualToString:fileName]) {
+            downloaded = YES;
+        }
+    }];
+    
+    return downloaded;
+}
+
 @end

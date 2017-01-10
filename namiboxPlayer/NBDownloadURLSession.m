@@ -32,7 +32,7 @@ static NSInteger const sPlayAfterCacheCount = 2;
 - (instancetype)init {
     if (self == [super init]) {
         _startPlay = NO;
-        _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
+//        _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
         
         [_session invalidateAndCancel];
         _session = nil;
@@ -45,8 +45,9 @@ static NSInteger const sPlayAfterCacheCount = 2;
     return self;
 }
 
-- (void)addDownloadTask:(NSString *)playUrl {
+- (void)addDownloadTask:(NSString *)playUrl withIndex:(NSInteger)index {
     _playUrl = playUrl;
+    _downloadedIndex = index;
     
     NSURL * url = [NSURL URLWithString:playUrl];
     NSURLRequest * request = [NSURLRequest requestWithURL:url];
@@ -64,12 +65,7 @@ static NSInteger const sPlayAfterCacheCount = 2;
         
         NSUInteger downloadedCount = [[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count + 1;
         
-        _downloadedIndex = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo].integerValue;
-        
-        _downloadedIndex = downloadedCount == 1?0: _downloadedIndex +1;
-        
-        if (_downloadedIndex < self.currentIndex) {
-            _downloadedIndex = self.currentIndex;
+        if (self.currentIndex > 0 && self.nextTs == self.currentIndex) {
             self.startPlay = YES;
         }
         
@@ -89,13 +85,20 @@ static NSInteger const sPlayAfterCacheCount = 2;
                 
             case NBPlayerCacheTypePlayWithCache: {
                 // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
-                if (downloadedCount - self.currentIndex == sPlayAfterCacheCount) {
+//                if (!self.startPlay) {
+//                    self.startPlay = YES;
+//                }
+                
+                if (downloadedCount - self.currentIndex == 2) {
                     if (!self.startPlay) {
                         self.startPlay = YES;
                     }
                 }
-                if (self.nextTs < sPlayAfterCacheCount-1) {
-                    self.nextTs = _downloadedIndex + 1;
+                
+                if (self.nextTs < self.taskCount-1 && self.nextTs - self.currentIndex <= sPlayAfterCacheCount-1) {
+                    if (self.nextTs != self.nextTs +1) {
+                        self.nextTs = self.nextTs + 1;
+                    }
                 }
             }
             break;
@@ -170,19 +173,29 @@ static NSInteger const sPlayAfterCacheCount = 2;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
     if (context == DownloadKVOContext) {
         if ([keyPath isEqualToString:@"currentIndex"]) {
-            NSInteger sds =[[NSFileManager defaultManager] getFilesWithSuffix:@"ts" path:cachePathForVideo].count - self.currentIndex;
-            BOOL s = sds < sPlayAfterCacheCount;
-            if (_downloadedIndex+1 < self.taskCount && s ) {
-                NSLog(@"当45666666666666666:%ld",(long)self.currentIndex);
-                if (_downloadedIndex < self.currentIndex) {
-                    _downloadedIndex = self.currentIndex - 1;
-                    NSLog(@"开始缓存下一个111111111111：%ld",(long)self.nextTs);
+            // 当拿到index的时候，首先判断，当前index是否下载了，如果没有下载则直接下载，如果已经下载，判断预下载逻辑
+            
+            if (![[NSFileManager defaultManager] haveDownloaded:[NSString stringWithFormat:@"%ld.ts",(long)self.currentIndex] withPath:cachePathForVideo]) {
+                if (self.nextTs != self.currentIndex) {
+                    self.nextTs = self.currentIndex;
                 }
-                if (self.nextTs != _downloadedIndex +1) {
-                    self.nextTs = _downloadedIndex + 1;
-                    NSLog(@"开始缓存下一个：%ld",(long)self.nextTs);
+                return;
+            }
+            
+            // 如果已经下载。
+            // 1. 依当前index为基本，后面一个是否下载，如果没有下载，就进行下载，如果下载了，直接return
+            
+            for (int i= 1; i < sPlayAfterCacheCount + 1; i++) {
+                long preDownloadIndex = self.currentIndex + i;
+                if (preDownloadIndex < self.taskCount && ![[NSFileManager defaultManager] haveDownloaded:[NSString stringWithFormat:@"%ld.ts",preDownloadIndex] withPath:cachePathForVideo]) {
+                    if (self.nextTs != preDownloadIndex) {
+                        self.nextTs = preDownloadIndex;
+                        
+                        return;
+                    }
                 }
             }
+            
             return;
         }
     }

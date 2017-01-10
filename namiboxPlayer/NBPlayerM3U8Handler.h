@@ -12,8 +12,9 @@
 
 @interface M3U8SegmentInfo : NSObject
 
-@property(nonatomic,assign) double duration;
-@property(nonatomic,copy) NSString *locationUrl;
+@property (nonatomic, assign) double duration;
+@property (nonatomic, copy) NSString *locationUrl;
+@property (nonatomic, assign) NSInteger index;
 
 @end
 

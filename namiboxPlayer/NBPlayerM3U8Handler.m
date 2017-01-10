@@ -84,13 +84,13 @@ SCNetworkReachabilityRef reachability;
         
         durationWithHLS = duration;
         
-        NSString *lastFileName = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo];
+//        NSString *lastFileName = [[NSFileManager defaultManager] getLastFileNameWithSuffix:@"ts" path:cachePathForVideo];
         
-        if ([lastFileName intValue] +1 != fileList.count) {
-            [[NSFileManager defaultManager] removeItemAtPath:cachePathForVideo error:nil];
-            [self praseUrlFromNetWork:urlstr];
-            return;
-        }
+//        if ([lastFileName intValue] +1 != fileList.count) {
+//            [[NSFileManager defaultManager] removeItemAtPath:cachePathForVideo error:nil];
+//            [self praseUrlFromNetWork:urlstr];
+//            return;
+//        }
         
         if (fileList.count <= self.durations.count) {
             switch (currentCacheType) {
@@ -174,6 +174,7 @@ SCNetworkReachabilityRef reachability;
             M3U8SegmentInfo * segment = [[M3U8SegmentInfo alloc]init];
             segment.duration = [temp[0] doubleValue];
             segment.locationUrl = [self removeSpaceAndNewlineAndOtherFlag:temp[1]];
+            segment.index = idx-1;
             if (!([segment.locationUrl hasPrefix:@"http"] || [segment.locationUrl hasPrefix:@"https"])) {
                 
                 segment.locationUrl = [baseUrl stringByAppendingString:segment.locationUrl];
@@ -198,12 +199,12 @@ SCNetworkReachabilityRef reachability;
         
         if (self.segments.firstObject) {
             M3U8SegmentInfo * segment = self.segments.firstObject;
-            [self.loadSession addDownloadTask:segment.locationUrl];
+            [self.loadSession addDownloadTask:segment.locationUrl withIndex:segment.index];
         }
     } else if (fileList.count < self.segments.count && currentCacheType == NBPlayerCacheTypePlayAfterCache) {
         // 说明没有下载完成，只是下载了一部分或者下载完成
         M3U8SegmentInfo * segment = self.segments[fileList.count];
-        [self.loadSession addDownloadTask:segment.locationUrl];
+        [self.loadSession addDownloadTask:segment.locationUrl withIndex:segment.index];
         self.loadSession.downloadProgress = (double)fileList.count/(double)self.segments.count;
     }
     
@@ -229,7 +230,7 @@ SCNetworkReachabilityRef reachability;
             
             M3U8SegmentInfo * segment = [self.segments objectAtIndex:nextTs];
             if (segment) {
-                [self.loadSession addDownloadTask:segment.locationUrl];
+                [self.loadSession addDownloadTask:segment.locationUrl withIndex:segment.index];
             }
             return;
         }
@@ -242,7 +243,7 @@ SCNetworkReachabilityRef reachability;
     }
     M3U8SegmentInfo * segment = [self.segments objectAtIndex:textTs];
     if (segment) {
-        [self.loadSession addDownloadTask:segment.locationUrl];
+        [self.loadSession addDownloadTask:segment.locationUrl withIndex:segment.index];
     } else {
         error([NSError errorWithDomain:@"重刷数据失败" code:0 userInfo:nil], self.loadSession.nextTs);
     }
@@ -270,7 +271,7 @@ SCNetworkReachabilityRef reachability;
             }
         }];
         self.loadSession.currentIndex = currentIndex;
-//        NSLog(@"当钱播放的index：%ld",(long)currentIndex);
+        NSLog(@"当前播放的index：%ld",(long)currentIndex);
         
         if (currentIndex == self.durations.count - 1) {
             if (self.playFinished) {

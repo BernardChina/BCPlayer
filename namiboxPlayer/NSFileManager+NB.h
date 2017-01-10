@@ -28,4 +28,6 @@
  */
 - (NSString *)getLastFileNameWithSuffix:(NSString *)suffix path:(NSString *)path;
 
+- (BOOL)haveDownloaded:(NSString *)fileName withPath:(NSString *)path;
+
 @end
