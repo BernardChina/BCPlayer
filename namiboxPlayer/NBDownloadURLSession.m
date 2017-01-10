@@ -14,7 +14,7 @@
 #import "NBPlayerEnvironment.h"
 #import "NSFileManager+NB.h"
 
-static NSInteger const sPlayAfterCacheCount = 2;
+static NSInteger const sPlayAfterCacheCount = 10;
 
 @interface NBDownloadURLSession()<NSURLSessionDownloadDelegate> {
     NSURLSession *_session;
@@ -84,10 +84,6 @@ static NSInteger const sPlayAfterCacheCount = 2;
             break;
                 
             case NBPlayerCacheTypePlayWithCache: {
-                // 当缓存的数量－当前播放的数量 ＝ 3.开始播放
-//                if (!self.startPlay) {
-//                    self.startPlay = YES;
-//                }
                 
                 if (downloadedCount - self.currentIndex == 2) {
                     if (!self.startPlay) {
@@ -95,10 +91,8 @@ static NSInteger const sPlayAfterCacheCount = 2;
                     }
                 }
                 
-                if (self.nextTs < self.taskCount-1 && self.nextTs - self.currentIndex <= sPlayAfterCacheCount-1) {
-                    if (self.nextTs != self.nextTs +1) {
-                        self.nextTs = self.nextTs + 1;
-                    }
+                if (self.nextTs < 1) {
+                    self.nextTs = _downloadedIndex + 1;
                 }
             }
             break;
@@ -188,11 +182,12 @@ static NSInteger const sPlayAfterCacheCount = 2;
             for (int i= 1; i < sPlayAfterCacheCount + 1; i++) {
                 long preDownloadIndex = self.currentIndex + i;
                 if (preDownloadIndex < self.taskCount && ![[NSFileManager defaultManager] haveDownloaded:[NSString stringWithFormat:@"%ld.ts",preDownloadIndex] withPath:cachePathForVideo]) {
-                    if (self.nextTs != preDownloadIndex) {
-                        self.nextTs = preDownloadIndex;
-                        
+                    // 如果想等说明正在下载。
+                    if (preDownloadIndex == _downloadedIndex) {
                         return;
                     }
+                    self.nextTs = preDownloadIndex;
+                    return;
                 }
             }
             
