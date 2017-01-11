@@ -1772,6 +1772,14 @@ typedef enum : NSUInteger {
 
 #pragma mark - 对外的API
 
+- (void)play {
+    if (self.state == NBPlayerStateWillPlay) {
+        [self startPlay];
+    } else {
+        [self resume];
+    }
+}
+
 - (void)makePalyerMute:(BOOL)isMute {
     self.player.muted = isMute;
 }

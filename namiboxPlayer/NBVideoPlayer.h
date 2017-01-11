@@ -73,6 +73,8 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  */
 - (void)startPlay;
 
+- (void)play;
+
 /**
  * 恢复播放。在播放过程中，暂停了播放调用了pause，此时调用resume，可以恢复播放
  */
