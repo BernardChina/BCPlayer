@@ -31,6 +31,31 @@
     return self;
 }
 
+#pragma mark - AVAssetResourceLoaderDelegate
+
+/**
+ *  必须返回Yes，如果返回NO，则resourceLoader将会加载出现故障的数据
+ *  这里会出现很多个loadingRequest请求， 需要为每一次请求作出处理
+ *  @param resourceLoader 资源管理器
+ *  @param loadingRequest 每一小块数据的请求
+ *
+ */
+- (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest {
+    [self.pendingRequests addObject:loadingRequest];
+    [self dealWithLoadingRequest:loadingRequest];
+    NSLog(@"----loadingRequest----:%@", loadingRequest);
+    return YES;
+}
+
+- (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
+    NSLog(@"%@",@"为什么cancel了");
+    NSLog(@"%@",loadingRequest);
+    [self.pendingRequests removeObject:loadingRequest];
+    
+}
+
+#pragma mark - Private Methods
+
 - (void)fillInContentInformation:(AVAssetResourceLoadingContentInformationRequest *)contentInformationRequest {
     NSString *mimeType = self.task.mimeType;
     CFStringRef contentType = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef)(mimeType), NULL);
@@ -38,8 +63,6 @@
     contentInformationRequest.contentType = CFBridgingRelease(contentType);
     contentInformationRequest.contentLength = self.task.videoLength;
 }
-
-#pragma mark - AVURLAsset resource loader methods
 
 - (void)processPendingRequests {
     NSMutableArray *requestsCompleted = [NSMutableArray array];  //请求完成的数组
@@ -106,21 +129,6 @@
 }
 
 
-/**
- *  必须返回Yes，如果返回NO，则resourceLoader将会加载出现故障的数据
- *  这里会出现很多个loadingRequest请求， 需要为每一次请求作出处理
- *  @param resourceLoader 资源管理器
- *  @param loadingRequest 每一小块数据的请求
- *
- */
-- (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest {
-    [self.pendingRequests addObject:loadingRequest];
-    [self dealWithLoadingRequest:loadingRequest];
-    NSLog(@"----loadingRequest----:%@", loadingRequest);
-    return YES;
-}
-
-
 - (void)dealWithLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
     NSURL *interceptedURL = [loadingRequest.request URL];
     NSRange range = NSMakeRange((NSUInteger)loadingRequest.dataRequest.currentOffset, NSUIntegerMax);
@@ -148,13 +156,7 @@
     self.task.playCachePath = self.playCachePath;
 }
 
-
-- (void)resourceLoader:(AVAssetResourceLoader *)resourceLoader didCancelLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest {
-    NSLog(@"%@",@"为什么cancel了");
-    NSLog(@"%@",loadingRequest);
-    [self.pendingRequests removeObject:loadingRequest];
-    
-}
+#pragma mark Public Methods
 
 - (NSURL *)getSchemeVideoURL:(NSURL *)url {
     self.url = url;

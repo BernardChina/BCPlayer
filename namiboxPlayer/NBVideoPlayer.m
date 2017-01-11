@@ -185,6 +185,10 @@ typedef enum : NSUInteger {
     
     [self commonPlayerObserver];
     
+    // 显示loading
+    [self.actIndicator startAnimating];
+    self.actIndicator.hidden = NO;
+    
 }
 
 // 播放本地视频
@@ -1094,16 +1098,18 @@ typedef enum : NSUInteger {
         [self playWithNoCache:_playUrl];
         return;
     }
+    if (isHLS) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.m3u8Handler refreshTask:self.nextTs completeWithError:^(NSError *error, NSInteger nextTs) {
+                if (error) {
+                    [self showNetWorkPoorView];
+                    return ;
+                }
+            }];
+            
+        });
+    }
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.m3u8Handler refreshTask:self.nextTs completeWithError:^(NSError *error, NSInteger nextTs) {
-            if (error) {
-                [self showNetWorkPoorView];
-                return ;
-            }
-        }];
-        
-    });
 }
 
 - (void)sliderTapAction:(UITapGestureRecognizer *)tap {
