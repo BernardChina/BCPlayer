@@ -24,7 +24,6 @@
 @property (nonatomic, strong) NSMutableArray  *taskArr;
 
 @property (nonatomic, assign) NSUInteger      downLoadingOffset;
-@property (nonatomic, assign) BOOL            once;
 
 @property (nonatomic, strong) NSFileHandle    *fileHandle;
 @property (nonatomic, strong) NSString        *tempPath;
@@ -38,11 +37,7 @@
     if (self) {
         _taskArr = [NSMutableArray array];
         _tempPath = [cachePathForVideo stringByAppendingPathComponent:@"temp.mp4"];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
-            [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
-            [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
-            
-        } else {
+        if (![[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
             [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
         }
         
@@ -171,21 +166,24 @@
         }
         return;
     }
+    
     //网络中断：-1005
     //无网络连接：-1009
     //请求超时：-1001
     //服务器内部错误：-1004
     //找不到服务器：-1003
-    if (error.code == -1001 && !_once) {      //网络超时，重连一次
+    [self.taskArr removeObject:session];
+    static int refreshCount = 0;
+    if (refreshCount < 3) {      //网络超时，重连一次
+        NSLog(@"重试下载");
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self continueLoading];
         });
+        refreshCount ++;
+        return;
     }
     if ([self.delegate respondsToSelector:@selector(didFailLoadingWithTask:withError:)]) {
         [self.delegate didFailLoadingWithTask:self withError:error.code];
-    }
-    if (error.code == -1009) {
-        NSLog(@"无网络连接");
     }
 }
 
@@ -193,7 +191,7 @@
     
     BOOL isSuccess = [[NSFileManager defaultManager] copyItemAtPath:path toPath:toPath error:nil];
     if (isSuccess) {
-        [self clearData];
+//        [self clearData];
         NSLog(@"rename success");
     }else{
         NSLog(@"rename fail");
@@ -201,19 +199,24 @@
 }
 
 - (void)continueLoading {
-    _once = YES;
     NSURLComponents *actualURLComponents = [[NSURLComponents alloc] initWithURL:self.url resolvingAgainstBaseURL:NO];
-    actualURLComponents.scheme = @"http";
+//    actualURLComponents.scheme = @"http";
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[actualURLComponents URL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
     
     [request addValue:[NSString stringWithFormat:@"bytes=%ld-%ld",(unsigned long)_downLoadingOffset, (unsigned long)self.videoLength - 1] forHTTPHeaderField:@"Range"];
     
+    [self.session invalidateAndCancel];
+    self.session = nil;
     
-//    [self.connection cancel];
-//    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-//    [self.connection setDelegateQueue:[NSOperationQueue mainQueue]];
-//    [self.connection start];
+    // Create a new configuration and session specifying this object as the delegate
+    NSURLSessionConfiguration *sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    
+    self.task = [self.session dataTaskWithRequest:request];
+    
+    [self.task resume];
+    
 }
 
 - (void)clearData {

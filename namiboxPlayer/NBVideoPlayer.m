@@ -432,6 +432,8 @@ typedef enum : NSUInteger {
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
     
+    [self.resouerLoader.task clearData];
+    
     // 播放结束
     if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
         [self.delegate NBVideoPlayer:self didCompleteWithError:nil];
@@ -520,14 +522,21 @@ typedef enum : NSUInteger {
     } else if ([NBVideoPlayerItemPlaybackBufferEmptyKeyPath isEqualToString:keyPath]) {
         //监听播放器在缓冲数据的状态
         //指示播放是否已占用所有缓冲媒体，并且播放将停止或结束
-        NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
         
         if (playerItem.isPlaybackBufferEmpty) {
+            NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
+            self.state = NBPlayerStateBuffering;
             if (!self.downloadFailed) {
                 [self.actIndicator startAnimating];
                 self.actIndicator.hidden = NO;
+            } else {
+                [self.player pause];
+                [self.actIndicator stopAnimating];
+                self.actIndicator.hidden = YES;
+                [self showNetWorkPoorView];
+                return;
             }
-            self.state = NBPlayerStateBuffering;
+            
             [self bufferingSomeSecond];
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
@@ -624,6 +633,7 @@ typedef enum : NSUInteger {
 - (void)calculateDownloadProgress:(AVPlayerItem *)playerItem {
     NSArray *loadedTimeRanges = [playerItem loadedTimeRanges];
     CMTimeRange timeRange = [loadedTimeRanges.firstObject CMTimeRangeValue];// 获取缓冲区域
+    
     float startSeconds = CMTimeGetSeconds(timeRange.start);
     float durationSeconds = CMTimeGetSeconds(timeRange.duration);
     NSTimeInterval timeInterval = startSeconds + durationSeconds;// 计算缓冲总进度
@@ -633,7 +643,7 @@ typedef enum : NSUInteger {
         self.duration = durationWithHLS;
     }
     self.loadedProgress = timeInterval / totalDuration;
-    [self.videoProgressView setProgress:timeInterval / totalDuration animated:YES];
+    [self.videoProgressView setProgress:timeInterval / totalDuration animated:NO];
 }
 
 - (void)bufferingSomeSecond {
@@ -662,6 +672,11 @@ typedef enum : NSUInteger {
             if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache && !self.playFinished) {
                 [self localUrlPlayer];
                 [self seekToTime:_current completionHandler:nil];
+            } else {
+                if (self.downloadFailed) {
+                    [self.player pause];
+                    [self showNetWorkPoorView];
+                }
             }
         }
     });
@@ -1219,12 +1234,21 @@ typedef enum : NSUInteger {
         if (_hasMoved) {
             if (NBPlayerControlTypeProgress == _controlType) {
                 float value = [self moveProgressControllWithTempPoint:touchPoint];
-                
                 _current = value;
-                
-                double ds = value/self.duration;
-                if (ds < self.loadedProgress) {
-                    __weak __typeof(self)weakSelf = self;
+                __weak __typeof(self)weakSelf = self;
+                if (isHLS ) {
+                    
+                    double persent = value/self.duration;
+                    if (persent < self.loadedProgress) {
+                        [self seekToTime:value completionHandler:^(BOOL finished) {
+                            __strong __typeof(weakSelf) strongSelf = weakSelf;
+                            
+                            [strongSelf monitoringPlayback:strongSelf.player.currentItem];
+                        }];
+                    }
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(value)}];
+                } else {
                     [self seekToTime:value completionHandler:^(BOOL finished) {
                         __strong __typeof(weakSelf) strongSelf = weakSelf;
                         
@@ -1235,9 +1259,6 @@ typedef enum : NSUInteger {
                 self.timeSheetView.hidden = YES;
                 [self updateCurrentTime:value];
                 [self updateVideoSlider:value];
-                if (isHLS ) {
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(value)}];
-                }
             }
         }
     }
@@ -1293,6 +1314,7 @@ typedef enum : NSUInteger {
             self.state = NBPlayerStateBuffering;
             self.actIndicator.hidden = NO;
             [self.actIndicator startAnimating];
+            [self.player play];
         } else {
             self.isPauseByUser = NO;
             [self.player play];
@@ -1314,15 +1336,23 @@ typedef enum : NSUInteger {
     _current = slider.value;
     [self.player pause];
     self.playSlider.selected = NO;
-    double ds = slider.value/slider.maximumValue;
-    if (ds < self.loadedProgress) {
-        __weak __typeof(self)weakSelf = self;
-        [self seekToTime:slider.value completionHandler:^(BOOL finished) {
+    __weak __typeof(self)weakSelf = self;
+    if (isHLS) {
+        double persent = slider.value/slider.maximumValue;
+        if (persent < self.loadedProgress) {
+            [self seekToTime:slider.value completionHandler:^(BOOL finished) {
+                __strong __typeof(weakSelf) strongSelf = weakSelf;
+                
+                [strongSelf monitoringPlayback:strongSelf.player.currentItem];
+            }];
+        }
+    } else {
+        [self seekToTime:_current completionHandler:^(BOOL finished) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
-            
             [strongSelf monitoringPlayback:strongSelf.player.currentItem];
         }];
     }
+    
     
     [self updateCurrentTime:slider.value];
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
@@ -1430,7 +1460,9 @@ typedef enum : NSUInteger {
 - (void)repeatPlay {
     _current = 0;
     [self showToolView];
-    [self resumeOrPause];
+    self.repeatBtn.hidden = YES;
+//    [self resumeOrPause];
+    [self playWithLocalUrl:_playUrl];
 }
 
 - (void)startPlay {
@@ -1708,7 +1740,11 @@ typedef enum : NSUInteger {
             str = [NSString stringWithFormat:@"%@", @"(_errorCode)"];
             break;
     }
-    
+    self.downloadFailed = YES;
+    self.errorLabel.text = str;
+    if (self.state == NBPlayerStateDefault) {
+        [self showNetWorkPoorView];
+    }
     NSLog(@"%@", str);
 }
 
