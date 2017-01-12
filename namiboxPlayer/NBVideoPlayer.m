@@ -57,6 +57,7 @@ typedef enum : NSUInteger {
     
     //网络播放地址
     NSURL *_playUrl;
+    NBPlayerCacheType _cacheType;
 }
 
 @property (nonatomic, strong)HTTPServer * httpServer;
@@ -319,6 +320,7 @@ typedef enum : NSUInteger {
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView cacheType:(NBPlayerCacheType)cacheType {
     
     _playUrl = url;
+    _cacheType = cacheType;
     
     if ([url.lastPathComponent hasSuffix:@".m3u8"]) {
         isHLS = YES;
@@ -432,6 +434,9 @@ typedef enum : NSUInteger {
     [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
     
     [self.resouerLoader.task clearData];
+    
+    [self.bottomProgress setProgress:0];
+    [self updateVideoSlider:0];
     
     // 播放结束
     if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
@@ -1460,7 +1465,8 @@ typedef enum : NSUInteger {
     [self showToolView];
     self.repeatBtn.hidden = YES;
 //    [self resumeOrPause];
-    [self playWithLocalUrl:_playUrl];
+    
+    [self playWithUrl:_playUrl showView:_showView cacheType:_cacheType];
 }
 
 - (void)startPlay {
