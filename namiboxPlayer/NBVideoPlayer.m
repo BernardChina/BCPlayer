@@ -185,9 +185,8 @@ typedef enum : NSUInteger {
     
     [self commonPlayerObserver];
     
-    // 显示loading
-    [self.actIndicator startAnimating];
-    self.actIndicator.hidden = NO;
+    // 边播边缓存或者不缓存，此时应该是buffering状态
+    self.state = NBPlayerStateBuffering;
     
 }
 
@@ -215,7 +214,7 @@ typedef enum : NSUInteger {
     
     [self commonPlayerObserver];
     
-//    self.state = NBPlayerStateWillPlay;
+    self.state = NBPlayerStateWillPlay;
 }
 
 // 缓存后播放
@@ -456,11 +455,11 @@ typedef enum : NSUInteger {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
             // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
-            
-            if (self.state != NBPlayerStatePlaying) {
-                [self.actIndicator startAnimating];
-                self.actIndicator.hidden = NO;
-            }
+            // 这个应该没有必要
+//            if (self.state != NBPlayerStatePlaying) {
+//                [self.actIndicator startAnimating];
+//                self.actIndicator.hidden = NO;
+//            }
             
             return;
         }
@@ -486,7 +485,7 @@ typedef enum : NSUInteger {
             }
             
             // 用户设置不是自动播放，应该显示播放按钮
-            self.state = NBPlayerStateWillPlay;
+            self.state = NBPlayerStateDefault;
             self.playBtn.hidden = NO;
             
             return;
@@ -497,7 +496,7 @@ typedef enum : NSUInteger {
     
     if ([NBVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
         if ([playerItem status] == AVPlayerStatusReadyToPlay) {
-            
+            NSLog(@"AVPlayerStatusReadyToPlay");
             [self createTimer];
             [self monitoringPlayback:playerItem];// 给播放器添加计时器
             
@@ -526,10 +525,8 @@ typedef enum : NSUInteger {
         if (playerItem.isPlaybackBufferEmpty) {
             NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
             self.state = NBPlayerStateBuffering;
-            if (!self.downloadFailed) {
-                [self.actIndicator startAnimating];
-                self.actIndicator.hidden = NO;
-            } else {
+            
+            if (self.downloadFailed) {
                 [self.player pause];
                 [self.actIndicator stopAnimating];
                 self.actIndicator.hidden = YES;
@@ -694,6 +691,9 @@ typedef enum : NSUInteger {
     if (state != NBPlayerStateBuffering) {
         [self.actIndicator stopAnimating];
         self.actIndicator.hidden = YES;
+    } else {
+        [self.actIndicator startAnimating];
+        self.actIndicator.hidden = NO;
     }
     
     if (_state == state) {
@@ -1312,8 +1312,6 @@ typedef enum : NSUInteger {
         
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             self.state = NBPlayerStateBuffering;
-            self.actIndicator.hidden = NO;
-            [self.actIndicator startAnimating];
             [self.player play];
         } else {
             self.isPauseByUser = NO;
@@ -1334,7 +1332,7 @@ typedef enum : NSUInteger {
 //手指结束拖动，播放器从当前点开始播放，开启滑竿的时间走动
 - (void)playSliderChangeEnd:(UISlider *)slider {
     _current = slider.value;
-    [self.player pause];
+//    [self.player pause];
     self.playSlider.selected = NO;
     __weak __typeof(self)weakSelf = self;
     if (isHLS) {
@@ -1525,6 +1523,7 @@ typedef enum : NSUInteger {
     [self toolViewHidden];
     self.m3u8Handler = nil;
     [self.httpServer stop];
+    self.resouerLoader = nil;
 }
 
 #pragma mark - 计算播放进度
@@ -1737,7 +1736,7 @@ typedef enum : NSUInteger {
             break;
             
         default:
-            str = [NSString stringWithFormat:@"%@", @"(_errorCode)"];
+            str = [NSString stringWithFormat:@"%ld", (long)errorCode];
             break;
     }
     self.downloadFailed = YES;
@@ -1815,7 +1814,7 @@ typedef enum : NSUInteger {
 #pragma mark - 对外的API
 
 - (void)play {
-    if (self.state == NBPlayerStateWillPlay) {
+    if (self.state == NBPlayerStateDefault) {
         [self startPlay];
     } else {
         [self resume];

@@ -187,4 +187,10 @@
     }
 }
 
+- (void)dealloc {
+    NSLog(@"NBLoaderURLSession dealloc");
+    [self.task cancel];
+    self.task = nil;
+}
+
 @end

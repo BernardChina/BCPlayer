@@ -37,7 +37,12 @@
     if (self) {
         _taskArr = [NSMutableArray array];
         _tempPath = [cachePathForVideo stringByAppendingPathComponent:@"temp.mp4"];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
+            [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
+            [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
+            
+        } else {
             [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
         }
         
@@ -79,6 +84,8 @@
 }
 
 - (void)cancel {
+    [self.task cancel];
+    self.task = nil;
     [self.session invalidateAndCancel];
     self.session = nil;
 }
@@ -172,7 +179,11 @@
     //请求超时：-1001
     //服务器内部错误：-1004
     //找不到服务器：-1003
-    [self.taskArr removeObject:session];
+    //cancelled -999,手动调用了cancel
+//    [self.taskArr removeObject:session];
+    if (error.code == -999) {
+        return;
+    }
     static int refreshCount = 0;
     if (refreshCount < 3) {      //网络超时，重连一次
         NSLog(@"重试下载");

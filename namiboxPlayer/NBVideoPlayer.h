@@ -67,18 +67,15 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
  */
 - (void)makePalyerMute:(BOOL)isMute;
 
-
 /**
- 开始播放，第一次播放
+ 播放
  */
-- (void)startPlay;
-
 - (void)play;
 
 /**
  * 恢复播放。在播放过程中，暂停了播放调用了pause，此时调用resume，可以恢复播放
  */
-- (void)resume;
+//- (void)resume;
 
 /**
  *  暂停播放
@@ -86,7 +83,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 - (void)pause;
 
 /**
- *  停止播放
+ *  停止播放，并进行释放player
  */
 - (void)stop;
 
