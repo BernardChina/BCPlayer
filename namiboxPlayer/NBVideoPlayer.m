@@ -436,6 +436,7 @@ typedef enum : NSUInteger {
     
     [self.bottomProgress setProgress:0];
     [self updateVideoSlider:0];
+    [self.videoProgressView setProgress:0];
     
     // 播放结束
     if (self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:didCompleteWithError:)]) {
@@ -506,7 +507,12 @@ typedef enum : NSUInteger {
             [self createTimer];
             [self monitoringPlayback:playerItem];// 给播放器添加计时器
             
-            self.state = NBPlayerStatePlaying;
+            if (self.autoPlay && self.state != NBPlayerStatePause) {
+                [self.player play];
+                self.state = NBPlayerStatePlaying;
+            } else {
+                self.playBtn.hidden = NO;
+            }
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
             [self stop];
@@ -577,12 +583,6 @@ typedef enum : NSUInteger {
     
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
-    
-    if (self.autoPlay && self.state != NBPlayerStatePause) {
-        [self.player play];
-    } else {
-        self.playBtn.hidden = NO;
-    }
     
     __weak __typeof(self)weakSelf = self;
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
@@ -701,7 +701,7 @@ typedef enum : NSUInteger {
         return;
     }
     
-    if (_loadedProgress >= 1 && self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withCacheSuccess:)]) {
+    if (loadedProgress >= 1 && self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withCacheSuccess:)]) {
         [self.delegate NBVideoPlayer:self withCacheSuccess:YES];
     }
     
@@ -864,7 +864,7 @@ typedef enum : NSUInteger {
             make.width.equalTo(@(50));
             make.height.equalTo(@(50));
         }];
-        [_playBtn addTarget:self action:@selector(startPlay) forControlEvents:UIControlEventTouchUpInside];
+        [_playBtn addTarget:self action:@selector(play) forControlEvents:UIControlEventTouchUpInside];
         _playBtn.hidden = YES;
     }
     return _playBtn;
@@ -1336,6 +1336,8 @@ typedef enum : NSUInteger {
         
         NSLog(@"是否结束：%@",@"完成");
         
+        self.state = NBPlayerStatePlaying;
+        
         if (!self.currentPlayerItem.isPlaybackLikelyToKeepUp) {
             self.state = NBPlayerStateBuffering;
             [self.player play];
@@ -1346,14 +1348,14 @@ typedef enum : NSUInteger {
         
         if (self.downloadFailed) {
             [self showNetWorkPoorView];
-            [self.player pause];
+            [self pause];
         }
         
         if (completionHandler) {
             completionHandler(finished);
         }
         if (!self.autoPlay) {
-            [self.player pause];
+            [self pause];
         }
     }];
 }
@@ -1495,7 +1497,6 @@ typedef enum : NSUInteger {
 
 - (void)startPlay {
     _current = 0;
-    self.autoPlay = YES;
     _playBtn.hidden = YES;
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
@@ -1844,11 +1845,14 @@ typedef enum : NSUInteger {
 #pragma mark - 对外的API
 
 - (void)play {
+    self.playBtn.hidden = YES;
+    self.autoPlay = YES;
     if (self.state == NBPlayerStateDefault) {
         [self startPlay];
     } else {
         [self resume];
     }
+    self.state = NBPlayerStatePlaying;
 }
 
 - (void)makePalyerMute:(BOOL)isMute {

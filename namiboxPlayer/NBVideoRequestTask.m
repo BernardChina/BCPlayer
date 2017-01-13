@@ -131,11 +131,11 @@
 //服务器返回数据 可能会调用多次
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     
-    NSLog(@"接受到数据didReceiveData: %@",dataTask);
+//    NSLog(@"接受到数据didReceiveData: %@",dataTask);
     [self.fileHandle seekToEndOfFile];
     
     [self.fileHandle writeData:data];
-    NSLog(@"接受多少: %lu",(unsigned long)data.length);
+//    NSLog(@"接受多少: %lu",(unsigned long)data.length);
     _downLoadingOffset += data.length;
     
     if ([self.delegate respondsToSelector:@selector(didReciveVideoDataWithTask:)]) {
@@ -181,6 +181,7 @@
     //找不到服务器：-1003
     //cancelled -999,手动调用了cancel
 //    [self.taskArr removeObject:session];
+    
     if (error.code == -999) {
         return;
     }
