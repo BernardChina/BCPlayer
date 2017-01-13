@@ -29,4 +29,12 @@
  */
 - (void)NBVideoPlayer:(NBVideoPlayer *)player withProgress:(double)progress currentTime:(double)current totalTime:(double)totalTime;
 
+/**
+ 缓存是否完成成功
+ 
+ @param player 当前的palyer
+ @param success 是否成功
+ */
+- (void)NBVideoPlayer:(NBVideoPlayer *)player withCacheSuccess:(BOOL)success;
+
 @end

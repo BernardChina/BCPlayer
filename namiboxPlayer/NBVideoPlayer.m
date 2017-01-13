@@ -76,7 +76,6 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, weak  ) UIView         *showView;
 @property (nonatomic, assign) CGRect         showViewRect;            //视频展示ViewRect
-//@property (nonatomic, strong) NBPlayerView  *playerView;
 @property (nonatomic, strong) UIView         *touchView;              //事件响应View
 
 @property (nonatomic, strong) UIView         *statusBarBgView;        //全屏状态栏的背景view
@@ -193,10 +192,10 @@ typedef enum : NSUInteger {
 
 // 播放本地视频
 - (void)playWithLocalUrl:(NSURL *)url {
-    if (!self.autoPlay) {
-        self.playBtn.hidden = NO;
-        return;
-    }
+//    if (!self.autoPlay) {
+//        self.playBtn.hidden = NO;
+//        return;
+//    }
     [self removeCommonPlayerObserver];
     
     if (isHLS) {
@@ -460,6 +459,8 @@ typedef enum : NSUInteger {
         if ([object isEqual:self.downloadSession] && [keyPath isEqualToString:@"downloadProgress"]) {
             // 更改进度
             [self.videoProgressView setProgress:[[change objectForKey:NSKeyValueChangeNewKey] floatValue] animated:YES];
+            self.loadedProgress = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
+            
             // 这个应该没有必要
 //            if (self.state != NBPlayerStatePlaying) {
 //                [self.actIndicator startAnimating];
@@ -547,6 +548,10 @@ typedef enum : NSUInteger {
         if (playerItem.isPlaybackLikelyToKeepUp) {
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
+            
+            if (self.autoPlay && self.state != NBPlayerStatePause) {
+                self.state = NBPlayerStatePlaying;
+            }
         }
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
         CGSize size = self.currentPlayerItem.presentationSize;
@@ -569,9 +574,15 @@ typedef enum : NSUInteger {
     if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
         self.duration = durationWithHLS;
     }
-    [self.player play];
+    
     [self updateTotolTime:self.duration];
     [self setPlaySliderValue:self.duration];
+    
+    if (self.autoPlay && self.state != NBPlayerStatePause) {
+        [self.player play];
+    } else {
+        self.playBtn.hidden = NO;
+    }
     
     __weak __typeof(self)weakSelf = self;
     // addPeriodicTimeObserverForInterval. 请求在回放期间周期性调用给定块以报告改变时间
@@ -608,9 +619,10 @@ typedef enum : NSUInteger {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(current)}];
         }
         
-        if (strongSelf.isPauseByUser == NO) {
-            strongSelf.state = NBPlayerStatePlaying;
-        }
+//        if (strongSelf.isPauseByUser == NO) {
+//            NSLog(@"ddddddddddddddd");
+//            strongSelf.state = NBPlayerStatePlaying;
+//        }
         
         // 不相等的时候才更新，并发通知，否则seek时会继续跳动
         if (strongSelf.current != current) {
@@ -687,6 +699,10 @@ typedef enum : NSUInteger {
 - (void)setLoadedProgress:(CGFloat)loadedProgress {
     if (_loadedProgress == loadedProgress) {
         return;
+    }
+    
+    if (_loadedProgress >= 1 && self.delegate && [self.delegate respondsToSelector:@selector(NBVideoPlayer:withCacheSuccess:)]) {
+        [self.delegate NBVideoPlayer:self withCacheSuccess:YES];
     }
     
     _loadedProgress = loadedProgress;
@@ -842,8 +858,12 @@ typedef enum : NSUInteger {
 - (UIButton *)playBtn {
     if (!_playBtn) {
         _playBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_playBtn setTitle:@"点击屏幕，开始播放" forState:UIControlStateNormal];
-        [_playBtn.titleLabel setFont:[UIFont systemFontOfSize:12]];
+        _playBtn.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+        [_playBtn setImage:[UIImage imageNamed:NBImageName(@"play2")] forState:UIControlStateNormal];        [_playBtn.imageView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.center.equalTo(_playBtn);
+            make.width.equalTo(@(50));
+            make.height.equalTo(@(50));
+        }];
         [_playBtn addTarget:self action:@selector(startPlay) forControlEvents:UIControlEventTouchUpInside];
         _playBtn.hidden = YES;
     }
@@ -963,6 +983,7 @@ typedef enum : NSUInteger {
         make.width.mas_equalTo(52);
         make.height.mas_equalTo(44);
     }];
+    [self updateCurrentTime:0];
     
     // 总共播放时间
     [self.totalTimeLbl removeFromSuperview];
@@ -1330,6 +1351,9 @@ typedef enum : NSUInteger {
         
         if (completionHandler) {
             completionHandler(finished);
+        }
+        if (!self.autoPlay) {
+            [self.player pause];
         }
     }];
 }
