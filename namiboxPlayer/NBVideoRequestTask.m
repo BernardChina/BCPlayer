@@ -95,6 +95,8 @@
 //服务器响应
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
     
+    NSLog(@"返回的状态：%@",response);
+    
     _isFinishLoad = NO;
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
     
@@ -181,7 +183,7 @@
     //找不到服务器：-1003
     //cancelled -999,手动调用了cancel
 //    [self.taskArr removeObject:session];
-    
+    NSLog(@"error code :%ld",(long)error.code);
     if (error.code == -999) {
         return;
     }

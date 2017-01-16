@@ -41,9 +41,10 @@
  *
  */
 - (BOOL)resourceLoader:(AVAssetResourceLoader *)resourceLoader shouldWaitForLoadingOfRequestedResource:(AVAssetResourceLoadingRequest *)loadingRequest {
+    NSLog(@"----loadingRequest----:%@", loadingRequest);
     [self.pendingRequests addObject:loadingRequest];
     [self dealWithLoadingRequest:loadingRequest];
-    NSLog(@"----loadingRequest----:%@", loadingRequest);
+    
     return YES;
 }
 
@@ -148,7 +149,7 @@
             // 如果往回拖也重新请求
             range.location < self.task.offset) {
             [self.task setUrl:interceptedURL offset:range.location];
-            NSLog(@"%@",loadingRequest);
+            
             NSLog(@"%@",@"删掉了taskarr");
         }
     }

@@ -107,6 +107,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, strong) NBPlayerM3U8Handler *m3u8Handler;
 @property (nonatomic, assign) BOOL playFinished;
 @property (nonatomic, assign) BOOL downloadFailed;
+@property (nonatomic, assign) BOOL requestFailed;
 
 @property (nonatomic, assign) NSInteger nextTs; // 只有解析失败的时候，才会记录
 
@@ -450,6 +451,15 @@ typedef enum : NSUInteger {
     NSLog(@"buffing----buffing");
     [self.actIndicator startAnimating];
     self.actIndicator.hidden = NO;
+    
+    if (self.downloadFailed) {
+        [self.player pause];
+        
+        self.state = NBPlayerStateFailed;
+        [self showNetWorkPoorView];
+        return;
+    }
+    
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -536,21 +546,23 @@ typedef enum : NSUInteger {
         if (playerItem.isPlaybackBufferEmpty) {
             NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
             self.state = NBPlayerStateBuffering;
+//            [self.stopButton setSelected:YES];
             
-            if (self.downloadFailed) {
-                [self.player pause];
-                [self.actIndicator stopAnimating];
-                self.actIndicator.hidden = YES;
-                [self showNetWorkPoorView];
-                return;
-            }
+//            if (self.downloadFailed) {
+//                [self.player pause];
+//                [self.actIndicator stopAnimating];
+//                self.actIndicator.hidden = YES;
+//                [self showNetWorkPoorView];
+//                return;
+//            }
             
             [self bufferingSomeSecond];
         }
     } else if ([NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath isEqualToString:keyPath]) {
          //playbackLikelyToKeepUp. 指示项目是否可能无阻塞地播放。;
-        NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
+        
         if (playerItem.isPlaybackLikelyToKeepUp) {
+            NSLog(@"NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath");
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
@@ -654,6 +666,18 @@ typedef enum : NSUInteger {
     CGFloat totalDuration = CMTimeGetSeconds(duration);
     if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
         self.duration = durationWithHLS;
+    }
+    
+    if (playerItem.isPlaybackLikelyToKeepUp) {
+        NSLog(@"可以播放");
+    }
+    
+    NSLog(@"%lld %d",playerItem.currentTime.value/playerItem.currentTime.timescale,(int)timeInterval);
+    if (_current < timeInterval) {
+//        [_player play];
+//        NSLog(@"可以播放");
+    } else {
+        NSLog(@"不可以播放了");
     }
     self.loadedProgress = timeInterval / totalDuration;
     [self.videoProgressView setProgress:timeInterval / totalDuration animated:NO];
@@ -830,8 +854,8 @@ typedef enum : NSUInteger {
         _stopButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_stopButton addTarget:self action:@selector(resumeOrPause) forControlEvents:UIControlEventTouchUpInside];
         
-        [_stopButton setBackgroundImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-        [_stopButton setBackgroundImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateSelected];
+        [_stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
+        [_stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateSelected];
     }
     return _stopButton;
 }
@@ -889,6 +913,15 @@ typedef enum : NSUInteger {
 - (UIActivityIndicatorView *)actIndicator {
     if (!_actIndicator) {
         _actIndicator = [[UIActivityIndicatorView alloc]init];
+        UILabel *label = [[UILabel alloc] init];
+        [_actIndicator addSubview:label];
+        [label mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(_actIndicator).offset(44);
+            make.left.right.bottom.equalTo(_actIndicator);
+        }];
+        [label setFont:[UIFont systemFontOfSize:12]];
+        label.textAlignment = NSTextAlignmentCenter;
+        label.text = @"正在加载, 请稍等";
     }
     return _actIndicator;
 }
@@ -959,10 +992,10 @@ typedef enum : NSUInteger {
     [self.stopButton removeFromSuperview];
     [self.toolView addSubview:self.stopButton];
     [self.stopButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(10);
-        make.centerY.equalTo(self.toolView);
-        make.width.mas_equalTo(20);
-        make.height.mas_equalTo(20);
+        make.top.mas_equalTo(0);
+        make.left.mas_equalTo(0);
+        make.width.mas_equalTo(44);
+        make.height.mas_equalTo(44);
     }];
     
     [self.screenButton removeFromSuperview];
@@ -1027,8 +1060,8 @@ typedef enum : NSUInteger {
     [self.actIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.playerView);
         make.centerY.equalTo(self.playerView);
-        make.width.mas_equalTo(44);
-        make.height.mas_equalTo(44);
+        make.width.mas_equalTo(144);
+        make.height.mas_equalTo(144);
     }];
     
     [self.touchView removeFromSuperview];
@@ -1137,6 +1170,10 @@ typedef enum : NSUInteger {
     [self hideNetWorkPoorView];
     
     if (self.state == NBPlayerStateFailed) {
+        if (self.requestFailed) {
+            [self.resouerLoader.task continueLoading];
+            return;
+        }
         [self playWithNoCache:_playUrl];
         return;
     }
@@ -1461,7 +1498,7 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
-    if (self.state == NBPlayerStatePlaying) {
+    if (self.state == NBPlayerStatePlaying || self.state == NBPlayerStateBuffering) {
         [self.stopButton setSelected:YES];
         [self.player pause];
         self.state = NBPlayerStatePause;
@@ -1765,8 +1802,9 @@ typedef enum : NSUInteger {
             break;
     }
     self.downloadFailed = YES;
+    self.requestFailed = YES;
     self.errorLabel.text = str;
-    if (self.state == NBPlayerStateDefault) {
+    if (self.state == NBPlayerStateDefault || self.state == NBPlayerStateBuffering) {
         [self showNetWorkPoorView];
     }
     NSLog(@"%@", str);
