@@ -429,8 +429,7 @@ typedef enum : NSUInteger {
     self.repeatBtn.hidden = NO;
     [self toolViewHidden];
     self.state = NBPlayerStateFinish;
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
+    [self.stopButton setSelected:YES];
     
     [self.resouerLoader.task clearData];
     
@@ -748,6 +747,7 @@ typedef enum : NSUInteger {
     if (!_toolView) {
         _toolView = [[UIView alloc]init];
         _toolView.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
+        _toolView.hidden = YES;
     }
     return _toolView;
 }
@@ -829,8 +829,9 @@ typedef enum : NSUInteger {
     if (!_stopButton) {
         _stopButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_stopButton addTarget:self action:@selector(resumeOrPause) forControlEvents:UIControlEventTouchUpInside];
-        [_stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-        [_stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
+        
+        [_stopButton setBackgroundImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
+        [_stopButton setBackgroundImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateSelected];
     }
     return _stopButton;
 }
@@ -958,10 +959,10 @@ typedef enum : NSUInteger {
     [self.stopButton removeFromSuperview];
     [self.toolView addSubview:self.stopButton];
     [self.stopButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.mas_equalTo(0);
-        make.left.mas_equalTo(0);
-        make.width.mas_equalTo(44);
-        make.height.mas_equalTo(44);
+        make.left.mas_equalTo(10);
+        make.centerY.equalTo(self.toolView);
+        make.width.mas_equalTo(20);
+        make.height.mas_equalTo(20);
     }];
     
     [self.screenButton removeFromSuperview];
@@ -1384,8 +1385,6 @@ typedef enum : NSUInteger {
     
     
     [self updateCurrentTime:slider.value];
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
     
     if (isHLS ) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kNBPlayerCurrentTimeChangedNofification object:nil userInfo:@{@"currentTime":@(slider.value)}];
@@ -1463,20 +1462,17 @@ typedef enum : NSUInteger {
         return;
     }
     if (self.state == NBPlayerStatePlaying) {
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
+        [self.stopButton setSelected:YES];
         [self.player pause];
         self.state = NBPlayerStatePause;
     } else if (self.state == NBPlayerStatePause) {
         self.repeatBtn.hidden = YES;
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
+        [self.stopButton setSelected:NO];
         [self.player play];
         self.state = NBPlayerStatePlaying;
     } else if (self.state == NBPlayerStateFinish) {
         self.repeatBtn.hidden = YES;
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-        [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
+        [self.stopButton setSelected:NO];
         [self seekToTime:0.0 completionHandler:nil];
         self.state = NBPlayerStatePlaying;
     }
@@ -1490,7 +1486,7 @@ typedef enum : NSUInteger {
     _current = 0;
     [self showToolView];
     self.repeatBtn.hidden = YES;
-//    [self resumeOrPause];
+    [self.stopButton setSelected:NO];
     
     [self playWithUrl:_playUrl showView:_showView cacheType:_cacheType];
 }
@@ -1519,11 +1515,10 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
-    
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause")] forState:UIControlStateNormal];
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_pause_hl")] forState:UIControlStateHighlighted];
+    [self.stopButton setSelected:NO];
     self.isPauseByUser = NO;
     [self.player play];
+    self.state = NBPlayerStatePlaying;
 }
 
 /**
@@ -1533,8 +1528,7 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play")] forState:UIControlStateNormal];
-    [self.stopButton setImage:[UIImage imageNamed:NBImageName(@"icon_play_hl")] forState:UIControlStateHighlighted];
+    [self.stopButton setSelected:YES];
     self.isPauseByUser = YES;
     self.state = NBPlayerStatePause;
     [self.player pause];
@@ -1853,6 +1847,8 @@ typedef enum : NSUInteger {
         [self resume];
     }
     self.state = NBPlayerStatePlaying;
+    
+    [self showToolView];
 }
 
 - (void)makePalyerMute:(BOOL)isMute {
