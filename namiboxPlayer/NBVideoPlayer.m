@@ -399,15 +399,13 @@ typedef enum : NSUInteger {
 
 - (void)appDidEnterBackground {
     if (self.stopInBackground) {
-        [self pause];
-        self.state = NBPlayerStatePause;
+        [self.player pause];
         self.isPauseByUser = NO;
     }
 }
 - (void)appDidEnterPlayGround {
     if (!self.isPauseByUser) {
-        [self resume];
-        self.state = NBPlayerStatePlaying;
+        self.playBtn.hidden = YES;
     }
 }
 
