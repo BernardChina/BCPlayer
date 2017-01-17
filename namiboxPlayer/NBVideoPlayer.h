@@ -30,7 +30,7 @@ typedef NS_ENUM(NSInteger, NBPlayerState) {
 @property (nonatomic, readonly) NBPlayerState  state;                   //视频Player状态
 @property (nonatomic, readonly) NSURL *playUrl;
 @property (nonatomic, readonly) CGFloat        loadedProgress;          //缓冲的进度
-@property (nonatomic, readonly) CGFloat        duration;                //视频总时间
+@property (nonatomic, readonly) double        duration;                //视频总时间
 @property (nonatomic, readonly) double        current;                 //当前播放时间
 //@property (nonatomic, readonly) CGFloat        progress;                //播放进度0~1之间
 @property (nonatomic, strong) NBPlayerView  *playerView;

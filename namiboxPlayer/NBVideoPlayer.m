@@ -64,7 +64,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, assign) NBPlayerState state;
 @property (nonatomic, assign) CGFloat        loadedProgress;
-@property (nonatomic, assign) CGFloat        duration;
+@property (nonatomic, assign) double        duration;
 @property (nonatomic, assign) double        current;
 
 @property (nonatomic, strong) AVURLAsset     *videoURLAsset;
@@ -585,7 +585,7 @@ typedef enum : NSUInteger {
 - (void)monitoringPlayback:(AVPlayerItem *)playerItem {
     NSLog(@"添加了monitoringPlayback");
     // playerItem.duration. 表示项目媒体的持续时间
-    self.duration = playerItem.duration.value / playerItem.duration.timescale; //视频总时间
+    self.duration = (double)playerItem.duration.value / (double)playerItem.duration.timescale; //视频总时间
     if (isHLS && currentCacheType == NBPlayerCacheTypePlayWithCache) {
         self.duration = durationWithHLS;
     }
