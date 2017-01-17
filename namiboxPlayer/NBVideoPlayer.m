@@ -428,6 +428,7 @@ typedef enum : NSUInteger {
     self.repeatBtn.hidden = NO;
     [self toolViewHidden];
     self.state = NBPlayerStateFinish;
+    self.isPauseByUser = NO;
     [self.stopButton setSelected:YES];
     
     [self.resouerLoader.task clearData];
@@ -511,15 +512,16 @@ typedef enum : NSUInteger {
     if ([NBVideoPlayerItemStatusKeyPath isEqualToString:keyPath]) {
         if ([playerItem status] == AVPlayerStatusReadyToPlay) {
             NSLog(@"AVPlayerStatusReadyToPlay");
+            
             [self createTimer];
             [self monitoringPlayback:playerItem];// 给播放器添加计时器
             
-            if (self.autoPlay && self.state != NBPlayerStatePause) {
-                [self.player play];
-                self.state = NBPlayerStatePlaying;
-            } else {
-                self.playBtn.hidden = NO;
-            }
+//            if (self.autoPlay && self.state != NBPlayerStatePause) {
+//                [self.player play];
+//                self.state = NBPlayerStatePlaying;
+//            } else {
+//                self.playBtn.hidden = NO;
+//            }
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
             [self stop];
@@ -565,7 +567,10 @@ typedef enum : NSUInteger {
             self.actIndicator.hidden = YES;
             
             if (self.autoPlay && self.state != NBPlayerStatePause) {
+                [self.player play];
                 self.state = NBPlayerStatePlaying;
+            } else {
+                self.playBtn.hidden = NO;
             }
         }
     } else if ([NBVideoPlayerItemPresentationSizeKeyPath isEqualToString:keyPath]) {
@@ -579,6 +584,13 @@ typedef enum : NSUInteger {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
         
         _canFullScreen = YES;
+    } else if([keyPath isEqualToString:@"rate"]) {
+        if (self.player.rate != 0) {
+            NSLog(@"正在playing");
+            
+        } else {
+            NSLog(@"还不能");
+        }
     }
 }
 
@@ -911,6 +923,7 @@ typedef enum : NSUInteger {
 - (UIActivityIndicatorView *)actIndicator {
     if (!_actIndicator) {
         _actIndicator = [[UIActivityIndicatorView alloc]init];
+        _actIndicator.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
         UILabel *label = [[UILabel alloc] init];
         [_actIndicator addSubview:label];
         [label mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -919,6 +932,7 @@ typedef enum : NSUInteger {
         }];
         [label setFont:[UIFont systemFontOfSize:12]];
         label.textAlignment = NSTextAlignmentCenter;
+        label.textColor = [UIColor whiteColor];
         label.text = @"正在加载, 请稍等";
     }
     return _actIndicator;
@@ -1058,8 +1072,8 @@ typedef enum : NSUInteger {
     [self.actIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.playerView);
         make.centerY.equalTo(self.playerView);
-        make.width.mas_equalTo(144);
-        make.height.mas_equalTo(144);
+        make.width.mas_equalTo(100);
+        make.height.mas_equalTo(70);
     }];
     
     [self.touchView removeFromSuperview];
@@ -1691,6 +1705,12 @@ typedef enum : NSUInteger {
     [self unmonitoringPlayback];
     
     self.currentPlayerItem = nil;
+    
+    if (!self.player) {
+        return;
+    }
+    
+    [self.player removeObserver:self forKeyPath:@"rate"];
 }
 
 - (void)releasePlayer {
@@ -1715,6 +1735,8 @@ typedef enum : NSUInteger {
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPlaybackLikelyToKeepUpKeyPath options:NSKeyValueObservingOptionNew context:nil];
     // presentationSize. 播放器呈现的大小size
     [self.currentPlayerItem addObserver:self forKeyPath:NBVideoPlayerItemPresentationSizeKeyPath options:NSKeyValueObservingOptionNew context:nil];
+    
+    [self.player addObserver:self forKeyPath:@"rate" options:NSKeyValueObservingOptionNew context:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterPlayGround) name:UIApplicationDidBecomeActiveNotification object:nil];
@@ -1805,7 +1827,7 @@ typedef enum : NSUInteger {
     if (self.state == NBPlayerStateDefault || self.state == NBPlayerStateBuffering) {
         [self showNetWorkPoorView];
     }
-    NSLog(@"%@", str);
+    NSLog(@"失败了失败了%@", str);
 }
 
 #pragma mark - 通知中心检测到屏幕旋转

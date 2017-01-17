@@ -95,7 +95,7 @@
 //服务器响应
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
     
-    NSLog(@"返回的状态：%@",response);
+//    NSLog(@"返回的状态：%@",response);
     
     _isFinishLoad = NO;
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
