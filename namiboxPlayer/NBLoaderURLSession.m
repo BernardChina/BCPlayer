@@ -134,6 +134,10 @@
     NSURL *interceptedURL = [loadingRequest.request URL];
     NSRange range = NSMakeRange((NSUInteger)loadingRequest.dataRequest.currentOffset, NSUIntegerMax);
     
+    if (self.task && self.task.loadingRequest && !_isDrag) {
+        return;
+    }
+    
     if (self.task.downLoadingOffset > 0) {
         [self processPendingRequests];
     }
@@ -142,12 +146,14 @@
         self.task = [[NBVideoRequestTask alloc] init];
         self.task.delegate = self;
         self.task.url = self.url;
+        self.task.loadingRequest = loadingRequest;
         [self.task setUrl:interceptedURL offset:0];
     } else {
         // 如果新的rang的起始位置比当前缓存的位置还大300k，则重新按照range请求数据
         if (self.task.offset + self.task.downLoadingOffset + 1024 * 300 < range.location ||
             // 如果往回拖也重新请求
             range.location < self.task.offset) {
+            self.task.loadingRequest = loadingRequest;
             [self.task setUrl:interceptedURL offset:range.location];
             
             NSLog(@"%@",@"删掉了taskarr");
@@ -177,6 +183,8 @@
 }
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
+    NSLog(@"下载成功了");
+    task.loadingRequest = nil;
     if ([self.loaderURLSessionDelegate respondsToSelector:@selector(didFinishLoadingWithTask:)]) {
         [self.loaderURLSessionDelegate didFinishLoadingWithTask:task];
     }

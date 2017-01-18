@@ -108,6 +108,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL playFinished;
 @property (nonatomic, assign) BOOL downloadFailed;
 @property (nonatomic, assign) BOOL requestFailed;
+@property (nonatomic, assign) BOOL canTapTouchView;
 
 @property (nonatomic, assign) NSInteger nextTs; // 只有解析失败的时候，才会记录
 
@@ -338,6 +339,7 @@ typedef enum : NSUInteger {
     
     self.isPauseByUser = NO;
     self.loadedProgress = 0;
+    self.canTapTouchView = NO;
     self.duration = 0;
     self.current  = 0;
     
@@ -598,9 +600,11 @@ typedef enum : NSUInteger {
     } else if([keyPath isEqualToString:@"rate"]) {
         if (self.player.rate != 0) {
             NSLog(@"正在playing");
-            
+            self.canTapTouchView = YES;
+            self.state = NBPlayerStatePlaying;
         } else {
             NSLog(@"还不能");
+            self.state = NBPlayerStateBuffering;
         }
     }
 }
@@ -1177,6 +1181,9 @@ typedef enum : NSUInteger {
 #pragma mark - 手势Action
 
 - (void)tapAction:(UITapGestureRecognizer *)tap{
+    if (!self.canTapTouchView) {
+        return;
+    }
     //点击一次
     if (tap.numberOfTapsRequired == 1) {
         if (self.toolView.hidden) {
@@ -1341,6 +1348,7 @@ typedef enum : NSUInteger {
                         
                         [strongSelf monitoringPlayback:strongSelf.player.currentItem];
                     }];
+                    self.resouerLoader.isDrag = YES;
                 }
                 
                 self.timeSheetView.hidden = YES;
@@ -1441,6 +1449,7 @@ typedef enum : NSUInteger {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
             [strongSelf monitoringPlayback:strongSelf.player.currentItem];
         }];
+        self.resouerLoader.isDrag = YES;
     }
     
     

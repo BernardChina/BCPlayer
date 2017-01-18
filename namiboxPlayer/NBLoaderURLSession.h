@@ -23,6 +23,7 @@
 @property (nonatomic, copy) NSString *playCachePath;
 @property (nonatomic, strong) NBVideoRequestTask *task;
 @property (nonatomic, weak  ) id<NBLoaderURLSessionDelegate> loaderURLSessionDelegate;
+@property (nonatomic, assign) BOOL isDrag;
 - (NSURL *)getSchemeVideoURL:(NSURL *)url;
 
 @end

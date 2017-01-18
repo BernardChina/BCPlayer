@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 
 @class NBVideoRequestTask;
 
@@ -30,7 +31,11 @@
 @property (nonatomic, readonly)         NSString      *mimeType;
 @property (nonatomic, assign)           BOOL          isFinishLoad;
 
+@property (nonatomic, strong) AVAssetResourceLoadingRequest *loadingRequest;
+
+
 @property (nonatomic, weak)             id<NBVideoRequestTaskDelegate> delegate;
+
 
 - (void)setUrl:(NSURL *)url offset:(NSUInteger)offset;
 
