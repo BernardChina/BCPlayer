@@ -318,7 +318,9 @@ typedef enum : NSUInteger {
     }
 }
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView cacheType:(NBPlayerCacheType)cacheType {
-    
+    if ([_playUrl isEqual:url]) {
+        return;
+    }
     _playUrl = url;
     _cacheType = cacheType;
     
@@ -399,13 +401,21 @@ typedef enum : NSUInteger {
 
 - (void)appDidEnterBackground {
     if (self.stopInBackground) {
-        [self.player pause];
-        self.isPauseByUser = NO;
+        NSLog(@"当前状态appDidEnterBackground：%ld",(long)self.state);
+        if (self.state == NBPlayerStatePlaying) {
+            NSLog(@"appDidEnterBackgroundappDidEnterBackground");
+            [self resumeOrPause];
+            self.isPauseByUser = NO;
+        }
     }
 }
 - (void)appDidEnterPlayGround {
-    if (!self.isPauseByUser) {
-        self.playBtn.hidden = YES;
+    NSLog(@"当前状态appDidEnterPlayGround：%ld",(long)self.state);
+    if (self.state == NBPlayerStateFinish) {
+        return;
+    }
+    if (self.state == NBPlayerStatePlaying || !self.isPauseByUser) {
+        [self resumeOrPause];
     }
 }
 
@@ -425,7 +435,8 @@ typedef enum : NSUInteger {
         return;
     }
     
-    self.repeatBtn.hidden = NO;
+//    self.repeatBtn.hidden = NO;
+    self.playBtn.hidden = NO;
     [self toolViewHidden];
     self.state = NBPlayerStateFinish;
     self.isPauseByUser = NO;
@@ -566,7 +577,7 @@ typedef enum : NSUInteger {
             [self.actIndicator stopAnimating];
             self.actIndicator.hidden = YES;
             
-            if (self.autoPlay && self.state != NBPlayerStatePause) {
+            if (self.autoPlay && self.state != NBPlayerStatePause && self.state != NBPlayerStateFinish) {
                 [self.player play];
                 self.state = NBPlayerStatePlaying;
             } else {
@@ -1510,22 +1521,29 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
-    if (self.state == NBPlayerStatePlaying || self.state == NBPlayerStateBuffering) {
+    self.isPauseByUser = NO;
+    
+    if (self.state == NBPlayerStatePlaying ) {
         [self.stopButton setSelected:YES];
         [self.player pause];
+        self.isPauseByUser = YES;
+        self.playBtn.hidden = NO;
         self.state = NBPlayerStatePause;
-    } else if (self.state == NBPlayerStatePause) {
+    } else if (self.state == NBPlayerStatePause || self.state == NBPlayerStateWillPlay || self.state == NBPlayerStateBuffering) {
         self.repeatBtn.hidden = YES;
         [self.stopButton setSelected:NO];
         [self.player play];
         self.state = NBPlayerStatePlaying;
+        self.playBtn.hidden = YES;
     } else if (self.state == NBPlayerStateFinish) {
         self.repeatBtn.hidden = YES;
         [self.stopButton setSelected:NO];
         [self seekToTime:0.0 completionHandler:nil];
         self.state = NBPlayerStatePlaying;
+        self.playBtn.hidden = YES;
+        _current = 0;
     }
-    self.isPauseByUser = YES;
+    
 }
 
 /**
@@ -1902,7 +1920,8 @@ typedef enum : NSUInteger {
     if (self.state == NBPlayerStateDefault) {
         [self startPlay];
     } else {
-        [self resume];
+//        [self resume];
+        [self resumeOrPause];
     }
     self.state = NBPlayerStatePlaying;
     
