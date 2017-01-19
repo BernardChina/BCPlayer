@@ -941,7 +941,12 @@ typedef enum : NSUInteger {
 - (UIActivityIndicatorView *)actIndicator {
     if (!_actIndicator) {
         _actIndicator = [[UIActivityIndicatorView alloc]init];
+        _actIndicator.layer.cornerRadius = 10;
         _actIndicator.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.5];
+        _actIndicator.layer.shadowColor = [UIColor blackColor].CGColor;//shadowColor阴影颜色
+        _actIndicator.layer.shadowOffset = CGSizeMake(5,5);
+        _actIndicator.layer.shadowOpacity = 0.5;//阴影透明度，默认0
+        _actIndicator.layer.shadowRadius = 4;//阴影半径，默认3
         UILabel *label = [[UILabel alloc] init];
         [_actIndicator addSubview:label];
         [label mas_makeConstraints:^(MASConstraintMaker *make) {
