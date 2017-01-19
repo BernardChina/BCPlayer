@@ -94,6 +94,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL           isFullScreen;
 @property (nonatomic, assign) BOOL           canFullScreen;
 @property (nonatomic, strong) UIActivityIndicatorView *actIndicator;  //加载视频时的旋转菊花
+@property (nonatomic, strong) UILabel *actIndicatorLabel; // 菊花文案
 
 @property (nonatomic, strong) MPVolumeView   *volumeView;             //音量控制控件
 @property (nonatomic, strong) UISlider       *volumeSlider;           //用这个来控制音量
@@ -230,6 +231,19 @@ typedef enum : NSUInteger {
         
         [self.downloadSession addObserver:self forKeyPath:@"downloadProgress" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
         [self.downloadSession addObserver:self forKeyPath:@"startPlay" options:NSKeyValueObservingOptionNew context:DownloadKVOContext];
+        
+        __weak __typeof(self)weakSelf = self;
+        
+        self.downloadSession.downloadFailed = ^(NSError *error, NSURLSessionTask *task, NSInteger nextTs){
+            if (error) {
+                __strong __typeof(weakSelf) strongSelf = weakSelf;
+                strongSelf.downloadFailed = YES;
+                strongSelf.nextTs= nextTs;
+                if (strongSelf.state == NBPlayerStateDefault) {
+                    [strongSelf showNetWorkPoorView];
+                }
+            }
+        };
     }
     
 }
@@ -486,10 +500,11 @@ typedef enum : NSUInteger {
             self.loadedProgress = [[change objectForKey:NSKeyValueChangeNewKey] floatValue];
             
             // 这个应该没有必要
-//            if (self.state != NBPlayerStatePlaying) {
-//                [self.actIndicator startAnimating];
-//                self.actIndicator.hidden = NO;
-//            }
+            if (self.state != NBPlayerStatePlaying) {
+                [self.actIndicator startAnimating];
+                self.actIndicator.hidden = NO;
+                self.actIndicatorLabel.text = [NSString stringWithFormat:@"缓存进度：%d%%",(int)(self.loadedProgress*100)];
+            }
             
             return;
         }
@@ -947,18 +962,26 @@ typedef enum : NSUInteger {
         _actIndicator.layer.shadowOffset = CGSizeMake(5,5);
         _actIndicator.layer.shadowOpacity = 0.5;//阴影透明度，默认0
         _actIndicator.layer.shadowRadius = 4;//阴影半径，默认3
-        UILabel *label = [[UILabel alloc] init];
-        [_actIndicator addSubview:label];
-        [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        [_actIndicator addSubview:self.actIndicatorLabel];
+        [self.actIndicatorLabel mas_makeConstraints:^(MASConstraintMaker *make) {
             make.top.equalTo(_actIndicator).offset(44);
             make.left.right.bottom.equalTo(_actIndicator);
         }];
-        [label setFont:[UIFont systemFontOfSize:12]];
-        label.textAlignment = NSTextAlignmentCenter;
-        label.textColor = [UIColor whiteColor];
-        label.text = @"正在加载, 请稍等";
+        
     }
     return _actIndicator;
+}
+
+- (UILabel *)actIndicatorLabel {
+    if (!_actIndicatorLabel) {
+        _actIndicatorLabel = [[UILabel alloc] init];
+        [_actIndicatorLabel setFont:[UIFont systemFontOfSize:12]];
+        _actIndicatorLabel.textAlignment = NSTextAlignmentCenter;
+        _actIndicatorLabel.textColor = [UIColor whiteColor];
+        _actIndicatorLabel.text = @"正在加载, 请稍等";
+    }
+    return _actIndicatorLabel;
 }
 
 - (MPVolumeView *)volumeView {
@@ -1095,7 +1118,7 @@ typedef enum : NSUInteger {
     [self.actIndicator mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerX.equalTo(self.playerView);
         make.centerY.equalTo(self.playerView);
-        make.width.mas_equalTo(100);
+        make.width.mas_equalTo(120);
         make.height.mas_equalTo(70);
     }];
     
