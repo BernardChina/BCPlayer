@@ -109,6 +109,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL downloadFailed;
 @property (nonatomic, assign) BOOL requestFailed;
 @property (nonatomic, assign) BOOL canTapTouchView;
+@property (nonatomic, assign) BOOL isRepeated;
 
 @property (nonatomic, assign) NSInteger nextTs; // 只有解析失败的时候，才会记录
 
@@ -319,7 +320,7 @@ typedef enum : NSUInteger {
     }
 }
 - (void)playWithUrl:(NSURL *)url showView:(UIView *)showView cacheType:(NBPlayerCacheType)cacheType {
-    if ([_playUrl isEqual:url]) {
+    if ([_playUrl isEqual:url] && self.player && !self.isRepeated) {
         return;
     }
     _playUrl = url;
@@ -438,6 +439,7 @@ typedef enum : NSUInteger {
     }
     
 //    self.repeatBtn.hidden = NO;
+    self.isRepeated = YES;
     self.playBtn.hidden = NO;
     [self toolViewHidden];
     self.state = NBPlayerStateFinish;
@@ -598,13 +600,14 @@ typedef enum : NSUInteger {
         
         _canFullScreen = YES;
     } else if([keyPath isEqualToString:@"rate"]) {
+        NSLog(@"当前rate：%f",self.player.rate);
         if (self.player.rate != 0) {
             NSLog(@"正在playing");
             self.canTapTouchView = YES;
-            self.state = NBPlayerStatePlaying;
+//            self.state = NBPlayerStatePlaying;
         } else {
             NSLog(@"还不能");
-            self.state = NBPlayerStateBuffering;
+//            self.state = NBPlayerStateBuffering;
         }
     }
 }
@@ -1401,7 +1404,7 @@ typedef enum : NSUInteger {
     [self.player pause];
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
         self.netWorkPoorView.hidden = YES;
-        self.downloadFailed = NO;
+//        self.downloadFailed = NO;
         
         NSLog(@"是否结束：%@",@"完成");
         
@@ -1415,10 +1418,10 @@ typedef enum : NSUInteger {
             [self.player play];
         }
         
-        if (self.downloadFailed) {
-            [self showNetWorkPoorView];
-            [self pause];
-        }
+//        if (self.downloadFailed) {
+//            [self showNetWorkPoorView];
+//            [self pause];
+//        }
         
         if (completionHandler) {
             completionHandler(finished);
@@ -1563,8 +1566,8 @@ typedef enum : NSUInteger {
     [self showToolView];
     self.repeatBtn.hidden = YES;
     [self.stopButton setSelected:NO];
-    
     [self playWithUrl:_playUrl showView:_showView cacheType:_cacheType];
+    self.isRepeated = NO;
 }
 
 - (void)startPlay {
@@ -1929,7 +1932,10 @@ typedef enum : NSUInteger {
     if (self.state == NBPlayerStateDefault) {
         [self startPlay];
     } else {
-//        [self resume];
+        if (self.state == NBPlayerStateFinish) {
+            [self repeatPlay];
+            return;
+        }
         [self resumeOrPause];
     }
     self.state = NBPlayerStatePlaying;

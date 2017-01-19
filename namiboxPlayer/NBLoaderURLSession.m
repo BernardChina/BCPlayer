@@ -191,6 +191,10 @@
 }
 
 - (void)didFailLoadingWithTask:(NBVideoRequestTask *)task withError:(NSInteger)errorCode {
+    NSLog(@"下载失败了");
+    task.loadingRequest = nil;
+    //    [self dealWithLoadingRequest:self.pendingRequests.lastObject];
+    [self processPendingRequests];
     if ([self.loaderURLSessionDelegate respondsToSelector:@selector(didFailLoadingWithTask:withError:)]) {
         [self.loaderURLSessionDelegate didFailLoadingWithTask:task withError:errorCode];
     }
