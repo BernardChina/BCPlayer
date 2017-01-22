@@ -22,7 +22,7 @@
 
 @interface NBVideoRequestTask : NSObject
 
-@property (nonatomic, copy) NSString *playCachePath;
+@property (nonatomic, strong) NSString *playCachePath;
 @property (nonatomic, strong) NSURL         *url;
 @property (nonatomic, readonly)         NSUInteger    offset;
 

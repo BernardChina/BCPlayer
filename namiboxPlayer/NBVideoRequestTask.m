@@ -38,13 +38,11 @@
         _taskArr = [NSMutableArray array];
         _tempPath = [cachePathForVideo stringByAppendingPathComponent:@"temp.mp4"];
         
-        if ([[NSFileManager defaultManager] fileExistsAtPath:_tempPath]) {
-            [[NSFileManager defaultManager] removeItemAtPath:_tempPath error:nil];
-            [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
-            
-        } else {
-            [[NSFileManager defaultManager] createFileAtPath:_tempPath contents:nil attributes:nil];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:self.tempPath]) {
+            [[NSFileManager defaultManager] removeItemAtPath:self.tempPath error:nil];
         }
+        
+        [[NSFileManager defaultManager] createFileAtPath:self.tempPath contents:nil attributes:nil];
         
     }
     return self;
@@ -125,6 +123,9 @@
     
     NSLog(@"%@",@"重置taskarr session");
     
+    if (self.fileHandle) {
+        [self.fileHandle closeFile];
+    }
     self.fileHandle = [NSFileHandle fileHandleForWritingAtPath:_tempPath];
     
     completionHandler(NSURLSessionResponseAllow);

@@ -20,7 +20,7 @@
 
 @interface NBLoaderURLSession : NSURLSession <AVAssetResourceLoaderDelegate>
 
-@property (nonatomic, copy) NSString *playCachePath;
+@property (nonatomic, strong) NSString *playCachePath;
 @property (nonatomic, strong) NBVideoRequestTask *task;
 @property (nonatomic, weak  ) id<NBLoaderURLSessionDelegate> loaderURLSessionDelegate;
 @property (nonatomic, assign) BOOL isDrag;

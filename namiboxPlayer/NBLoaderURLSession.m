@@ -202,6 +202,10 @@
 
 - (void)dealloc {
     NSLog(@"NBLoaderURLSession dealloc");
+    [self.pendingRequests removeAllObjects];
+    self.pendingRequests = nil;
+//    self.videoPath = nil;
+    self.playCachePath = nil;
     [self.task cancel];
     self.task = nil;
 }
