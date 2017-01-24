@@ -651,9 +651,6 @@ typedef enum : NSUInteger {
         
         // playerItem.currentTime. 返回项目的当前时间
         double current = (double)playerItem.currentTime.value / (double)playerItem.currentTime.timescale;
-        if (_current > current) {
-            return;
-        }
         _current = current;
         
         // 通知外面接受到播放信息
@@ -1432,7 +1429,6 @@ typedef enum : NSUInteger {
     [self.player pause];
     [self.player seekToTime:CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC) completionHandler:^(BOOL finished) {
         self.netWorkPoorView.hidden = YES;
-//        self.downloadFailed = NO;
         
         NSLog(@"是否结束：%@",@"完成");
         
@@ -1445,11 +1441,6 @@ typedef enum : NSUInteger {
             self.isPauseByUser = NO;
             [self.player play];
         }
-        
-//        if (self.downloadFailed) {
-//            [self showNetWorkPoorView];
-//            [self pause];
-//        }
         
         if (completionHandler) {
             completionHandler(finished);
