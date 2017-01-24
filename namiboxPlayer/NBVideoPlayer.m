@@ -1226,6 +1226,12 @@ typedef enum : NSUInteger {
 
 - (void)tapRefresh:(UITapGestureRecognizer *)tap {
     [self hideNetWorkPoorView];
+    if (_cacheType == NBPlayerCacheTypePlayAfterCache) {
+        if (self.downloadSession) {
+            [self.downloadSession refreshDownload];
+        }
+        return;
+    }
     
     if (self.state == NBPlayerStateFailed) {
         if (self.requestFailed) {

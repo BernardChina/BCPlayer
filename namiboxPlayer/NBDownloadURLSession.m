@@ -24,6 +24,7 @@ static NSInteger sPlayAfterCacheCount = 10;
 
 @property (nonatomic, strong) NSString *errorUrlString; // 下载失败的url
 @property (nonatomic, assign) int retryCount;   // 重试下载次数
+@property (nonatomic, strong) NSError *error;
 
 @end
 
@@ -118,8 +119,11 @@ static NSInteger sPlayAfterCacheCount = 10;
 
 // Handle task completion
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    self.error = nil;
+    
     if (error) {
         NSLog(@"Task %@ failed: %@", task, error);
+        self.error = error;
         if (![self.errorUrlString isEqualToString:task.currentRequest.URL.absoluteString]) {
             self.retryCount = 0;
         }
@@ -194,6 +198,15 @@ static NSInteger sPlayAfterCacheCount = 10;
             
             return;
         }
+    }
+}
+
+- (void)refreshDownload {
+    self.retryCount = 0;
+    NSData *data = self.error.userInfo[@"NSURLSessionDownloadTaskResumeData"];
+    if (data) {
+        NSURLSessionDownloadTask * downloadTask=[_session downloadTaskWithResumeData:data];
+        [downloadTask resume];
     }
 }
 

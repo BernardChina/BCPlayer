@@ -46,4 +46,6 @@ typedef void(^downloadFailed)(NSError *error, NSURLSessionTask *task, NSInteger 
 
 - (void)addDownloadTask:(NSString *)playUrl withIndex:(NSInteger)index;
 
+- (void)refreshDownload;
+
 @end
