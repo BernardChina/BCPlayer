@@ -772,6 +772,11 @@ typedef enum : NSUInteger {
 }
 
 - (void)setState:(NBPlayerState)state {
+    if (state == NBPlayerStatePause || state == NBPlayerStateFinish) {
+        self.playBtn.hidden = NO;
+    } else {
+        self.playBtn.hidden = YES;
+    }
     if (state != NBPlayerStateBuffering) {
         [self.actIndicator stopAnimating];
         self.actIndicator.hidden = YES;

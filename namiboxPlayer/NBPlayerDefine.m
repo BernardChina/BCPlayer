@@ -13,18 +13,19 @@ NSString *saveCachePathForVideo(NSString *url) {
     NSURLComponents *components = [[NSURLComponents alloc] initWithURL:[NSURL URLWithString:url] resolvingAgainstBaseURL:NO];
     components.scheme = @"streaming";
     NSURL *playUrl = [components URL];
+    NSString *key = [NSString stringWithFormat:@"%@%ld",[playUrl absoluteString],(long)currentCacheType];
     NSString *md5File = @"";
     if (isHLS) {
-        md5File = [NSString stringWithFormat:@"%@.m3u8", [[playUrl absoluteString] stringToMD5]];
+        md5File = [NSString stringWithFormat:@"%@.m3u8", [key stringToMD5]];
     } else {
-        md5File = [NSString stringWithFormat:@"%@.mp4", [[playUrl absoluteString] stringToMD5]];
+        md5File = [NSString stringWithFormat:@"%@.mp4", [key stringToMD5]];
     }
     
     cacheVieoName = md5File;
     
     //这里自己写需要保存数据的路径
     NSString *document = [[NBPlayerEnvironment defaultEnvironment] cachePath];
-    NSString *tempPath = [document stringByAppendingString:[NSString stringWithFormat:@"/%@",[[playUrl absoluteString] stringToMD5]]];
+    NSString *tempPath = [document stringByAppendingString:[NSString stringWithFormat:@"/%@",[key stringToMD5]]];
     
     BOOL isDir;
     BOOL isExist = [[NSFileManager defaultManager] fileExistsAtPath:tempPath isDirectory:&isDir];
