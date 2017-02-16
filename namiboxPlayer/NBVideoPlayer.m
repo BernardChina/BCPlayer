@@ -364,6 +364,8 @@ typedef enum : NSUInteger {
     
     [self setVideoToolView];
     
+    [self toolViewHidden];
+    
     // 支持hls
     if (isHLS) {
         [self playHLSWithUrl:url];
@@ -543,15 +545,11 @@ typedef enum : NSUInteger {
         if ([playerItem status] == AVPlayerStatusReadyToPlay) {
             NSLog(@"AVPlayerStatusReadyToPlay");
             
-            [self createTimer];
+            [self showToolView];
+            
             [self monitoringPlayback:playerItem];// 给播放器添加计时器
             
-//            if (self.autoPlay && self.state != NBPlayerStatePause) {
-//                [self.player play];
-//                self.state = NBPlayerStatePlaying;
-//            } else {
-//                self.playBtn.hidden = NO;
-//            }
+            self.canTapTouchView = YES;
             
         } else if ([playerItem status] == AVPlayerStatusFailed || [playerItem status] == AVPlayerStatusUnknown) {
             [self stop];
@@ -576,15 +574,6 @@ typedef enum : NSUInteger {
         if (playerItem.isPlaybackBufferEmpty) {
             NSLog(@"%@",@"NBVideoPlayerItemPlaybackBufferEmptyKeyPath");
             self.state = NBPlayerStateBuffering;
-//            [self.stopButton setSelected:YES];
-            
-//            if (self.downloadFailed) {
-//                [self.player pause];
-//                [self.actIndicator stopAnimating];
-//                self.actIndicator.hidden = YES;
-//                [self showNetWorkPoorView];
-//                return;
-//            }
             
             [self bufferingSomeSecond];
         }
@@ -615,14 +604,12 @@ typedef enum : NSUInteger {
         
         _canFullScreen = YES;
     } else if([keyPath isEqualToString:@"rate"]) {
-        NSLog(@"当前rate：%f",self.player.rate);
+//        NSLog(@"当前rate：%f",self.player.rate);
         if (self.player.rate != 0) {
             NSLog(@"正在playing");
-            self.canTapTouchView = YES;
-//            self.state = NBPlayerStatePlaying;
+//            self.canTapTouchView = YES;
         } else {
             NSLog(@"还不能");
-//            self.state = NBPlayerStateBuffering;
         }
     }
 }
@@ -708,17 +695,6 @@ typedef enum : NSUInteger {
         self.duration = durationWithHLS;
     }
     
-    if (playerItem.isPlaybackLikelyToKeepUp) {
-        NSLog(@"可以播放");
-    }
-    
-    NSLog(@"%lld %d",playerItem.currentTime.value/playerItem.currentTime.timescale,(int)timeInterval);
-    if (_current < timeInterval) {
-//        [_player play];
-//        NSLog(@"可以播放");
-    } else {
-        NSLog(@"不可以播放了");
-    }
     self.loadedProgress = timeInterval / totalDuration;
     [self.videoProgressView setProgress:timeInterval / totalDuration animated:NO];
 }
@@ -1230,22 +1206,33 @@ typedef enum : NSUInteger {
 }
 
 - (void)tapRefresh:(UITapGestureRecognizer *)tap {
+    
     [self hideNetWorkPoorView];
+    
     if (_cacheType == NBPlayerCacheTypePlayAfterCache) {
         if (self.downloadSession) {
             [self.downloadSession refreshDownload];
         }
         return;
     }
-    
+    NSLog(@"tapRefresh state :%ld",(long)self.state);
     if (self.state == NBPlayerStateFailed) {
         if (self.requestFailed) {
+            NSLog(@"错了错了，重试");
             [self.resouerLoader.task continueLoading];
             return;
         }
-        [self playWithNoCache:_playUrl];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:self.cachePath]) {
+            NSLog(@"删除了删除了");
+            [[NSFileManager defaultManager] removeItemAtPath:self.cachePath error:nil];
+        }
+        NSLog(@"重试了重试了");
+        [self playWithUrl:_playUrl showView:_showView cacheType:_cacheType];
         return;
     }
+    
+    
     if (isHLS) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self.m3u8Handler refreshTask:self.nextTs completeWithError:^(NSError *error, NSInteger nextTs) {
@@ -1563,6 +1550,11 @@ typedef enum : NSUInteger {
     if (!self.currentPlayerItem) {
         return;
     }
+    
+    if (self.player.rate == 1) {
+        self.state = NBPlayerStatePlaying;
+    }
+    
     self.isPauseByUser = NO;
     
     if (self.state == NBPlayerStatePlaying ) {
@@ -1575,7 +1567,7 @@ typedef enum : NSUInteger {
         self.repeatBtn.hidden = YES;
         [self.stopButton setSelected:NO];
         [self.player play];
-        self.state = NBPlayerStatePlaying;
+//        self.state = NBPlayerStatePlaying;
         self.playBtn.hidden = YES;
     } else if (self.state == NBPlayerStateFinish) {
         self.repeatBtn.hidden = YES;
@@ -1593,7 +1585,7 @@ typedef enum : NSUInteger {
  */
 - (void)repeatPlay {
     _current = 0;
-    [self showToolView];
+//    [self showToolView];
     self.repeatBtn.hidden = YES;
     [self.stopButton setSelected:NO];
     [self playWithUrl:_playUrl showView:_showView cacheType:_cacheType];
@@ -1717,6 +1709,7 @@ typedef enum : NSUInteger {
     self.downloadFailed = YES;
     self.actIndicator.hidden = YES;
     [self.actIndicator stopAnimating];
+    self.state = NBPlayerStateFailed;
 }
 
 - (void)hideNetWorkPoorView {
@@ -1851,7 +1844,9 @@ typedef enum : NSUInteger {
 #pragma mark - NBLoaderURLSessionDelegate
 
 - (void)didFinishLoadingWithTask:(NBVideoRequestTask *)task {
-    
+    if (self.state != NBPlayerStatePause) {
+        [self.player play];
+    }
 }
 
 //网络中断：-1005
@@ -1884,8 +1879,11 @@ typedef enum : NSUInteger {
     self.downloadFailed = YES;
     self.requestFailed = YES;
     self.errorLabel.text = str;
-    if (self.state == NBPlayerStateDefault || self.state == NBPlayerStateBuffering) {
+    if (self.state == NBPlayerStateDefault || self.state == NBPlayerStateBuffering || self.state == NBPlayerStateFailed) {
         [self showNetWorkPoorView];
+    } else {
+        // 失败了，还要继续尝试播放。
+        [self.player play];
     }
     NSLog(@"失败了失败了%@", str);
 }
@@ -1968,9 +1966,9 @@ typedef enum : NSUInteger {
         }
         [self resumeOrPause];
     }
-    self.state = NBPlayerStatePlaying;
-    
-    [self showToolView];
+//    self.state = NBPlayerStatePlaying;
+//    
+//    [self showToolView];
 }
 
 - (void)makePalyerMute:(BOOL)isMute {

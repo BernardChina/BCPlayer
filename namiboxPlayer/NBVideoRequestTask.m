@@ -219,7 +219,10 @@
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[actualURLComponents URL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
     
-    [request addValue:[NSString stringWithFormat:@"bytes=%ld-%ld",(unsigned long)_downLoadingOffset, (unsigned long)self.videoLength - 1] forHTTPHeaderField:@"Range"];
+    if (_offset > 0 && self.videoLength > 0) {
+        [request addValue:[NSString stringWithFormat:@"bytes=%ld-%ld",(unsigned long)_offset, (unsigned long)self.videoLength - 1] forHTTPHeaderField:@"Range"];
+    }
+    
     
     [self.session invalidateAndCancel];
     self.session = nil;

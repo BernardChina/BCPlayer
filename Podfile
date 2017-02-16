@@ -6,6 +6,7 @@ target 'namiboxVideo' do
   # use_frameworks!
   pod 'Masonry'
   pod 'FBMemoryProfiler'
+  pod 'MLeaksFinder'
 
   # Pods for namiboxVideo
 
